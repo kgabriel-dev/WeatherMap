@@ -9,15 +9,13 @@ import os
 from datetime import datetime
 
 
-def retreive_and_handle_data(data_retreiver, log_text, start_date, last_date, lat, lon, size, resolution):
+def retreive_and_handle_data(data_retreiver, log_text, finished_callback, start_date, last_date, lat, lon, size, resolution):
     weather_data = {}
     searched_locations = 0
     number_of_size_steps = math.ceil(size / resolution)
 
     negative_offset = -math.ceil(number_of_size_steps // 2)
     positive_offset = math.ceil(number_of_size_steps // 2)
-
-    print(f"Negative offset: {negative_offset}, Positive offset: {positive_offset}, Number of size steps: {number_of_size_steps}")
 
     for lat_index in range(number_of_size_steps):
         for lon_index in range(number_of_size_steps):
@@ -32,7 +30,7 @@ def retreive_and_handle_data(data_retreiver, log_text, start_date, last_date, la
 
             searched_locations += 1
 
-            log_text(f"Lade Wetterdaten für {latitude}, {longitude} ({searched_locations}/{number_of_size_steps ** 2})...")
+            log_text(f"Lade Wetterdaten für ({latitude}, {longitude}) (Pos. {searched_locations} von {number_of_size_steps ** 2})")
 
             data = data_retreiver.get_weather(start_date.isoformat(), last_date.isoformat(), latitude, longitude)
             
@@ -76,11 +74,14 @@ def retreive_and_handle_data(data_retreiver, log_text, start_date, last_date, la
     y_labels = [round(y, 2) for y in y_labels]
     y_labels.reverse()
 
-    colors = [(0, 0, 1, a) for a in np.linspace(0, 0.8, 100)]
+    color_clear = np.array([1, 1, 1, 0.8])
+    color_clouds = np.array([0, 0, 1, 0.8])
+    color_vector = color_clouds - color_clear
+    colors = [color_clear + (color_vector * i) for i in np.linspace(0, 1, 256)]
     cmap = mpl.colors.LinearSegmentedColormap.from_list('custom', colors)
 
     for figure_index in range(number_of_keys):
-        log_text(f"Erstelle Bild {figure_index + 1}/{number_of_keys}...")
+        log_text(f"Erstelle Wetterbild {figure_index + 1} von {number_of_keys}...")
 
         entry = list(clouds_cover_over_time.keys())[figure_index]
         data = clouds_cover_over_time[entry]
@@ -113,3 +114,5 @@ def retreive_and_handle_data(data_retreiver, log_text, start_date, last_date, la
         plt.savefig(f'data/clouds_{figure_index}.png', dpi=150, transparent=False, format='png', bbox_inches='tight', pad_inches=0.1)
     
     plt.close('all')
+
+    finished_callback()

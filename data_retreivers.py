@@ -23,6 +23,10 @@ class BrightSky:
         
         request = requests.get(url)
 
+        if(request.status_code != 200):
+            print(f"Error: {request.status_code}")
+            return []
+
         json = request.json()
 
         forecast = []
@@ -85,7 +89,6 @@ class ClearOutside:
                     break
 
                 element = soup.select_one(f"div#day_{d} div.fc_hours.fc_hour_ratings > ul > li:nth-child({h+1}) > span:nth-child(2)")
-                print(element)
                 text_value = element.text.strip()
                 
                 numeric_value = self.condition_values.get(text_value, None)
