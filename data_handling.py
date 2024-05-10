@@ -7,6 +7,7 @@ import matplotlib as mpl
 import numpy as np
 import os
 from datetime import datetime
+import sys
 
 
 def retreive_and_handle_data(data_retreiver, log_text, finished_callback, start_date, last_date, lat, lon, size, number_of_size_steps):
@@ -15,9 +16,6 @@ def retreive_and_handle_data(data_retreiver, log_text, finished_callback, start_
     lat_size, lon_size = size
     lat_resolution = lat_size / number_of_size_steps
     lon_resolution = lon_size / number_of_size_steps
-
-    lat_lon_ratio = lat_resolution / lon_resolution
-    print(lat_lon_ratio)
 
     negative_offset = -math.ceil(number_of_size_steps // 2)
     positive_offset = math.ceil(number_of_size_steps // 2)
@@ -72,7 +70,9 @@ def retreive_and_handle_data(data_retreiver, log_text, finished_callback, start_
 
 
     log_text("Lese Karte ein...")
-    worldmap = geopandas.read_file('./shapefiles/gadm41_DEU_2.shp')
+
+    bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+    worldmap = geopandas.read_file(os.path.join(bundle_dir, 'shapefiles/gadm41_DEU_2.shp'))
     worldmap.crs = "EPSG:4326"
 
     number_of_keys = len(clouds_cover_over_time.keys())
@@ -83,13 +83,14 @@ def retreive_and_handle_data(data_retreiver, log_text, finished_callback, start_
     y_labels = [round(y, 2) for y in y_labels]
     y_labels.reverse()
 
-    print(x_labels, y_labels)
-
     color_clear = np.array([1, 1, 1, 0.8])
     color_clouds = np.array([0, 0, 1, 0.8])
     color_vector = color_clouds - color_clear
     colors = [color_clear + (color_vector * i) for i in np.linspace(0, 1, 256)]
     cmap = mpl.colors.LinearSegmentedColormap.from_list('custom', colors)
+
+    # create folder if not exists
+    os.makedirs('data/originals', exist_ok=True)
 
     for figure_index in range(number_of_keys):
         log_text(f"Erstelle Wetterbild {figure_index + 1} von {number_of_keys}...")

@@ -103,6 +103,4 @@ class ClearOutside:
                     'cloud_cover': numeric_value
                 })
 
-                pprint.pprint(forecast[-1])
-
         return forecast
