@@ -6,11 +6,25 @@ from data_handling import retreive_and_handle_data
 from data_retreivers import BrightSky, ClearOutside
 from threading import Thread
 import math
+import PIL.Image
+import sys
 
 
 global_log_text = ""
 thread = None
 number_of_images = 0
+screen_factor = 1.0
+
+default_values = {
+    'forecast_length': 12,
+    'latitude': 54.10,
+    'longitude': 12.11,
+    'source': 'BrightSky (DWD)',
+    'size': 80.0,
+    'resolution': 8
+}
+
+auto_start_data_retreival = False
 
 
 def set_log_text(text):
@@ -19,42 +33,59 @@ def set_log_text(text):
 
 
 def finish_thread():
-    global global_log_text, thread, number_of_images
+    global global_log_text, thread, number_of_images, screen_factor
     global_log_text = "Berechnungen abgeschlossen."
-    thread = None
+    
+
+    set_log_text("Entferne alte Bilder...")
+    for image_name in os.listdir('data'):
+        if image_name.startswith('clouds_'):
+            os.remove(os.path.join('data', image_name))
+
+    set_log_text("Bilder werden skaliert...")
+    for image_name in os.listdir('data/originals'):
+        if image_name.startswith('clouds_'):
+            image = PIL.Image.open(os.path.join('data/originals', image_name))
+            image = image.resize((int(image.width * screen_factor), int(image.height * screen_factor)), PIL.Image.LANCZOS)
+            image.save(os.path.join('data', image_name))
+    
+    set_log_text("Alles erledigt.")
     number_of_images = len([name for name in os.listdir('data') if name.startswith('clouds_')])
+    thread = None
 
 
 def create_layout():
+    global screen_factor
+
     settings = [
         sg.Push(),
         sg.Text("Vorschau (h):"),
-        sg.Input(key='forecast_length', size=(7,1), default_text='12'),
+        sg.Input(key='forecast_length', size=(7,1), default_text=str(default_values['forecast_length'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
         sg.Text("Breitengrad:"),
-        sg.Input(key='latitude', size=(7,1), default_text='54.10'),
+        sg.Input(key='latitude', size=(7,1), default_text=str(default_values['latitude'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
         sg.Text("Längengrad:"),
-        sg.Input(key='longitude', size=(7,1), default_text='12.11'),
+        sg.Input(key='longitude', size=(7,1), default_text=str(default_values['longitude'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
         sg.Text("Quelle:"),
-        sg.Combo(['BrightSky (DWD)', 'ClearOutside'], key='source', default_value='BrightSky (DWD)', size=(15,1), readonly=True),
+        sg.Combo(['BrightSky (DWD)', 'ClearOutside'], key='source', default_value=str(default_values['source']), size=(15,1), readonly=True),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
         sg.Text("Größe (km):"),
-        sg.Input(key='size', size=(6,1), default_text='80.0'),
+        sg.Input(key='size', size=(6,1), default_text=str(default_values['size'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
         sg.Text("Auflösung:"),
-        sg.Input(key='resolution', size=(4,1), default_text='8'),
+        sg.Input(key='resolution', size=(4,1), default_text=str(default_values['resolution'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
@@ -73,7 +104,11 @@ def create_layout():
         settings,
         [sg.HSeparator()],
         [sg.VPush()],
-        [sg.Push(), sg.Image(key='forecast_image'), sg.Push()],
+        [
+            sg.Push(),
+            sg.Image(key='forecast_image', size=(801 * screen_factor, 743 * screen_factor)),
+            sg.Push()
+        ],
         [sg.VPush()],
         [sg.HSeparator()],
         animation,
@@ -85,21 +120,38 @@ def create_layout():
 
 
 def run_gui():
-    global thread, global_log_text, number_of_images
+    global thread, global_log_text, number_of_images, screen_factor, auto_start_data_retreival
 
     number_of_images = len([name for name in os.listdir('data') if name.startswith('clouds_')])
 
-    window = sg.Window('WeatherMap', create_layout(), finalize=True)
+    window = sg.Window('WeatherMap', create_layout(), finalize=True, resizable=True)
     window.maximize()
+
+    window.bind('<Configure>', 'Configure')
     window['index_slider'].bind('<ButtonRelease-1>', 'index_slider')
 
     image_index = 0
+    window_height = window.size[1]
 
     while True:
         event, values = window.read(timeout=500)
 
         if values is None:
             break
+
+        if event == 'Configure':
+            window_height = window.size[1]
+            
+            new_screen_factor = round((window_height - 30) / 1080, 1)
+            
+            if screen_factor != new_screen_factor:
+                screen_factor = new_screen_factor
+            
+                for image_name in os.listdir('data/originals'):
+                    if image_name.startswith('clouds_'):
+                        image = PIL.Image.open(os.path.join('data/originals', image_name))
+                        image = image.resize((int(image.width * screen_factor), int(image.height * screen_factor)), PIL.Image.LANCZOS)
+                        image.save(os.path.join('data', image_name))
 
         window['log_text'].update(global_log_text)
 
@@ -119,32 +171,32 @@ def run_gui():
 
                 image_index = (image_index + 1) % number_of_images
 
-        if event == 'calculate_button' and thread is None:
-            if thread is None:
-                forecast_length = int(values['forecast_length'])
-                longitude = float(values['longitude'])
-                latitude = float(values['latitude'])
-                
-                # convert size from km to degrees
-                size_km = float(values['size'])
-                size_lat = size_km / 110.57
-                size_lon = size_km / (111.32 * math.cos(math.radians(latitude)))
+        if (event == 'calculate_button' or auto_start_data_retreival is True) and thread is None:
+            auto_start_data_retreival = False
+            forecast_length = int(values['forecast_length'])
+            longitude = float(values['longitude'])
+            latitude = float(values['latitude'])
+            
+            # convert size from km to degrees
+            size_km = float(values['size'])
+            size_lat = size_km / 110.57
+            size_lon = size_km / (111.32 * math.cos(math.radians(latitude)))
 
-                resolution = int(values['resolution'])
+            resolution = int(values['resolution'])
 
-                start_date = datetime.now(pytz.timezone('Europe/Berlin'))
-                last_date = start_date + timedelta(hours=forecast_length)
+            start_date = datetime.now(pytz.timezone('Europe/Berlin'))
+            last_date = start_date + timedelta(hours=forecast_length)
 
-                if values['source'] == 'BrightSky (DWD)':
-                    thread = Thread(target=retreive_and_handle_data, args=(BrightSky(), set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution))
+            if values['source'] == 'BrightSky (DWD)':
+                thread = Thread(target=retreive_and_handle_data, args=(BrightSky(), set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution))
 
-                    window['forecast_image'].update(filename=None, size=(801, 743))
-                    window['index_slider'].update(range=(0,1), value=0)
+                window['forecast_image'].update(filename=None)
+                window['index_slider'].update(range=(0,1), value=0)
 
-                    thread.start()
-                elif values['source'] == 'ClearOutside':
-                    thread = Thread(target=retreive_and_handle_data, args=(ClearOutside(), set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution))
-                    thread.start()
+                thread.start()
+            elif values['source'] == 'ClearOutside':
+                thread = Thread(target=retreive_and_handle_data, args=(ClearOutside(), set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution))
+                thread.start()
 
     # wait for the thread to finish
     if thread is not None:
@@ -156,7 +208,18 @@ def run_gui():
     for file in os.listdir('data'):
         if file.startswith('clouds_'):
             os.remove(os.path.join('data', file))
+    for file in os.listdir('data/originals'):
+        if file.startswith('clouds_'):
+            os.remove(os.path.join('data/originals', file))
 
 
 if __name__ == '__main__':
+    args = sys.argv[1:]
+
+    if '--test' in args:
+        default_values['forecast_length'] = 2
+        default_values['resolution'] = 3
+        default_values['size'] = 90.0
+        auto_start_data_retreival = True
+
     run_gui()

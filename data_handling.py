@@ -121,7 +121,7 @@ def retreive_and_handle_data(data_retreiver, log_text, finished_callback, start_
         ax.set_xlim(min(x) - lon_resolution, max(x) + lon_resolution)
         fig.colorbar(c, ax=ax, orientation='vertical', label='Bewölkung in %')
 
-        plt.savefig(f'data/clouds_{figure_index}.png', dpi=150, transparent=False, format='png', bbox_inches='tight', pad_inches=0.1)
+        plt.savefig(f'data/originals/clouds_{figure_index}.png', dpi=150, transparent=False, format='png', bbox_inches='tight', pad_inches=0.1)
         plt.close(fig)
 
     finished_callback()
