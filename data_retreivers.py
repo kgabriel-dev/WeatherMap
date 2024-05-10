@@ -46,12 +46,12 @@ class ClearOutside:
         self.web_url = "https://clearoutside.com/forecast/{lat}/{lon}?view=midnight"
         self.min_value = 0
         self.max_value = 2
-        self.request_delay = 3
+        self.request_delay = 1
 
         self.condition_values = {
-            'Good': 2,
+            'Good': 0,
             'OK': 1,
-            'Bad': 0
+            'Bad': 2
         }
     
 
@@ -73,6 +73,11 @@ class ClearOutside:
         url = self.web_url.format(lat=lat, lon=lon)
 
         request = requests.get(url)
+
+        if(request.status_code != 200):
+            print(f"Error: {request.status_code}")
+            return []
+
         data = request.text
         soup = BeautifulSoup(data, 'html.parser')
 
