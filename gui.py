@@ -3,7 +3,7 @@ import os
 from datetime import datetime, timedelta
 import pytz
 from data_handling import retreive_and_handle_data
-from data_retreivers import BrightSky, ClearOutside
+from data_retreivers import BrightSky
 from threading import Thread
 import math
 import PIL.Image
@@ -72,7 +72,7 @@ def create_layout():
         sg.VSeparator(),
         sg.Push(),
         sg.Text("Quelle:"),
-        sg.Combo(['BrightSky (DWD)', 'ClearOutside'], key='source', default_value=str(default_values['source']), size=(15,1), readonly=True),
+        sg.Combo(['BrightSky (DWD)'], key='source', default_value=str(default_values['source']), size=(15,1), readonly=True),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
@@ -209,9 +209,6 @@ def run_gui():
                 window['forecast_image'].update(filename=None)
                 window['index_slider'].update(range=(0,1), value=0)
 
-                thread.start()
-            elif values['source'] == 'ClearOutside':
-                thread = Thread(target=retreive_and_handle_data, args=(ClearOutside(), data_directory, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution))
                 thread.start()
 
     # wait for the thread to finish
