@@ -3,54 +3,50 @@
 <hr>
 
 <div align="center">
-<p style="font-size: 18pt">What is this project about?</p>
-<p>Designed for astronomy and astrophotography enthusiasts, this project visualizes precise weather conditions across selected regions, aiding in the planning of ideal observational activities.</p>
+
+## What is this project about?
+Designed for astronomy and astrophotography enthusiasts, this project visualizes precise weather conditions across selected regions, aiding in the planning of ideal observational activities.
 
 <br>
 
-<p style="font-size: 18pt">Project Screenshot</p>
+## Project Screenshot
 <img src="README/AppScreenshot.png" alt="project-screenshot" width="75%">
 
 <br>
 
-<p style="font-size: 18pt">Features</p>
-<ul style="display: inline-block; text-align: left">
-    <li>Visualize weather data</li>
-    <li>Choose between different data sources</li>
-    <li>Check the weather conditions at different locations</li>
-</ul>
+## Features
+Visualize weather data
+Choose between different data sources
+Check the weather conditions at different locations
 
 <br>
 
-<p style="font-size: 18pt">How to run this project?</p>
-<p>There are two ways to run this project:</p>
-<ol style="display: inline-block; text-align: left">
-    <li>Install it using an installer</li>
-    <li>Build it yourself from this repository</li>
-</ol>
+## How to run this project
+There are two ways to run this project:
+
+Install it using the installer <br />
+or <br />
+Build it yourself from the code of this repository <br />
 
 <br>
 
-If you want to run the project locally, follow these steps:
-<ol style="display: inline-block; text-align: left">
-    <li>Download the latest installer from the <a href="https://github.com/kgabriel-dev/WeatherMap/releases">releases page</a></li>
-    <li>Run the installer and follow the installation instructions</li>
-    <li>Open the installed application</li>
-</ol>
+### If you want to run the project locally, follow these steps:
+Download the latest installer from the <a href="https://github.com/kgabriel-dev/WeatherMap/releases">releases page</a> <br />
+Run the installer and follow the installation instructions <br />
+Open the installed application
 
 <br>
 
-To build the project from this repository, follow these steps:
-<ol style="display: inline-block; text-align: left">
-    <li>Make sure you have Python 3.10 installed on your machine</li>
-    <li>Clone this repository using "git clone https://github.com/kgabriel-dev/WeatherMap.git"</li>
-    <li>Install all package dependencies using "pip install -r requirements.txt"</li>
-    <li>Run the application using "python gui.py"</li>
-</ol>
+### To build the project from this repository, follow these steps:
+Make sure you have Python 3.10 installed on your machine <br />
+Clone this repository using `git clone https://github.com/kgabriel-dev/WeatherMap.git` <br />
+Install all package dependencies using `pip install -r requirements.txt` <br />
+Run the application using `python gui.py` <br />
+
 
 <br>
 
-<p style="font-size: 18pt">How to contribute to this project?</p>
-<p>Contributions are always welcome! Feel free to open an issue on <a href="https://github.com/kgabriel-dev/WeatherMap/issues">the issues page</a> or submit a pull request if you have any suggestions or improvements to this project.</p>
+## How to contribute?
+Contributions are always welcome! Feel free to open an issue on <a href="https://github.com/kgabriel-dev/WeatherMap/issues">the issues page</a> or submit a pull request if you have any suggestions or improvements to this project.
 <div>
 
