@@ -229,8 +229,8 @@ if __name__ == '__main__':
 
     if '--test' in args:
         default_values['forecast_length'] = 2
-        default_values['resolution'] = 3
-        default_values['size'] = 90.0
+        default_values['resolution'] = 2
+        default_values['size'] = 150.0
         auto_start_data_retreival = True
 
     run_gui()

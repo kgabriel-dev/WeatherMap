@@ -75,9 +75,9 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
     log_text("Lese Karte ein...")
 
     bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
-    worldmap = geopandas.read_file(os.path.join(bundle_dir, 'shapefiles/gadm41_DEU_2.shp'))
-    worldmap.crs = "EPSG:4326"
-
+    states = geopandas.read_file(os.path.join(bundle_dir, 'shapefiles/ne_10m_admin_1_states_provinces_lines.shp'), engine="pyogrio")
+    countries = geopandas.read_file(os.path.join(bundle_dir, 'shapefiles/ne_10m_admin_0_countries.shp'), engine="pyogrio")
+    
     number_of_keys = len(clouds_cover_over_time.keys())
 
     x_labels = [lon + ((negative_offset + x) * lon_resolution) for x in range(number_of_size_steps)]
@@ -97,13 +97,14 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
 
     for figure_index in range(number_of_keys):
         log_text(f"Erstelle Wetterbild {figure_index + 1} von {number_of_keys}...")
+        
+        fig, ax = plt.subplots(figsize=(6,6))
+        ax.set_aspect(lon_resolution/lat_resolution)
+        countries.plot(ax = ax, color='#b8e864', edgecolor='black', zorder=1, aspect=lon_resolution/lat_resolution)
+        states.plot(ax = ax, color=None, edgecolor='black', linewidth=0.5, zorder=2, aspect=lon_resolution/lat_resolution)
 
         entry = list(clouds_cover_over_time.keys())[figure_index]
         data = clouds_cover_over_time[entry]
-        
-        fig, ax = plt.subplots(figsize=(6,6))
-        worldmap.plot(ax = ax, color='#b8e864', edgecolor='black')
-
         df = pd.DataFrame(data, columns=x_labels, index=y_labels)
 
         x = df.columns
@@ -116,7 +117,8 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
             cmap=cmap,
             shading='auto',
             vmin=data_retreiver.min_value,
-            vmax=data_retreiver.max_value
+            vmax=data_retreiver.max_value,
+            zorder=10
         )
         start_date_iso = datetime.fromisoformat(entry)
 
