@@ -39,11 +39,14 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
             
             for entry in data:
                 timestamp = entry['timestamp']
-                cloud_coverage = entry['cloud_cover']
 
                 if not timestamp in weather_data:
                     weather_data[timestamp] = {}
-                
+
+                if entry['error'] is True:
+                    weather_data[timestamp][(latitude, longitude)] = None
+
+                cloud_coverage = entry['cloud_cover']
                 weather_data[timestamp][(latitude, longitude)] = cloud_coverage
         
             if(data_retreiver.request_delay >= 1):

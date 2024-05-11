@@ -3,7 +3,7 @@ import os
 from datetime import datetime, timedelta
 import pytz
 from data_handling import retreive_and_handle_data
-from data_retreivers import BrightSky
+from data_retreivers import BrightSky, OpenMeteo
 from threading import Thread
 import math
 import PIL.Image
@@ -22,7 +22,7 @@ default_values = {
     'forecast_length': 12,
     'latitude': 54.10,
     'longitude': 12.11,
-    'source': 'BrightSky (DWD)',
+    'source': 'OpenMeteo',
     'size': 80.0,
     'resolution': 8
 }
@@ -72,7 +72,7 @@ def create_layout():
         sg.VSeparator(),
         sg.Push(),
         sg.Text("Quelle:"),
-        sg.Combo(['BrightSky (DWD)'], key='source', default_value=str(default_values['source']), size=(15,1), readonly=True),
+        sg.Combo(['OpenMeteo', 'BrightSky (DWD)'], key='source', default_value=str(default_values['source']), size=(15,1), readonly=True),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
@@ -205,6 +205,14 @@ def run_gui():
 
             if values['source'] == 'BrightSky (DWD)':
                 thread = Thread(target=retreive_and_handle_data, args=(BrightSky(), data_directory, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution))
+
+                window['forecast_image'].update(filename=None)
+                window['index_slider'].update(range=(0,1), value=0)
+
+                thread.start()
+            
+            elif values['source'] == 'OpenMeteo':
+                thread = Thread(target=retreive_and_handle_data, args=(OpenMeteo(), data_directory, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution))
 
                 window['forecast_image'].update(filename=None)
                 window['index_slider'].update(range=(0,1), value=0)
