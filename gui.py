@@ -11,7 +11,7 @@ import sys
 import shutil
 
 
-data_directory = 'CloudMap_Data'
+data_directory = 'WeatherMap_Data'
 
 global_log_text = ""
 thread = Thread()
