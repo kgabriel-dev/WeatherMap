@@ -8,10 +8,13 @@ from threading import Thread
 import math
 import PIL.Image
 import sys
+import shutil
 
+
+data_directory = 'CloudMap_Data'
 
 global_log_text = ""
-thread = None
+thread = Thread()
 number_of_images = 0
 screen_factor = 1.0
 
@@ -38,20 +41,14 @@ def finish_thread():
     
 
     set_log_text("Entferne alte Bilder...")
-    for image_name in os.listdir('data'):
+    for image_name in os.listdir(data_directory):
         if image_name.startswith('clouds_'):
-            os.remove(os.path.join('data', image_name))
+            os.remove(os.path.join(data_directory, image_name))
 
-    set_log_text("Bilder werden skaliert...")
-    for image_name in os.listdir('data/originals'):
-        if image_name.startswith('clouds_'):
-            image = PIL.Image.open(os.path.join('data/originals', image_name))
-            image = image.resize((int(image.width * screen_factor), int(image.height * screen_factor)), PIL.Image.LANCZOS)
-            image.save(os.path.join('data', image_name))
+    scale_cloud_images()
     
     set_log_text("Alles erledigt.")
-    number_of_images = len([name for name in os.listdir('data') if name.startswith('clouds_')])
-    thread = None
+    number_of_images = len([name for name in os.listdir(data_directory) if name.startswith('clouds_')])
 
 
 def create_layout():
@@ -119,10 +116,25 @@ def create_layout():
     return layout
 
 
+def scale_cloud_images():
+    scaled_images = 0
+
+    for image_name in os.listdir(data_directory + '/originals'):
+        if image_name.startswith('clouds_'):
+            set_log_text(f"Skaliere Bild {scaled_images + 1} von {number_of_images}...")
+
+            image = PIL.Image.open(os.path.join(data_directory + '/originals', image_name))
+            image = image.resize((int(image.width * screen_factor), int(image.height * screen_factor)), PIL.Image.LANCZOS)
+            image.save(os.path.join(data_directory, image_name))
+
+            scaled_images += 1
+    
+    set_log_text("Alles erledigt.")
+
 def run_gui():
     global thread, global_log_text, number_of_images, screen_factor, auto_start_data_retreival
 
-    number_of_images = len([name for name in os.listdir('data') if name.startswith('clouds_')])
+    number_of_images = len([name for name in os.listdir(data_directory) if name.startswith('clouds_')])
 
     window = sg.Window('WeatherMap', create_layout(), finalize=True, resizable=True)
     window.maximize()
@@ -133,45 +145,49 @@ def run_gui():
     image_index = 0
     window_height = window.size[1]
 
+    last_resize_time = datetime.now()
+
     while True:
         event, values = window.read(timeout=500)
 
         if values is None:
             break
 
-        if event == 'Configure':
-            window_height = window.size[1]
-            
-            new_screen_factor = round((window_height - 30) / 1080, 1)
-            
-            if screen_factor != new_screen_factor:
-                screen_factor = new_screen_factor
-            
-                for image_name in os.listdir('data/originals'):
-                    if image_name.startswith('clouds_'):
-                        image = PIL.Image.open(os.path.join('data/originals', image_name))
-                        image = image.resize((int(image.width * screen_factor), int(image.height * screen_factor)), PIL.Image.LANCZOS)
-                        image.save(os.path.join('data', image_name))
+        if event == 'Configure' and thread.is_alive() is False:
+            now_time = datetime.now()
+
+            if (now_time - last_resize_time).total_seconds() > 1:
+                window_height = window.size[1]
+                
+                new_screen_factor = round((window_height - 30) / 1080, 3)
+                
+                if screen_factor != new_screen_factor:
+                    screen_factor = new_screen_factor
+
+                    thread = Thread(target=scale_cloud_images)
+                    thread.start()
+
+                    last_resize_time = now_time
 
         window['log_text'].update(global_log_text)
 
-        if values['animation_checkbox'] is True and thread is None:
+        if values['animation_checkbox'] is True and thread.is_alive() is False and number_of_images > 0:
             window['index_slider'].update(range=(0, max(number_of_images - 1, 1)))
-        elif values['animation_checkbox'] is False and thread is None:
+        elif values['animation_checkbox'] is False and thread.is_alive() is False:
             image_index = int(values['index_slider'])
-            window['forecast_image'].update(filename=f'data/clouds_{image_index}.png')
+            window['forecast_image'].update(filename=f'{data_directory}/clouds_{image_index}.png')
 
         if event == sg.WIN_CLOSED:
             break
 
         if event == sg.TIMEOUT_KEY:
-            if values['animation_checkbox'] is True and thread is None and number_of_images > 0:
-                window['forecast_image'].update(filename=f'data/clouds_{image_index}.png')
+            if values['animation_checkbox'] is True and thread.is_alive() is False and number_of_images > 0:
+                window['forecast_image'].update(filename=f'{data_directory}/clouds_{image_index}.png')
                 window['index_slider'].update(value=image_index)
 
                 image_index = (image_index + 1) % number_of_images
 
-        if (event == 'calculate_button' or auto_start_data_retreival is True) and thread is None:
+        if (event == 'calculate_button' or auto_start_data_retreival is True) and thread.is_alive() is False:
             auto_start_data_retreival = False
             forecast_length = int(values['forecast_length'])
             longitude = float(values['longitude'])
@@ -188,14 +204,14 @@ def run_gui():
             last_date = start_date + timedelta(hours=forecast_length)
 
             if values['source'] == 'BrightSky (DWD)':
-                thread = Thread(target=retreive_and_handle_data, args=(BrightSky(), set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution))
+                thread = Thread(target=retreive_and_handle_data, args=(BrightSky(), data_directory, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution))
 
                 window['forecast_image'].update(filename=None)
                 window['index_slider'].update(range=(0,1), value=0)
 
                 thread.start()
             elif values['source'] == 'ClearOutside':
-                thread = Thread(target=retreive_and_handle_data, args=(ClearOutside(), set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution))
+                thread = Thread(target=retreive_and_handle_data, args=(ClearOutside(), data_directory, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution))
                 thread.start()
 
     # wait for the thread to finish
@@ -205,15 +221,13 @@ def run_gui():
     window.close()
 
     # remove old images
-    for file in os.listdir('data'):
-        if file.startswith('clouds_'):
-            os.remove(os.path.join('data', file))
-    for file in os.listdir('data/originals'):
-        if file.startswith('clouds_'):
-            os.remove(os.path.join('data/originals', file))
+    shutil.rmtree(data_directory)
 
 
 if __name__ == '__main__':
+    # prepare for starting the program
+    os.makedirs(data_directory + '/originals', exist_ok=True)
+
     args = sys.argv[1:]
 
     if '--test' in args:
