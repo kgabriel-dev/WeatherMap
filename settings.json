@@ -1,0 +1,10 @@
+{
+    "forecast_length": 12,
+    "latitude": 54.1,
+    "longitude": 12.11,
+    "source": "OpenMeteo",
+    "size": 60.0,
+    "resolution": 3,
+    "language": "Englisch",
+    "load_data_on_start": false
+}

@@ -9,24 +9,20 @@ import math
 import PIL.Image
 import sys
 import shutil
+from settings import Settings, SettingsGUI
 
 
 data_directory = 'WeatherMap_Data'
+settings_path = 'settings.json'
+settings = Settings()
+settings_gui = None
 
 global_log_text = ""
 thread = Thread()
 number_of_images = 0
 screen_factor = 1.0
 last_resize_time = datetime.now()
-
-default_values = {
-    'forecast_length': 12,
-    'latitude': 54.10,
-    'longitude': 12.11,
-    'source': 'OpenMeteo',
-    'size': 80.0,
-    'resolution': 8
-}
+settings_changed = False
 
 auto_start_data_retreival = False
 
@@ -53,41 +49,47 @@ def finish_thread():
 
 
 def create_layout():
-    global screen_factor
+    global screen_factor, settings
 
-    settings = [
+    values = settings.get_settings()
+
+    options = [
         sg.Push(),
         sg.Text("Vorschau (h):"),
-        sg.Input(key='forecast_length', size=(7,1), default_text=str(default_values['forecast_length'])),
+        sg.Input(key='forecast_length', size=(7,1), default_text=str(values['forecast_length'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
         sg.Text("Breitengrad:"),
-        sg.Input(key='latitude', size=(7,1), default_text=str(default_values['latitude'])),
+        sg.Input(key='latitude', size=(7,1), default_text=str(values['latitude'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
         sg.Text("Längengrad:"),
-        sg.Input(key='longitude', size=(7,1), default_text=str(default_values['longitude'])),
+        sg.Input(key='longitude', size=(7,1), default_text=str(values['longitude'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
         sg.Text("Quelle:"),
-        sg.Combo(['OpenMeteo', 'BrightSky (DWD)'], key='source', default_value=str(default_values['source']), size=(15,1), readonly=True),
+        sg.Combo(['OpenMeteo', 'BrightSky (DWD)'], key='source', default_value=str(values['source']), size=(15,1), readonly=True),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
         sg.Text("Größe (km):"),
-        sg.Input(key='size', size=(6,1), default_text=str(default_values['size'])),
+        sg.Input(key='size', size=(6,1), default_text=str(values['size'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
         sg.Text("Auflösung:"),
-        sg.Input(key='resolution', size=(4,1), default_text=str(default_values['resolution'])),
+        sg.Input(key='resolution', size=(4,1), default_text=str(values['resolution'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
         sg.Button('Berechnen & Anzeigen', key='calculate_button'),
+        sg.Push(),
+        sg.VSeparator(),
+        sg.Push(),
+        sg.Button('Einstellungen', key='settings_button'),
         sg.Push()
     ]
 
@@ -99,7 +101,7 @@ def create_layout():
     ]
 
     layout = [
-        settings,
+        options,
         [sg.HSeparator()],
         [sg.VPush()],
         [
@@ -115,6 +117,15 @@ def create_layout():
     ]
 
     return layout
+
+
+def change_settings(new_settings_values):
+    global settings, settings_changed
+
+    settings.change_settings(new_settings_values)
+    settings.save_settings_to_file(settings_path)
+
+    settings_changed = True
 
 
 def scale_cloud_images():
@@ -138,7 +149,7 @@ def scale_cloud_images():
     set_log_text("Alles erledigt.")
 
 def run_gui():
-    global thread, global_log_text, number_of_images, screen_factor, auto_start_data_retreival, last_resize_time
+    global thread, global_log_text, number_of_images, screen_factor, auto_start_data_retreival, last_resize_time, settings_gui, settings, settings_changed
 
     number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('clouds_')])
 
@@ -148,6 +159,8 @@ def run_gui():
     window.bind('<Configure>', 'Configure')
     window['index_slider'].bind('<ButtonRelease-1>', 'index_slider')
 
+    settings_gui = SettingsGUI(window, settings, change_settings)
+
     image_index = 0
     window_height = window.size[1]
 
@@ -156,11 +169,21 @@ def run_gui():
     while True:
         event, values = window.read(timeout=500)
 
-        if values is None:
-            break
-
         if event == sg.WIN_CLOSED:
             break
+
+        if settings_changed is True:
+            settings_changed = False
+            settings_values = settings.get_settings()
+
+            print(settings_values)
+
+            window['forecast_length'].update(value=settings_values['forecast_length'])
+            window['latitude'].update(value=settings_values['latitude'])
+            window['longitude'].update(value=settings_values['longitude'])
+            window['source'].update(value=settings_values['source'])
+            window['size'].update(value=settings_values['size'])
+            window['resolution'].update(value=settings_values['resolution'])
 
         if event == 'Configure' and thread.is_alive() is False and (datetime.now() - last_resize_time).total_seconds() > 1:
             window_height = window.size[1]
@@ -168,13 +191,18 @@ def run_gui():
             new_screen_factor = round((window_height - 30) / 1080, 3)
             
             if screen_factor != new_screen_factor:
-                image = PIL.Image.open(f'{data_directory}/originals/clouds_0.png')
-                window['forecast_image'].update(size=(int(image.width * new_screen_factor), int(image.height * new_screen_factor)))
+                try:
+                    image = PIL.Image.open(f'{data_directory}/originals/clouds_0.png')
+                    window['forecast_image'].update(size=(int(image.width * new_screen_factor), int(image.height * new_screen_factor)))
 
-                screen_factor = new_screen_factor
+                    screen_factor = new_screen_factor
 
-                thread = Thread(target=scale_cloud_images)
-                thread.start()
+                    thread = Thread(target=scale_cloud_images)
+                    thread.start()
+                
+                except FileNotFoundError:
+                    print("Cannot rescale images, because there are no images.")
+                    pass
 
         window['log_text'].update(global_log_text)
 
@@ -225,6 +253,10 @@ def run_gui():
 
                 thread.start()
 
+        if event == 'settings_button' and SettingsGUI is not None:
+            settings_gui.open_settings_window()
+            
+
     # wait for the thread to finish
     if thread.is_alive() is True:
         thread.join()
@@ -243,12 +275,18 @@ if __name__ == '__main__':
     # prepare for starting the program
     os.makedirs(data_directory + '/originals', exist_ok=True)
 
+    # read the settings from the settings file, otherwise it uses the default settings
+    if os.path.exists(settings_path):
+        settings.load_settings_from_file(settings_path)
+    
+    auto_start_data_retreival = settings.get_settings()['load_data_on_start']
+
     args = sys.argv[1:]
 
     if '--test' in args:
-        default_values['forecast_length'] = 2
-        default_values['resolution'] = 2
-        default_values['size'] = 150.0
+        settings['forecast_length'] = 2
+        settings['resolution'] = 2
+        settings['size'] = 150.0
         auto_start_data_retreival = True
 
     run_gui()
