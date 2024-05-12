@@ -3,4 +3,4 @@ data
 .venv
 build
 dist
-CloudMap.spec
+WeatherMap.spec

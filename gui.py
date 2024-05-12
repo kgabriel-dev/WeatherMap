@@ -32,7 +32,7 @@ auto_start_data_retreival = False
 
 def set_log_text(text):
     global global_log_text
-    global_log_text = text
+    global_log_text = "Ausgabe: " + str(text)
 
 
 def finish_thread():

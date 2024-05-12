@@ -98,14 +98,14 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
     # create folder if not exists
     os.makedirs(data_dir + '/originals', exist_ok=True)
 
+    fig, ax = plt.subplots(figsize=(6,6))
+    ax.set_aspect(lon_resolution/lat_resolution)
+    countries.plot(ax = ax, color='#b8e864', edgecolor='black', zorder=1, aspect=lon_resolution/lat_resolution)
+    states.plot(ax = ax, color=None, edgecolor='black', linewidth=0.5, zorder=2, aspect=lon_resolution/lat_resolution)
+
     for figure_index in range(number_of_keys):
         log_text(f"Erstelle Wetterbild {figure_index + 1} von {number_of_keys}...")
         
-        fig, ax = plt.subplots(figsize=(6,6))
-        ax.set_aspect(lon_resolution/lat_resolution)
-        countries.plot(ax = ax, color='#b8e864', edgecolor='black', zorder=1, aspect=lon_resolution/lat_resolution)
-        states.plot(ax = ax, color=None, edgecolor='black', linewidth=0.5, zorder=2, aspect=lon_resolution/lat_resolution)
-
         entry = list(clouds_cover_over_time.keys())[figure_index]
         data = clouds_cover_over_time[entry]
         df = pd.DataFrame(data, columns=x_labels, index=y_labels)
@@ -113,7 +113,7 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
         x = df.columns
         y = df.index
         z = df.values  
-        c = ax.pcolormesh(
+        cmesh = ax.pcolormesh(
             x,
             y,
             z,
@@ -123,14 +123,17 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
             vmax=data_retreiver.max_value,
             zorder=10
         )
-        start_date_iso = datetime.fromisoformat(entry)
 
+        start_date_iso = datetime.fromisoformat(entry)
         ax.set_title(start_date_iso.__format__('%d.%m.%Y, %H:%M Uhr'))
-        ax.set_ylim(min(y) - lat_resolution, max(y) + lat_resolution)
-        ax.set_xlim(min(x) - lon_resolution, max(x) + lon_resolution)
-        fig.colorbar(c, ax=ax, orientation='vertical', label='Bewölkung in %')
+
+        if figure_index == 0:
+            ax.set_ylim(min(y) - lat_resolution, max(y) + lat_resolution)
+            ax.set_xlim(min(x) - lon_resolution, max(x) + lon_resolution)
+            fig.colorbar(cmesh, ax=ax, orientation='vertical', label='Bewölkung in %', fraction=0.047*(df.shape[0]/df.shape[1]))
 
         plt.savefig(f'{data_dir}/originals/clouds_{figure_index}.png', dpi=150, transparent=False, format='png', bbox_inches='tight', pad_inches=0.1)
-        plt.close(fig)
+
+        cmesh.remove()
 
     finished_callback()
