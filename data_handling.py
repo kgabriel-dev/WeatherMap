@@ -10,7 +10,12 @@ from datetime import datetime
 import sys
 
 
+states_map = None
+countries_map = None
+
 def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callback, start_date, last_date, lat, lon, size, number_of_size_steps):
+    global states_map, countries_map
+
     weather_data = {}
     searched_locations = 0
     lat_size, lon_size = size
@@ -75,12 +80,16 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
             os.remove(os.path.join(data_dir + '/originals', file))
 
 
-    log_text("Lese Karte ein...")
-
+    log_text("Lese Kartendaten ein...")
     bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
-    states = geopandas.read_file(os.path.join(bundle_dir, 'shapefiles/ne_10m_admin_1_states_provinces_lines.shp'), engine="pyogrio")
-    countries = geopandas.read_file(os.path.join(bundle_dir, 'shapefiles/ne_10m_admin_0_countries.shp'), engine="pyogrio")
+
+    if states_map is None:
+        states_map = geopandas.read_file(os.path.join(bundle_dir, 'shapefiles/ne_10m_admin_1_states_provinces_lines.shp'))
+    if countries_map is None:
+        countries_map = geopandas.read_file(os.path.join(bundle_dir, 'shapefiles/ne_10m_admin_0_countries.shp'))
     
+
+    log_text("Bereite Erstellung der Wetterbilder vor...")
     number_of_keys = len(clouds_cover_over_time.keys())
 
     x_labels = [lon + ((negative_offset + x) * lon_resolution) for x in range(number_of_size_steps)]
@@ -100,8 +109,14 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
 
     fig, ax = plt.subplots(figsize=(6,6))
     ax.set_aspect(lon_resolution/lat_resolution)
-    countries.plot(ax = ax, color='#b8e864', edgecolor='black', zorder=1, aspect=lon_resolution/lat_resolution)
-    states.plot(ax = ax, color=None, edgecolor='black', linewidth=0.5, zorder=2, aspect=lon_resolution/lat_resolution)
+    countries_map.plot(ax = ax, color='#b8e864', edgecolor='black', zorder=1, aspect=lon_resolution/lat_resolution)
+    states_map.plot(ax = ax, color=None, edgecolor='black', linewidth=0.5, zorder=2, aspect=lon_resolution/lat_resolution)
+
+    ax.set_xlabel('Längengrad')
+    ax.set_ylabel('Breitengrad')
+
+    ax.plot(lon, lat, 'ro', markersize=5, zorder=20)
+    ax.text(lon + lon_resolution/15, lat + lat_resolution/15, 'Standort', zorder=20)
 
     for figure_index in range(number_of_keys):
         log_text(f"Erstelle Wetterbild {figure_index + 1} von {number_of_keys}...")

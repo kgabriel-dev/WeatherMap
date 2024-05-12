@@ -1,3 +1,4 @@
+altgraph==0.17.4
 asttokens==2.4.1
 attrs==23.2.0
 beautifulsoup4==4.12.3
@@ -31,6 +32,7 @@ numpy==1.26.4
 packaging==24.0
 pandas==2.2.2
 parso==0.8.4
+pefile==2023.2.7
 pillow==10.3.0
 platformdirs==4.2.1
 prompt-toolkit==3.0.43
@@ -38,12 +40,16 @@ psutil==5.9.8
 pure-eval==0.2.2
 pyasn1==0.6.0
 Pygments==2.18.0
+pyinstaller==6.6.0
+pyinstaller-hooks-contrib==2024.6
+pyogrio==0.8.0
 pyparsing==3.1.2
 pyproj==3.6.1
 PySimpleGUI==4.60.5
 python-dateutil==2.9.0.post0
 pytz==2024.1
 pywin32==306
+pywin32-ctypes==0.2.2
 pyzmq==26.0.3
 requests==2.31.0
 rsa==4.9

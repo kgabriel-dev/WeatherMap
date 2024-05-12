@@ -17,6 +17,7 @@ global_log_text = ""
 thread = Thread()
 number_of_images = 0
 screen_factor = 1.0
+last_resize_time = datetime.now()
 
 default_values = {
     'forecast_length': 12,
@@ -48,7 +49,7 @@ def finish_thread():
     scale_cloud_images()
     
     set_log_text("Alles erledigt.")
-    number_of_images = len([name for name in os.listdir(data_directory) if name.startswith('clouds_')])
+    number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('clouds_')])
 
 
 def create_layout():
@@ -117,24 +118,29 @@ def create_layout():
 
 
 def scale_cloud_images():
+    global last_resize_time, number_of_images
+
+    number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('clouds_')])
+
     scaled_images = 0
 
-    for image_name in os.listdir(data_directory + '/originals'):
-        if image_name.startswith('clouds_'):
+    for file_name in os.listdir(data_directory + '/originals'):
+        if file_name.startswith('clouds_'):
             set_log_text(f"Skaliere Bild {scaled_images + 1} von {number_of_images}...")
 
-            image = PIL.Image.open(os.path.join(data_directory + '/originals', image_name))
+            image = PIL.Image.open(os.path.join(data_directory + '/originals', file_name))
             image = image.resize((int(image.width * screen_factor), int(image.height * screen_factor)), PIL.Image.LANCZOS)
-            image.save(os.path.join(data_directory, image_name))
+            image.save(os.path.join(data_directory, file_name))
 
             scaled_images += 1
     
+    last_resize_time = datetime.now()
     set_log_text("Alles erledigt.")
 
 def run_gui():
-    global thread, global_log_text, number_of_images, screen_factor, auto_start_data_retreival
+    global thread, global_log_text, number_of_images, screen_factor, auto_start_data_retreival, last_resize_time
 
-    number_of_images = len([name for name in os.listdir(data_directory) if name.startswith('clouds_')])
+    number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('clouds_')])
 
     window = sg.Window('WeatherMap', create_layout(), finalize=True, resizable=True)
     window.maximize()
@@ -153,21 +159,22 @@ def run_gui():
         if values is None:
             break
 
-        if event == 'Configure' and thread.is_alive() is False:
-            now_time = datetime.now()
+        if event == sg.WIN_CLOSED:
+            break
 
-            if (now_time - last_resize_time).total_seconds() > 1:
-                window_height = window.size[1]
-                
-                new_screen_factor = round((window_height - 30) / 1080, 3)
-                
-                if screen_factor != new_screen_factor:
-                    screen_factor = new_screen_factor
+        if event == 'Configure' and thread.is_alive() is False and (datetime.now() - last_resize_time).total_seconds() > 1:
+            window_height = window.size[1]
+            
+            new_screen_factor = round((window_height - 30) / 1080, 3)
+            
+            if screen_factor != new_screen_factor:
+                image = PIL.Image.open(f'{data_directory}/originals/clouds_0.png')
+                window['forecast_image'].update(size=(int(image.width * new_screen_factor), int(image.height * new_screen_factor)))
 
-                    thread = Thread(target=scale_cloud_images)
-                    thread.start()
+                screen_factor = new_screen_factor
 
-                    last_resize_time = now_time
+                thread = Thread(target=scale_cloud_images)
+                thread.start()
 
         window['log_text'].update(global_log_text)
 
@@ -177,10 +184,9 @@ def run_gui():
             image_index = int(values['index_slider'])
             window['forecast_image'].update(filename=f'{data_directory}/clouds_{image_index}.png')
 
-        if event == sg.WIN_CLOSED:
-            break
-
         if event == sg.TIMEOUT_KEY:
+            number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('clouds_')])
+
             if values['animation_checkbox'] is True and thread.is_alive() is False and number_of_images > 0:
                 window['forecast_image'].update(filename=f'{data_directory}/clouds_{image_index}.png')
                 window['index_slider'].update(value=image_index)
@@ -220,7 +226,7 @@ def run_gui():
                 thread.start()
 
     # wait for the thread to finish
-    if thread is not None:
+    if thread.is_alive() is True:
         thread.join()
 
     window.close()
@@ -230,6 +236,10 @@ def run_gui():
 
 
 if __name__ == '__main__':
+    # remove old images (if there are any, e.g. when the program crashed)
+    if os.path.exists(data_directory):
+        shutil.rmtree(data_directory)
+
     # prepare for starting the program
     os.makedirs(data_directory + '/originals', exist_ok=True)
 
