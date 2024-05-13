@@ -2,21 +2,22 @@ import json
 import PySimpleGUI as sg
 from language import LanguageManager
 import pytz
+import os
 
 
 class Settings:
 
     def __init__(self):
         self.settings = {
-            'forecast_length': 12,
-            'latitude': 54.10,
-            'longitude': 12.11,
-            'source': 'OpenMeteo',
-            'size': 80.0,
-            'resolution': 8,
-            'language': 'Deutsch',
-            'load_data_on_start': False,
-            'timezone': 'America/New_York'
+            "forecast_length": 12,
+            "latitude": 40.73,
+            "longitude": -73.94,
+            "source": "OpenMeteo",
+            "size": 100.0,
+            "resolution": 5,
+            "language": "en-US",
+            "load_data_on_start": False,
+            "timezone": "America/New_York"
         }
     
     def get_settings(self):
@@ -33,6 +34,9 @@ class Settings:
             self.change_setting_entry(key, value)
 
     def load_settings_from_file(self, file_path):
+        if not os.path.exists(file_path):
+            self.save_settings_to_file(file_path)
+
         with open(file_path, 'r') as file:
             settings = json.load(file)
 

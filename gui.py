@@ -293,8 +293,7 @@ if __name__ == '__main__':
     os.makedirs(data_directory + '/originals', exist_ok=True)
 
     # read the settings from the settings file, otherwise it uses the default settings
-    if os.path.exists(settings_path):
-        settings.load_settings_from_file(settings_path)
+    settings.load_settings_from_file(settings_path)
 
     lm = LanguageManager(settings.get_settings()['language'] or 'en-US')
     
