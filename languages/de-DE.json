@@ -7,7 +7,7 @@
         "scale_image_at_index": "Skaliere Bild %index% von %total%...",
         "load_weather_at_index_at_pos": "Lade Wetterdaten an %lat%, %lon% (%index% von %total%)...",
         "waiting_delay_time": "Warte %time% Sekunden...",
-        "reading_in_map_data": "Lese Karten-Daten...",
+        "reading_in_map_data": "Lese Kartendaten ein...",
         "preparing_images": "Bereite Erstellung der Wetterbilder vor...",
         "creating_image_at_index": "Erstelle Bild %index% von %total%..."
     },

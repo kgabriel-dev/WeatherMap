@@ -172,6 +172,7 @@ def run_gui():
 
     image_index = 0
     window_height = window.size[1]
+    screen_factor = round((window_height - 30) / 1080, 3)
 
     last_resize_time = datetime.now()
 
