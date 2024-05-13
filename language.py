@@ -1,4 +1,7 @@
 import json
+import os
+import sys
+
 
 class LanguageManager:
 
@@ -24,7 +27,11 @@ class LanguageManager:
         if self.language not in self.accepted_languages:
             raise Exception('Language not supported')
         
-        self.language_file = open('languages/' + self.language + '.json', 'r', encoding='utf-8')
+        
+        bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__  )))
+        file_dir = os.path.join(bundle_dir, 'languages/' + self.language + '.json')
+
+        self.language_file = open(file_dir, 'r', encoding='utf-8')
         self.language_data = json.load(self.language_file)
 
     def get_string(self, dotkey, prefix='', suffix='', replace_dict={}):
