@@ -5,6 +5,6 @@
     "source": "OpenMeteo",
     "size": 60.0,
     "resolution": 3,
-    "language": "Englisch",
+    "language": "de-DE",
     "load_data_on_start": false
 }

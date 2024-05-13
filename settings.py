@@ -1,5 +1,6 @@
 import json
 import PySimpleGUI as sg
+from language import LanguageManager
 
 
 class Settings:
@@ -48,14 +49,15 @@ class Settings:
 
 class SettingsGUI:
 
-    def __init__(self, gui, settings, change_settings_callback):
+    def __init__(self, gui, settings, change_settings_callback, language_manager):
         self.main_gui = gui
         self.settings = settings
         self.change_settings_callback = change_settings_callback
+        self.lm = language_manager
 
     def open_settings_window(self):
         layout = self.create_layout()
-        window = sg.Window('Einstellungen', layout, modal=True, finalize=True)
+        window = sg.Window(self.lm.get_string("settings_window.title"), layout, modal=True, finalize=True)
 
         self.settings_gui = window
 
@@ -77,22 +79,22 @@ class SettingsGUI:
             [
                 sg.Column(
                     [
-                        [sg.Text('Vorhersagedauer (in Stunden):')],
+                        [sg.Text(self.lm.get_string("settings_window.forecast", suffix=':'))],
                         [sg.InputText(self.settings.get_settings()['forecast_length'], key='forecast_length')],
                         [sg.HSeparator()],
-                        [sg.Text('Breitengrad:')],
+                        [sg.Text(self.lm.get_string("settings_window.latitude", suffix=':'))],
                         [sg.InputText(self.settings.get_settings()['latitude'], key='latitude')],
                         [sg.HSeparator()],
-                        [sg.Text('Längengrad:')],
+                        [sg.Text(self.lm.get_string("settings_window.longitude", suffix=':'))],
                         [sg.InputText(self.settings.get_settings()['longitude'], key='longitude')],
                         [sg.HSeparator()],
-                        [sg.Text('Quelle:')],
+                        [sg.Text(self.lm.get_string("settings_window.data_source", suffix=':'))],
                         [sg.Combo(['OpenMeteo', 'BrightSky (DWD)'], key='source', default_value=str(self.settings.get_settings()['source']), size=(15,1), readonly=True)],
                         [sg.HSeparator()],
-                        [sg.Text('Größe (in km):')],
+                        [sg.Text(self.lm.get_string("settings_window.size", suffix=':'))],
                         [sg.InputText(self.settings.get_settings()['size'], key='size')],
                         [sg.HSeparator()],
-                        [sg.Text('Auflösung:')],
+                        [sg.Text(self.lm.get_string("settings_window.resolution", suffix=':'))],
                         [sg.InputText(self.settings.get_settings()['resolution'], key='resolution')]
                     ],
                     vertical_alignment='top',
@@ -103,10 +105,18 @@ class SettingsGUI:
 
                 sg.Column(
                     [
-                        [sg.Text('Sprache:'), sg.Combo(['Deutsch', 'Englisch'], default_value=self.settings.get_settings()['language'], key='language', readonly=True)],
-                        [sg.Text('(Erfordert Neustart des Programms)')],
+                        [
+                            sg.Text(self.lm.get_string("settings_window.language", suffix=':')),
+                            sg.Combo(
+                                LanguageManager.get_supported_language_names(),
+                                default_value=LanguageManager.get_language_name_by_code(self.settings.get_settings()['language']),
+                                key='language',
+                                readonly=True
+                            )
+                        ],
+                        [sg.Text(self.lm.get_string("settings_window.requires_restart"))],
                         [sg.HSeparator()],
-                        [sg.Checkbox('Daten bei Start laden', default=self.settings.get_settings()['load_data_on_start'], key='load_data_on_start')],
+                        [sg.Checkbox(self.lm.get_string("settings_window.load_data_at_start"), default=self.settings.get_settings()['load_data_on_start'], key='load_data_on_start')],
                     ],
                     vertical_alignment='top',
                     element_justification='left'
@@ -115,8 +125,8 @@ class SettingsGUI:
             [sg.HSeparator()],
             [
                 sg.Push(),
-                sg.Button('Abbrechen', key='cancel_button'),
-                sg.Button('Speichern', key='save_button'),
+                sg.Button(self.lm.get_string("settings_window.cancel"), key='cancel_button'),
+                sg.Button(self.lm.get_string("settings_window.save"), key='save_button'),
                 sg.Push()
             ]
         ]
@@ -131,7 +141,7 @@ class SettingsGUI:
             'source': values['source'],
             'size': float(values['size']),
             'resolution': int(values['resolution']),
-            'language': values['language'],
+            'language': LanguageManager.get_language_code_by_name(values['language']),
             'load_data_on_start': values['load_data_on_start']
         }
 

@@ -1,0 +1,47 @@
+{
+    "log": {
+        "output_beginning": "Ausgabe",
+        "calculations_finished": "Berechnungen abgeschlossen.",
+        "deleting_images": "Entferne alte Bilder...",
+        "finished_all_steps": "Alles erledigt!",
+        "scale_image_at_index": "Skaliere Bild %index% von %total%...",
+        "load_weather_at_index_at_pos": "Lade Wetterdaten an %lat%, %lon% (%index% von %total%)...",
+        "waiting_delay_time": "Warte %time% Sekunden...",
+        "reading_in_map_data": "Lese Karten-Daten...",
+        "preparing_images": "Bereite Erstellung der Wetterbilder vor...",
+        "creating_image_at_index": "Erstelle Bild %index% von %total%..."
+    },
+    "main_window": {
+        "title": "Wolkenradar",
+        "forecast": "Vorhersage (h)",
+        "latitude": "Breitengrad",
+        "longitude": "Längengrad",
+        "data_source": "Quelle",
+        "size": "Größe (km)",
+        "resolution": "Auflösung",
+        "calc_and_show": "Berechnen & Anzeigen",
+        "settings": "Einstellungen",
+        "animation": "Animation"
+    },
+    "settings_window": {
+        "title": "Einstellungen",
+        "forecast": "Vorhersagedauer (in Stunden)",
+        "latitude": "Breitengrad",
+        "longitude": "Längengrad",
+        "data_source": "Quelle",
+        "size": "Größe (in km)",
+        "resolution": "Auflösung",
+        "language": "Sprache",
+        "requires_restart": "(Erfordert Neustart des Programms)",
+        "load_data_at_start": "Daten beim Start laden",
+        "cancel": "Abbrechen",
+        "save": "Speichern"
+    },
+    "weather_image": {
+        "label_latitude": "Breitengrad",
+        "label_longitude": "Längengrad",
+        "label_position": "Standort",
+        "label_weather": "Bewölkung (%)",
+        "label_time": "%day%.%month%.%year%, %hour%:%minute%"
+    }
+}

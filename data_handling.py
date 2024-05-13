@@ -13,7 +13,7 @@ import sys
 states_map = None
 countries_map = None
 
-def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callback, start_date, last_date, lat, lon, size, number_of_size_steps):
+def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callback, start_date, last_date, lat, lon, size, number_of_size_steps, lm):
     global states_map, countries_map
 
     weather_data = {}
@@ -38,7 +38,12 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
 
             searched_locations += 1
 
-            log_text(f"Lade Wetterdaten für ({latitude}, {longitude}) (Pos. {searched_locations} von {number_of_size_steps ** 2})")
+            log_text(lm.get_string('log.load_weather_at_index_at_pos', replace_dict={
+                'lat': latitude,
+                'lon': longitude,
+                'index': searched_locations,
+                'total': number_of_size_steps ** 2
+            }))
 
             data = data_retreiver.get_weather(start_date.isoformat(), last_date.isoformat(), latitude, longitude)
             
@@ -55,7 +60,7 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
                 weather_data[timestamp][(latitude, longitude)] = cloud_coverage
         
             if(data_retreiver.request_delay >= 1):
-                log_text(f"Warte {data_retreiver.request_delay} Sekunden...")
+                log_text(lm.get_string('waiting_delay_time', replace_dict={'time': data_retreiver.request_delay}))
 
             time.sleep(data_retreiver.request_delay)
     
@@ -80,7 +85,7 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
             os.remove(os.path.join(data_dir + '/originals', file))
 
 
-    log_text("Lese Kartendaten ein...")
+    log_text(lm.get_string("log.reading_in_map_data"))
     bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
 
     if states_map is None:
@@ -89,7 +94,7 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
         countries_map = geopandas.read_file(os.path.join(bundle_dir, 'shapefiles/ne_10m_admin_0_countries.shp'))
     
 
-    log_text("Bereite Erstellung der Wetterbilder vor...")
+    log_text(lm.get_string("log.preparing_images"))
     number_of_keys = len(clouds_cover_over_time.keys())
 
     x_labels = [lon + ((negative_offset + x) * lon_resolution) for x in range(number_of_size_steps)]
@@ -112,14 +117,17 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
     countries_map.plot(ax = ax, color='#b8e864', edgecolor='black', zorder=1, aspect=lon_resolution/lat_resolution)
     states_map.plot(ax = ax, color=None, edgecolor='black', linewidth=0.5, zorder=2, aspect=lon_resolution/lat_resolution)
 
-    ax.set_xlabel('Längengrad')
-    ax.set_ylabel('Breitengrad')
+    ax.set_xlabel(lm.get_string("weather_image.label_longitude"))
+    ax.set_ylabel(lm.get_string("weather_image.label_latitude"))
 
     ax.plot(lon, lat, 'ro', markersize=5, zorder=20)
-    ax.text(lon + lon_resolution/15, lat + lat_resolution/15, 'Standort', zorder=20)
+    ax.text(lon + lon_resolution/15, lat + lat_resolution/15, lm.get_string("weather_image.label_position"), zorder=20)
 
     for figure_index in range(number_of_keys):
-        log_text(f"Erstelle Wetterbild {figure_index + 1} von {number_of_keys}...")
+        log_text(lm.get_string('log.creating_image_at_index', replace_dict={
+            'index': figure_index + 1,
+            'total': number_of_keys
+        }))
         
         entry = list(clouds_cover_over_time.keys())[figure_index]
         data = clouds_cover_over_time[entry]
@@ -139,13 +147,25 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
             zorder=10
         )
 
-        start_date_iso = datetime.fromisoformat(entry)
-        ax.set_title(start_date_iso.__format__('%d.%m.%Y, %H:%M Uhr'))
+        image_date = datetime.fromisoformat(entry)
+        ax.set_title(lm.get_string('weather_image.label_time', replace_dict={
+            'day': image_date.day,
+            'month': image_date.month,
+            'year': image_date.year,
+            'hour': str(image_date.hour).rjust(2, '0'),
+            'minute': str(image_date.minute).ljust(2, '0')
+        }))
 
         if figure_index == 0:
             ax.set_ylim(min(y) - lat_resolution, max(y) + lat_resolution)
             ax.set_xlim(min(x) - lon_resolution, max(x) + lon_resolution)
-            fig.colorbar(cmesh, ax=ax, orientation='vertical', label='Bewölkung in %', fraction=0.047*(df.shape[0]/df.shape[1]))
+            fig.colorbar(
+                cmesh,
+                ax=ax,
+                orientation='vertical',
+                label=lm.get_string("weather_image.label_weather"),
+                fraction=0.047*(df.shape[0]/df.shape[1])
+            )
 
         plt.savefig(f'{data_dir}/originals/clouds_{figure_index}.png', dpi=150, transparent=False, format='png', bbox_inches='tight', pad_inches=0.1)
 

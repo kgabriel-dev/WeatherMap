@@ -10,12 +10,14 @@ import PIL.Image
 import sys
 import shutil
 from settings import Settings, SettingsGUI
+from language import LanguageManager
 
 
 data_directory = 'WeatherMap_Data'
 settings_path = 'settings.json'
 settings = Settings()
 settings_gui = None
+lm = None
 
 global_log_text = ""
 thread = Thread()
@@ -29,22 +31,22 @@ auto_start_data_retreival = False
 
 def set_log_text(text):
     global global_log_text
-    global_log_text = "Ausgabe: " + str(text)
+    global_log_text = lm.get_string("log.output_beginning", suffix=': ') + str(text)
 
 
 def finish_thread():
     global global_log_text, thread, number_of_images, screen_factor
-    global_log_text = "Berechnungen abgeschlossen."
+    global_log_text = lm.get_string("log.calculation_finished")
     
 
-    set_log_text("Entferne alte Bilder...")
+    set_log_text(lm.get_string("log.deleting_images"))
     for image_name in os.listdir(data_directory):
         if image_name.startswith('clouds_'):
             os.remove(os.path.join(data_directory, image_name))
 
     scale_cloud_images()
     
-    set_log_text("Alles erledigt.")
+    set_log_text(lm.get_string("log.finished_all_steps"))
     number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('clouds_')])
 
 
@@ -55,47 +57,47 @@ def create_layout():
 
     options = [
         sg.Push(),
-        sg.Text("Vorschau (h):"),
+        sg.Text(lm.get_string("main_window.forecast", suffix=':')),
         sg.Input(key='forecast_length', size=(7,1), default_text=str(values['forecast_length'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
-        sg.Text("Breitengrad:"),
+        sg.Text(lm.get_string("main_window.latitude", suffix=':')),
         sg.Input(key='latitude', size=(7,1), default_text=str(values['latitude'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
-        sg.Text("Längengrad:"),
+        sg.Text(lm.get_string("main_window.longitude", suffix=':')),
         sg.Input(key='longitude', size=(7,1), default_text=str(values['longitude'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
-        sg.Text("Quelle:"),
+        sg.Text(lm.get_string("main_window.data_source", suffix=':')),
         sg.Combo(['OpenMeteo', 'BrightSky (DWD)'], key='source', default_value=str(values['source']), size=(15,1), readonly=True),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
-        sg.Text("Größe (km):"),
+        sg.Text(lm.get_string("main_window.size", suffix=':')),
         sg.Input(key='size', size=(6,1), default_text=str(values['size'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
-        sg.Text("Auflösung:"),
+        sg.Text(lm.get_string("main_window.resolution", suffix=':')),
         sg.Input(key='resolution', size=(4,1), default_text=str(values['resolution'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
-        sg.Button('Berechnen & Anzeigen', key='calculate_button'),
+        sg.Button(lm.get_string("main_window.calc_and_show"), key='calculate_button'),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
-        sg.Button('Einstellungen', key='settings_button'),
+        sg.Button(lm.get_string("main_window.settings"), key='settings_button'),
         sg.Push()
     ]
 
     animation = [
         sg.vbottom([
-            sg.Checkbox('Animation', key='animation_checkbox', default=True, text_color='black'),
+            sg.Checkbox(lm.get_string("main_window.animation"), key='animation_checkbox', default=True, text_color='black'),
             sg.Slider(range=(0, max(number_of_images - 1, 1)), orientation='horizontal', key='index_slider')
         ])
     ]
@@ -137,7 +139,7 @@ def scale_cloud_images():
 
     for file_name in os.listdir(data_directory + '/originals'):
         if file_name.startswith('clouds_'):
-            set_log_text(f"Skaliere Bild {scaled_images + 1} von {number_of_images}...")
+            set_log_text(lm.get_string("log.scale_image_at_index", replace_dict={'index': str(scaled_images + 1), 'total': str(number_of_images)}))
 
             image = PIL.Image.open(os.path.join(data_directory + '/originals', file_name))
             image = image.resize((int(image.width * screen_factor), int(image.height * screen_factor)), PIL.Image.LANCZOS)
@@ -146,20 +148,20 @@ def scale_cloud_images():
             scaled_images += 1
     
     last_resize_time = datetime.now()
-    set_log_text("Alles erledigt.")
+    set_log_text(lm.get_string("log.finished_all_steps"))
 
 def run_gui():
     global thread, global_log_text, number_of_images, screen_factor, auto_start_data_retreival, last_resize_time, settings_gui, settings, settings_changed
 
     number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('clouds_')])
 
-    window = sg.Window('WeatherMap', create_layout(), finalize=True, resizable=True)
+    window = sg.Window(lm.get_string("main_window.title"), create_layout(), finalize=True, resizable=True)
     window.maximize()
 
     window.bind('<Configure>', 'Configure')
     window['index_slider'].bind('<ButtonRelease-1>', 'index_slider')
 
-    settings_gui = SettingsGUI(window, settings, change_settings)
+    settings_gui = SettingsGUI(window, settings, change_settings, lm)
 
     image_index = 0
     window_height = window.size[1]
@@ -226,32 +228,29 @@ def run_gui():
             forecast_length = int(values['forecast_length'])
             longitude = float(values['longitude'])
             latitude = float(values['latitude'])
+            resolution = int(values['resolution'])
             
             # convert size from km to degrees
             size_km = float(values['size'])
             size_lat = size_km / 110.57
             size_lon = size_km / (111.32 * math.cos(math.radians(latitude)))
 
-            resolution = int(values['resolution'])
-
             start_date = datetime.now(pytz.timezone('Europe/Berlin'))
             last_date = start_date + timedelta(hours=forecast_length)
 
-            if values['source'] == 'BrightSky (DWD)':
-                thread = Thread(target=retreive_and_handle_data, args=(BrightSky(), data_directory, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution))
+            data_source = None
+            match(values['source']):
+                case 'BrightSky (DWD)':
+                    data_source = BrightSky()
+                case 'OpenMeteo':
+                    data_source = OpenMeteo()
 
-                window['forecast_image'].update(filename=None)
-                window['index_slider'].update(range=(0,1), value=0)
+            thread = Thread(target=retreive_and_handle_data, args=(data_source, data_directory, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution, lm))
 
-                thread.start()
-            
-            elif values['source'] == 'OpenMeteo':
-                thread = Thread(target=retreive_and_handle_data, args=(OpenMeteo(), data_directory, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution))
+            window['forecast_image'].update(filename=None)
+            window['index_slider'].update(range=(0,1), value=0)
 
-                window['forecast_image'].update(filename=None)
-                window['index_slider'].update(range=(0,1), value=0)
-
-                thread.start()
+            thread.start()
 
         if event == 'settings_button' and SettingsGUI is not None:
             settings_gui.open_settings_window()
@@ -278,6 +277,8 @@ if __name__ == '__main__':
     # read the settings from the settings file, otherwise it uses the default settings
     if os.path.exists(settings_path):
         settings.load_settings_from_file(settings_path)
+
+    lm = LanguageManager(settings.get_settings()['language'] or 'en-US')
     
     auto_start_data_retreival = settings.get_settings()['load_data_on_start']
 

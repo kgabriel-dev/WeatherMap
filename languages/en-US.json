@@ -1,0 +1,47 @@
+{
+    "log": {
+        "output_beginning": "Output",
+        "calculations_finished": "Calculations finished.",
+        "deleting_images": "Deleting old images...",
+        "finished_all_steps": "Finished all steps.",
+        "scale_image_at_index": "Scaling image %index% of %total%...",
+        "load_weather_at_index_at_pos": "Loading weather data at %lat%, %lon% (%index% of %total%)...",
+        "waiting_delay_time": "Waiting %time% seconds...",
+        "reading_in_map_data": "Reading in map data...",
+        "preparing_images": "Preparing creation of the weather images...",
+        "creating_image_at_index": "Creating image %index% of %total%..."
+    },
+    "main_window": {
+        "title": "CloudRadar",
+        "forecast": "Forecast (h)",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "data_source": "Source",
+        "size": "Size (km)",
+        "resolution": "Resolution",
+        "calc_and_show": "Calculate & Show",
+        "settings": "Settings",
+        "animation": "Animation"
+    },
+    "settings_window": {
+        "title": "Settings",
+        "forecast": "Forecast (in hours)",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "data_source": "Source",
+        "size": "Size (in km)",
+        "resolution": "Resolution",
+        "language": "Language",
+        "requires_restart": "(requires restart)",
+        "load_data_at_start": "Load data on start",
+        "cancel": "Cancel",
+        "save": "Save"
+    },
+    "weather_image": {
+        "label_latitude": "Latitude",
+        "label_longitude": "Longitude",
+        "label_position": "Position",
+        "label_weather": "Cloudiness (%)",
+        "label_time": "%month%/%day%/%year% %hour%:%minute%"
+    }
+}
