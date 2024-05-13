@@ -1,10 +1,11 @@
 {
     "forecast_length": 12,
-    "latitude": 54.1,
-    "longitude": 12.11,
+    "latitude": 40.73,
+    "longitude": -73.94,
     "source": "OpenMeteo",
-    "size": 60.0,
-    "resolution": 3,
-    "language": "de-DE",
-    "load_data_on_start": false
+    "size": 100.0,
+    "resolution": 5,
+    "language": "en-US",
+    "load_data_on_start": false,
+    "timezone": "America/New_York"
 }

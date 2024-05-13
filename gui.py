@@ -21,6 +21,7 @@ lm = None
 
 global_log_text = ""
 thread = Thread()
+thread_blocks = False
 number_of_images = 0
 screen_factor = 1.0
 last_resize_time = datetime.now()
@@ -35,7 +36,7 @@ def set_log_text(text):
 
 
 def finish_thread():
-    global global_log_text, thread, number_of_images, screen_factor
+    global global_log_text, thread, number_of_images, screen_factor, thread_blocks
     global_log_text = lm.get_string("log.calculation_finished")
     
 
@@ -48,6 +49,8 @@ def finish_thread():
     
     set_log_text(lm.get_string("log.finished_all_steps"))
     number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('clouds_')])
+
+    thread_blocks = False
 
 
 def create_layout():
@@ -131,7 +134,7 @@ def change_settings(new_settings_values):
 
 
 def scale_cloud_images():
-    global last_resize_time, number_of_images
+    global last_resize_time, number_of_images, thread_blocks
 
     number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('clouds_')])
 
@@ -148,10 +151,14 @@ def scale_cloud_images():
             scaled_images += 1
     
     last_resize_time = datetime.now()
+
+    if thread_blocks is True:
+        thread_blocks = False
+
     set_log_text(lm.get_string("log.finished_all_steps"))
 
 def run_gui():
-    global thread, global_log_text, number_of_images, screen_factor, auto_start_data_retreival, last_resize_time, settings_gui, settings, settings_changed
+    global thread, global_log_text, number_of_images, screen_factor, auto_start_data_retreival, last_resize_time, settings_gui, settings, settings_changed, thread_blocks
 
     number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('clouds_')])
 
@@ -187,19 +194,19 @@ def run_gui():
             window['size'].update(value=settings_values['size'])
             window['resolution'].update(value=settings_values['resolution'])
 
-        if event == 'Configure' and thread.is_alive() is False and (datetime.now() - last_resize_time).total_seconds() > 1:
+        if event == 'Configure' and thread_blocks is False and (datetime.now() - last_resize_time).total_seconds() > 1:
             window_height = window.size[1]
             
             new_screen_factor = round((window_height - 30) / 1080, 3)
             
             if screen_factor != new_screen_factor:
                 try:
-                    image = PIL.Image.open(f'{data_directory}/originals/clouds_0.png')
-                    window['forecast_image'].update(size=(int(image.width * new_screen_factor), int(image.height * new_screen_factor)))
+                    window['forecast_image'].update(size=(int(912 * new_screen_factor), int(752 * new_screen_factor)))
 
                     screen_factor = new_screen_factor
 
                     thread = Thread(target=scale_cloud_images)
+                    thread_blocks = True
                     thread.start()
                 
                 except FileNotFoundError:
@@ -208,22 +215,22 @@ def run_gui():
 
         window['log_text'].update(global_log_text)
 
-        if values['animation_checkbox'] is True and thread.is_alive() is False and number_of_images > 0:
+        if values['animation_checkbox'] is True and thread_blocks is False and number_of_images > 0:
             window['index_slider'].update(range=(0, max(number_of_images - 1, 1)))
-        elif values['animation_checkbox'] is False and thread.is_alive() is False:
+        elif values['animation_checkbox'] is False and thread_blocks is False:
             image_index = int(values['index_slider'])
             window['forecast_image'].update(filename=f'{data_directory}/clouds_{image_index}.png')
 
         if event == sg.TIMEOUT_KEY:
             number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('clouds_')])
 
-            if values['animation_checkbox'] is True and thread.is_alive() is False and number_of_images > 0:
+            if values['animation_checkbox'] is True and thread_blocks is False and number_of_images > 0:
                 window['forecast_image'].update(filename=f'{data_directory}/clouds_{image_index}.png')
                 window['index_slider'].update(value=image_index)
 
                 image_index = (image_index + 1) % number_of_images
 
-        if (event == 'calculate_button' or auto_start_data_retreival is True) and thread.is_alive() is False:
+        if (event == 'calculate_button' or auto_start_data_retreival is True) and thread_blocks is False:
             auto_start_data_retreival = False
             forecast_length = int(values['forecast_length'])
             longitude = float(values['longitude'])
@@ -235,7 +242,7 @@ def run_gui():
             size_lat = size_km / 110.57
             size_lon = size_km / (111.32 * math.cos(math.radians(latitude)))
 
-            start_date = datetime.now(pytz.timezone('Europe/Berlin'))
+            start_date = datetime.now(pytz.timezone(settings.get_settings()['timezone']))
             last_date = start_date + timedelta(hours=forecast_length)
 
             data_source = None
@@ -245,11 +252,21 @@ def run_gui():
                 case 'OpenMeteo':
                     data_source = OpenMeteo()
 
-            thread = Thread(target=retreive_and_handle_data, args=(data_source, data_directory, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution, lm))
+            thread = Thread(target=retreive_and_handle_data, args=(data_source, data_directory, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution, lm, settings.get_settings()['timezone']))
+            thread_blocks = True
 
             window['forecast_image'].update(filename=None)
             window['index_slider'].update(range=(0,1), value=0)
 
+            # delete all images
+            for image_name in os.listdir(data_directory):
+                if image_name.startswith('clouds_'):
+                    os.remove(os.path.join(data_directory, image_name))
+            for image_name in os.listdir(data_directory + '/originals'):
+                if image_name.startswith('clouds_'):
+                    os.remove(os.path.join(data_directory + '/originals', image_name))
+
+            # start the thread
             thread.start()
 
         if event == 'settings_button' and SettingsGUI is not None:

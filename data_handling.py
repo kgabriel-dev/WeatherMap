@@ -13,7 +13,7 @@ import sys
 states_map = None
 countries_map = None
 
-def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callback, start_date, last_date, lat, lon, size, number_of_size_steps, lm):
+def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callback, start_date, last_date, lat, lon, size, number_of_size_steps, lm, timezone):
     global states_map, countries_map
 
     weather_data = {}
@@ -45,7 +45,7 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
                 'total': number_of_size_steps ** 2
             }))
 
-            data = data_retreiver.get_weather(start_date.isoformat(), last_date.isoformat(), latitude, longitude)
+            data = data_retreiver.get_weather(start_date.isoformat(), last_date.isoformat(), latitude, longitude, timezone)
             
             for entry in data:
                 timestamp = entry['timestamp']

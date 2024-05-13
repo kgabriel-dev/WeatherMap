@@ -63,18 +63,18 @@ class BrightSky:
 class OpenMeteo:
 
     def __init__(self):
-        self.api_url = "https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=cloud_cover&forecast_hours={hours}&timezone=Europe%2FBerlin"
+        self.api_url = "https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=cloud_cover&forecast_hours={hours}&timezone={timezone}"
         self.min_value = 0
         self.max_value = 100
         self.request_delay = 0.5
 
-    def get_weather(self, start_date_iso, last_date_iso, lat, lon):
+    def get_weather(self, start_date_iso, last_date_iso, lat, lon, timezone):
         start_date = datetime.fromisoformat(start_date_iso)
         last_date = datetime.fromisoformat(last_date_iso)
 
         hours = math.ceil((last_date - start_date).total_seconds() / 3600) + 1
 
-        url = self.api_url.format(lat=lat, lon=lon, hours=hours)
+        url = self.api_url.format(lat=lat, lon=lon, hours=hours, timezone=timezone)
 
         request = requests.get(url)
 

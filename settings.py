@@ -1,6 +1,7 @@
 import json
 import PySimpleGUI as sg
 from language import LanguageManager
+import pytz
 
 
 class Settings:
@@ -14,7 +15,8 @@ class Settings:
             'size': 80.0,
             'resolution': 8,
             'language': 'Deutsch',
-            'load_data_on_start': False
+            'load_data_on_start': False,
+            'timezone': 'America/New_York'
         }
     
     def get_settings(self):
@@ -117,6 +119,9 @@ class SettingsGUI:
                         [sg.Text(self.lm.get_string("settings_window.requires_restart"))],
                         [sg.HSeparator()],
                         [sg.Checkbox(self.lm.get_string("settings_window.load_data_at_start"), default=self.settings.get_settings()['load_data_on_start'], key='load_data_on_start')],
+                        [sg.HSeparator()],
+                        [sg.Text(self.lm.get_string("settings_window.timezone", suffix=':'))],
+                        [sg.Combo(pytz.common_timezones, key='timezone', default_value=str(self.settings.get_settings()['timezone']), readonly=True)]
                     ],
                     vertical_alignment='top',
                     element_justification='left'
@@ -142,7 +147,8 @@ class SettingsGUI:
             'size': float(values['size']),
             'resolution': int(values['resolution']),
             'language': LanguageManager.get_language_code_by_name(values['language']),
-            'load_data_on_start': values['load_data_on_start']
+            'load_data_on_start': values['load_data_on_start'],
+            'timezone': values['timezone']
         }
 
         self.settings.change_settings(settings)
