@@ -11,7 +11,11 @@ import sys
 import shutil
 from settings import Settings, SettingsGUI
 from language import LanguageManager
+import requests
+from packaging.version import Version
 
+
+CURRENT_VERSION = Version('1.0.0')
 
 data_directory = 'WeatherMap_Data'
 settings_path = 'settings.json'
@@ -28,6 +32,8 @@ last_resize_time = datetime.now()
 settings_changed = False
 
 auto_start_data_retreival = False
+
+update_available_notification = False
 
 
 def set_log_text(text):
@@ -51,6 +57,25 @@ def finish_thread():
     number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('clouds_')])
 
     thread_blocks = False
+
+
+def check_for_updates():
+    global update_available_notification
+
+    try:
+        github_response = requests.get('https://api.github.com/repos/kgabriel-dev/WeatherMap/releases/latest')
+
+        if github_response.status_code == 200:
+            github_json = github_response.json()
+
+            if 'tag_name' in github_json:
+                latest_version = Version(github_json['tag_name'])
+
+                if latest_version and latest_version > CURRENT_VERSION:
+                    update_available_notification = True
+    
+    except requests.exceptions.RequestException as e:
+        print(f"Error while checking for updates: {e}")
 
 
 def create_layout():
@@ -158,7 +183,7 @@ def scale_cloud_images():
     set_log_text(lm.get_string("log.finished_all_steps"))
 
 def run_gui():
-    global thread, global_log_text, number_of_images, screen_factor, auto_start_data_retreival, last_resize_time, settings_gui, settings, settings_changed, thread_blocks
+    global thread, global_log_text, number_of_images, screen_factor, auto_start_data_retreival, last_resize_time, settings_gui, settings, settings_changed, thread_blocks, update_available_notification
 
     number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('clouds_')])
 
@@ -175,6 +200,16 @@ def run_gui():
     screen_factor = round((window_height - 30) / 1080, 3)
 
     last_resize_time = datetime.now()
+
+    if update_available_notification is True:
+        update_available_notification = False
+
+        open_github = sg.popup_yes_no(lm.get_string("update_available"), lm.get_string("update_available_text"), lm.get_string("update_available_yes"), lm.get_string("update_available_no"))
+
+        if open_github == 'Yes':
+            import webbrowser
+
+            webbrowser.open("https://github.com/kgabriel-dev/WeatherMap/releases/latest", new=0, autoraise=True)
 
     while True:
         event, values = window.read(timeout=500)
@@ -306,5 +341,7 @@ if __name__ == '__main__':
         settings['resolution'] = 2
         settings['size'] = 150.0
         auto_start_data_retreival = True
+    
+    check_for_updates()
 
     run_gui()
