@@ -43,5 +43,11 @@
         "label_position": "Position",
         "label_weather": "Cloudiness (%)",
         "label_time": "%month%/%day%/%year% %hour%:%minute%"
+    },
+    "update": {
+        "title": "Update available",
+        "message": "A new version is available. Do you want to download it now?",
+        "option_yes": "Yes",
+        "option_no": "No"
     }
 }

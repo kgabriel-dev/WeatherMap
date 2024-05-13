@@ -43,5 +43,11 @@
         "label_position": "Standort",
         "label_weather": "Bewölkung (%)",
         "label_time": "%day%.%month%.%year%, %hour%:%minute%"
+    },
+    "update": {
+        "title": "Update verfügbar",
+        "message": "Es ist ein Update verfügbar. Möchten Sie es jetzt herunterladen?",
+        "option_yes": "Ja",
+        "option_no": "Nein"
     }
 }

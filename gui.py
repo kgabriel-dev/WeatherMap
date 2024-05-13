@@ -13,6 +13,7 @@ from settings import Settings, SettingsGUI
 from language import LanguageManager
 import requests
 from packaging.version import Version
+import webbrowser
 
 
 CURRENT_VERSION = Version('1.0.0')
@@ -204,12 +205,29 @@ def run_gui():
     if update_available_notification is True:
         update_available_notification = False
 
-        open_github = sg.popup_yes_no(lm.get_string("update_available"), lm.get_string("update_available_text"), lm.get_string("update_available_yes"), lm.get_string("update_available_no"))
+        update_window = sg.Window(
+            title=lm.get_string("update.title"),
+            layout=[
+                [sg.Text(lm.get_string("update.message"))],
+                [
+                    sg.Button(lm.get_string("update.option_yes"), key='update_yes'),
+                    sg.Button(lm.get_string("update.option_no"), key='update_no')
+                ]
+            ]
+        )
 
-        if open_github == 'Yes':
-            import webbrowser
+        while True:
+            event, _ = update_window.read()
 
-            webbrowser.open("https://github.com/kgabriel-dev/WeatherMap/releases/latest", new=0, autoraise=True)
+            if event == sg.WIN_CLOSED or event == 'update_no':
+                break
+
+            if event == 'update_yes':
+                update_window.close()
+                webbrowser.open("https://github.com/kgabriel-dev/WeatherMap/releases/latest", new=0, autoraise=True)
+                break
+        
+        update_window.close()
 
     while True:
         event, values = window.read(timeout=500)
@@ -330,7 +348,7 @@ if __name__ == '__main__':
     # read the settings from the settings file, otherwise it uses the default settings
     settings.load_settings_from_file(settings_path)
 
-    lm = LanguageManager(settings.get_settings()['language'] or 'en-US')
+    lm = LanguageManager(settings.get_settings()['language'])
     
     auto_start_data_retreival = settings.get_settings()['load_data_on_start']
 
