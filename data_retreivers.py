@@ -1,8 +1,6 @@
 import requests
 from datetime import datetime, timedelta
 import math
-import pprint
-import pytz
 
 
 class BrightSky:
