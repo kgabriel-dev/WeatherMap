@@ -46,18 +46,19 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
             }))
 
             data = data_retreiver.get_weather(start_date.isoformat(), last_date.isoformat(), latitude, longitude, timezone)
-            
+
             for entry in data:
                 timestamp = entry['timestamp']
 
                 if not timestamp in weather_data:
                     weather_data[timestamp] = {}
 
-                if entry['error'] is True:
+                if entry['error'] is True or 'cloud_cover' not in entry:
                     weather_data[timestamp][(latitude, longitude)] = None
 
-                cloud_coverage = entry['cloud_cover']
-                weather_data[timestamp][(latitude, longitude)] = cloud_coverage
+                else:   # no problems detected
+                    cloud_coverage = entry['cloud_cover']
+                    weather_data[timestamp][(latitude, longitude)] = cloud_coverage
         
             if(data_retreiver.request_delay >= 1):
                 log_text(lm.get_string('waiting_delay_time', replace_dict={'time': data_retreiver.request_delay}))
