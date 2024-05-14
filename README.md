@@ -40,6 +40,9 @@ Open the installed application
 ### To build the project from this repository, follow these steps:
 Make sure you have Python 3.10 installed on your machine <br />
 Clone this repository using `git clone https://github.com/kgabriel-dev/WeatherMap.git` <br />
+Navigate to the project directory using `cd WeatherMap` <br />
+Create a virtual environment using `python -m venv venv` <br />
+Activate the virtual environment <br />
 Install all package dependencies using `pip install -r requirements.txt` <br />
 Run the application using `python gui.py` <br />
 
