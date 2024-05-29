@@ -188,7 +188,7 @@ def run_gui():
 
     number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('clouds_')])
 
-    window = sg.Window(lm.get_string("main_window.title"), create_layout(), finalize=True, resizable=True)
+    window = sg.Window(lm.get_string("main_window.title"), create_layout(), finalize=True, resizable=True, icon='app.ico')
     window.maximize()
 
     window.bind('<Configure>', 'Configure')
