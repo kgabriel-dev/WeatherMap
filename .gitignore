@@ -3,4 +3,5 @@ WeatherMap_Data
 .venv
 build
 dist
+Output
 WeatherMap.spec
