@@ -1,4 +1,4 @@
-<p align="center"><img src="https://socialify.git.ci/kgabriel-dev/WeatherMap/image?description=1&amp;descriptionEditable=Visualizing%20weather%20conditions%20across%20a%20selected%20region.&amp;font=Jost&amp;forks=1&amp;issues=1&amp;name=1&amp;owner=1&amp;pattern=Signal&amp;pulls=1&amp;stargazers=1&amp;theme=Dark" alt="project-image"></p>
+<p align="center"><img src="https://socialify.git.ci/kgabriel-dev/WeatherMap/image?description=1&amp;descriptionEditable=Visualizing%20weather%20conditions%20across%20any%20selected%20region.&amp;font=Jost&amp;forks=1&amp;issues=1&amp;name=1&amp;owner=1&amp;pattern=Signal&amp;pulls=1&amp;stargazers=1&amp;theme=Dark" alt="project-image"></p>
 
 <hr>
 

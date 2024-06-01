@@ -12,7 +12,7 @@
         "creating_image_at_index": "Creating image %index% of %total%..."
     },
     "main_window": {
-        "title": "CloudRadar",
+        "title": "WeatherMap",
         "forecast": "Forecast (h)",
         "latitude": "Latitude",
         "longitude": "Longitude",

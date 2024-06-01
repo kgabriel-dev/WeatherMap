@@ -12,7 +12,7 @@
         "creating_image_at_index": "Erstelle Bild %index% von %total%..."
     },
     "main_window": {
-        "title": "Wolkenradar",
+        "title": "WeatherMap",
         "forecast": "Vorhersage (h)",
         "latitude": "Breitengrad",
         "longitude": "Längengrad",
