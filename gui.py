@@ -89,32 +89,32 @@ def create_layout():
 
     options = [
         sg.Push(),
-        sg.Text(lm.get_string("main_window.forecast", suffix=':')),
+        sg.Text(lm.get_string("main_window.forecast", suffix=':'), key='forecast_length_text'),
         sg.Input(key='forecast_length', size=(7,1), default_text=str(values['forecast_length'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
-        sg.Text(lm.get_string("main_window.latitude", suffix=':')),
+        sg.Text(lm.get_string("main_window.latitude", suffix=':'), key='latitude_text'),
         sg.Input(key='latitude', size=(7,1), default_text=str(values['latitude'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
-        sg.Text(lm.get_string("main_window.longitude", suffix=':')),
+        sg.Text(lm.get_string("main_window.longitude", suffix=':'), key='longitude_text'),
         sg.Input(key='longitude', size=(7,1), default_text=str(values['longitude'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
-        sg.Text(lm.get_string("main_window.data_source", suffix=':')),
+        sg.Text(lm.get_string("main_window.data_source", suffix=':'), key='source_text'),
         sg.Combo(['OpenMeteo', 'BrightSky (DWD)'], key='source', default_value=str(values['source']), size=(15,1), readonly=True),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
-        sg.Text(lm.get_string("main_window.size", suffix=':')),
+        sg.Text(lm.get_string("main_window.size", suffix=':'), key='size_text'),
         sg.Input(key='size', size=(6,1), default_text=str(values['size'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
-        sg.Text(lm.get_string("main_window.resolution", suffix=':')),
+        sg.Text(lm.get_string("main_window.resolution", suffix=':'), key='resolution_text'),
         sg.Input(key='resolution', size=(4,1), default_text=str(values['resolution'])),
         sg.Push(),
         sg.VSeparator(),
@@ -187,6 +187,18 @@ def scale_cloud_images():
     set_log_text(lm.get_string("log.finished_all_steps"))
 
 
+def update_texts_of_elements(window, lm):
+    window['forecast_length_text'].update(lm.get_string("main_window.forecast", suffix=':'))
+    window['latitude_text'].update(lm.get_string("main_window.latitude", suffix=':'))
+    window['longitude_text'].update(lm.get_string("main_window.longitude", suffix=':'))
+    window['source_text'].update(lm.get_string("main_window.data_source", suffix=':'))
+    window['size_text'].update(lm.get_string("main_window.size", suffix=':'))
+    window['resolution_text'].update(lm.get_string("main_window.resolution", suffix=':'))
+    window['calculate_button'].update(lm.get_string("main_window.calc_and_show"))
+    window['settings_button'].update(lm.get_string("main_window.settings"))
+    window['animation_checkbox'].update(lm.get_string("main_window.animation"))
+
+
 def run_gui():
     global thread, global_log_text, number_of_images, screen_factor, auto_start_data_retreival, last_resize_time, settings_gui, settings, settings_changed, thread_blocks, update_available_notification
 
@@ -255,6 +267,8 @@ def run_gui():
             window['source'].update(value=settings_values['source'])
             window['size'].update(value=settings_values['size'])
             window['resolution'].update(value=settings_values['resolution'])
+
+            update_texts_of_elements(window, lm)
 
         # check if the window was resized and rescale the images
         if event == 'Configure' and thread_blocks is False and (datetime.now() - last_resize_time).total_seconds() > 1:

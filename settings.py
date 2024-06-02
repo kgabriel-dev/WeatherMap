@@ -32,6 +32,8 @@ class Settings:
     def change_settings(self, settings):
         for key, value in settings.items():
             self.change_setting_entry(key, value)
+        
+        
 
     def load_settings_from_file(self, file_path):
         if not os.path.exists(file_path):
@@ -120,7 +122,6 @@ class SettingsGUI:
                                 readonly=True
                             )
                         ],
-                        [sg.Text(self.lm.get_string("settings_window.requires_restart"))],
                         [sg.HSeparator()],
                         [sg.Checkbox(self.lm.get_string("settings_window.load_data_at_start"), default=self.settings.get_settings()['load_data_on_start'], key='load_data_on_start')],
                         [sg.HSeparator()],
@@ -159,5 +160,6 @@ class SettingsGUI:
         self.settings.save_settings_to_file('settings.json')
         
         self.change_settings_callback(settings)
+        self.lm.set_language(settings['language'])
 
         self.settings_gui.close()
