@@ -11,6 +11,7 @@ class LanguageManager:
 
         self.load_language_file()
 
+    # Set the language to be used
     def set_language(self, language):
         if language not in self.accepted_languages:
             raise Exception('Language not supported')
@@ -18,9 +19,11 @@ class LanguageManager:
         self.language = language
         self.load_language_file()
 
+    # Get the current language
     def get_language(self):
         return self.language
     
+    # load the language file for the current language
     def load_language_file(self):
         print('Loading language file for ' + self.language)
 
@@ -34,6 +37,7 @@ class LanguageManager:
         self.language_file = open(file_dir, 'r', encoding='utf-8')
         self.language_data = json.load(self.language_file)
 
+    # Get a string from the language file defined by the dotkey
     def get_string(self, dotkey, prefix='', suffix='', replace_dict={}):
         keys = dotkey.split('.')
         data = self.language_data

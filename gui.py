@@ -37,11 +37,13 @@ auto_start_data_retreival = False
 update_available_notification = False
 
 
+# This function is used to set the log text in the GUI
 def set_log_text(text):
     global global_log_text
     global_log_text = lm.get_string("log.output_beginning", suffix=': ') + str(text)
 
 
+# This function is used to finish the thread and do the final steps
 def finish_thread():
     global global_log_text, thread, number_of_images, screen_factor, thread_blocks
     global_log_text = lm.get_string("log.calculation_finished")
@@ -60,6 +62,7 @@ def finish_thread():
     thread_blocks = False
 
 
+# This function is used to check for updates
 def check_for_updates():
     global update_available_notification
 
@@ -183,17 +186,22 @@ def scale_cloud_images():
 
     set_log_text(lm.get_string("log.finished_all_steps"))
 
+
 def run_gui():
     global thread, global_log_text, number_of_images, screen_factor, auto_start_data_retreival, last_resize_time, settings_gui, settings, settings_changed, thread_blocks, update_available_notification
 
     number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('clouds_')])
 
+    # create the window
     window = sg.Window(lm.get_string("main_window.title"), create_layout(), finalize=True, resizable=True, icon='app.ico')
     window.maximize()
 
+    # bind the configure event of the window to later get the new size of the window
     window.bind('<Configure>', 'Configure')
+    # bind the slider event to get the new image index
     window['index_slider'].bind('<ButtonRelease-1>', 'index_slider')
 
+    # create the settings GUI
     settings_gui = SettingsGUI(window, settings, change_settings, lm)
 
     image_index = 0
@@ -202,6 +210,7 @@ def run_gui():
 
     last_resize_time = datetime.now()
 
+    # check if an update is available and show a notification
     if update_available_notification is True:
         update_available_notification = False
 
@@ -229,6 +238,7 @@ def run_gui():
         
         update_window.close()
 
+    # main event loop of the GUI
     while True:
         event, values = window.read(timeout=500)
 
@@ -239,8 +249,6 @@ def run_gui():
             settings_changed = False
             settings_values = settings.get_settings()
 
-            print(settings_values)
-
             window['forecast_length'].update(value=settings_values['forecast_length'])
             window['latitude'].update(value=settings_values['latitude'])
             window['longitude'].update(value=settings_values['longitude'])
@@ -248,6 +256,7 @@ def run_gui():
             window['size'].update(value=settings_values['size'])
             window['resolution'].update(value=settings_values['resolution'])
 
+        # check if the window was resized and rescale the images
         if event == 'Configure' and thread_blocks is False and (datetime.now() - last_resize_time).total_seconds() > 1:
             window_height = window.size[1]
             
@@ -269,12 +278,17 @@ def run_gui():
 
         window['log_text'].update(global_log_text)
 
+        # check if the animation checkbox is checked and the thread is not blocked
         if values['animation_checkbox'] is True and thread_blocks is False and number_of_images > 0:
+            # update the image index and the image
             window['index_slider'].update(range=(0, max(number_of_images - 1, 1)))
+        # check if the animation checkbox is unchecked and the thread is not blocked
         elif values['animation_checkbox'] is False and thread_blocks is False:
+            # update the image index and the image
             image_index = int(values['index_slider'])
             window['forecast_image'].update(filename=f'{data_directory}/clouds_{image_index}.png')
 
+        # on an timeout event, show the next image if wanted by the user
         if event == sg.TIMEOUT_KEY:
             number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('clouds_')])
 
@@ -284,6 +298,7 @@ def run_gui():
 
                 image_index = (image_index + 1) % number_of_images
 
+        # check if the user wants to calculate the data
         if (event == 'calculate_button' or auto_start_data_retreival is True) and thread_blocks is False:
             auto_start_data_retreival = False
             forecast_length = int(values['forecast_length'])
@@ -323,6 +338,7 @@ def run_gui():
             # start the thread
             thread.start()
 
+        # check if the user wants to open the settings window
         if event == 'settings_button' and SettingsGUI is not None:
             settings_gui.open_settings_window()
             
