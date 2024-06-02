@@ -8,13 +8,12 @@ import numpy as np
 import os
 from datetime import datetime
 import sys
-from scipy.interpolate import LinearNDInterpolator
 
 
 states_map = None
 countries_map = None
 
-def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callback, start_date, last_date, lat, lon, size, number_of_size_steps, lm, timezone):
+def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callback, start_date, last_date, lat, lon, size, number_of_size_steps, lm, timezone, interpolate):
     global states_map, countries_map
 
     weather_data = {}
@@ -145,32 +144,23 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
         data = clouds_cover_over_time[entry]
         df = pd.DataFrame(data, columns=x_labels, index=y_labels)
 
-        cartcoord = [(x, y) for x in x_labels for y in y_labels]
-        print(cartcoord)
-        print(df.values.flatten())
+        x = df.columns
+        y = df.index
+        z = df.values
 
-        X = np.linspace(min(x_labels), max(x_labels))
-        Y = np.linspace(min(y_labels), max(y_labels))
-        X, Y = np.meshgrid(X, Y)
-
-        interp_data = LinearNDInterpolator(cartcoord, df.values.flatten())
-        interp_df = pd.DataFrame(interp_data(X, Y), columns=X[0], index=Y[:,0])
-
-        x = interp_df.columns
-        y = interp_df.index
-        z = interp_df.values  
-        cmesh = ax.pcolormesh(
-            x,
-            y,
+        im = ax.imshow(
             z,
             cmap=cmap,
-            shading='auto',
             vmin=data_retreiver.min_value,
             vmax=data_retreiver.max_value,
-            zorder=10
+            zorder=10,
+            aspect=lon_resolution/lat_resolution,
+            interpolation='bicubic' if interpolate else 'antialiased',
+            extent=[min(x) - lon_resolution/2, max(x) + lon_resolution/2, min(y) - lat_resolution/2, max(y) + lat_resolution/2]
         )
 
         image_date = datetime.fromisoformat(entry)
+
         ax.set_title(lm.get_string('weather_image.label_time', replace_dict={
             'day': image_date.day,
             'month': image_date.month,
@@ -183,16 +173,16 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
             ax.set_ylim(min(y) - lat_resolution, max(y) + lat_resolution)
             ax.set_xlim(min(x) - lon_resolution, max(x) + lon_resolution)
             fig.colorbar(
-                cmesh,
+                im,
                 ax=ax,
                 orientation='vertical',
                 label=lm.get_string("weather_image.label_weather"),
-                fraction=0.047*(interp_df.shape[0]/interp_df.shape[1])
+                fraction=0.047*(df.shape[0]/df.shape[1])
             )
 
         plt.savefig(f'{data_dir}/originals/clouds_{figure_index}.png', dpi=150, transparent=False, format='png', bbox_inches='tight', pad_inches=0.1)
 
-        cmesh.remove()
+        im.remove()
 
     plt.close(fig)
     

@@ -335,7 +335,7 @@ def run_gui():
                 case 'OpenMeteo':
                     data_source = OpenMeteo()
 
-            thread = Thread(target=retreive_and_handle_data, args=(data_source, data_directory, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution, lm, settings.get_settings()['timezone']))
+            thread = Thread(target=retreive_and_handle_data, args=(data_source, data_directory, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution, lm, settings.get_settings()['timezone'], settings.get_settings()['interpolation']))
             thread_blocks = True
 
             window['forecast_image'].update(filename=None)

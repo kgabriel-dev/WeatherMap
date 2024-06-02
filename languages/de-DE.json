@@ -35,7 +35,9 @@
         "load_data_at_start": "Daten beim Start laden",
         "timezone": "Zeitzone",
         "cancel": "Abbrechen",
-        "save": "Speichern"
+        "save": "Speichern",
+        "interpolation": "Interpolation",
+        "interpolation_info": "(Interpolation erzeugt Wetterdaten für die ganze Karte. Je höher die Auflösung ist, desto genauer sind die Daten.)"
     },
     "weather_image": {
         "label_latitude": "Breitengrad",

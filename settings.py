@@ -17,7 +17,8 @@ class Settings:
             "resolution": 5,
             "language": "en-US",
             "load_data_on_start": False,
-            "timezone": "America/New_York"
+            "timezone": "America/New_York",
+            "interpolation": False
         }
     
     def get_settings(self):
@@ -126,7 +127,10 @@ class SettingsGUI:
                         [sg.Checkbox(self.lm.get_string("settings_window.load_data_at_start"), default=self.settings.get_settings()['load_data_on_start'], key='load_data_on_start')],
                         [sg.HSeparator()],
                         [sg.Text(self.lm.get_string("settings_window.timezone", suffix=':'))],
-                        [sg.Combo(pytz.common_timezones, key='timezone', default_value=str(self.settings.get_settings()['timezone']), readonly=True)]
+                        [sg.Combo(pytz.common_timezones, key='timezone', default_value=str(self.settings.get_settings()['timezone']), readonly=True)],
+                        [sg.HSeparator()],
+                        [sg.Checkbox(self.lm.get_string("settings_window.interpolation"), default=self.settings.get_settings()['interpolation'], key='interpolation')],
+                        [sg.Text(self.lm.get_string("settings_window.interpolation_info"), size=(35, 4))]
                     ],
                     vertical_alignment='top',
                     element_justification='left'
@@ -153,7 +157,8 @@ class SettingsGUI:
             'resolution': int(values['resolution']),
             'language': LanguageManager.get_language_code_by_name(values['language']),
             'load_data_on_start': values['load_data_on_start'],
-            'timezone': values['timezone']
+            'timezone': values['timezone'],
+            'interpolation': values['interpolation']
         }
 
         self.settings.change_settings(settings)

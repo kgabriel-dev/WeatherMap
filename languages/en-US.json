@@ -35,7 +35,9 @@
         "load_data_at_start": "Load data on start",
         "timezone": "Timezone",
         "cancel": "Cancel",
-        "save": "Save"
+        "save": "Save",
+        "interpolation": "Interpolation",
+        "interpolation_info": "(Interpolation is used to calculate weather data for the whole map. With a higher resolution, the result will be more accurate.)"
     },
     "weather_image": {
         "label_latitude": "Latitude",
