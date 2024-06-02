@@ -32,8 +32,8 @@
         "size": "Größe (in km)",
         "resolution": "Auflösung",
         "language": "Sprache",
-        "requires_restart": "(Erfordert Neustart des Programms)",
         "load_data_at_start": "Daten beim Start laden",
+        "timezone": "Zeitzone",
         "cancel": "Abbrechen",
         "save": "Speichern"
     },

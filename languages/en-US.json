@@ -32,8 +32,8 @@
         "size": "Size (in km)",
         "resolution": "Resolution",
         "language": "Language",
-        "requires_restart": "(requires restart)",
         "load_data_at_start": "Load data on start",
+        "timezone": "Timezone",
         "cancel": "Cancel",
         "save": "Save"
     },
