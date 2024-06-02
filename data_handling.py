@@ -8,6 +8,7 @@ import numpy as np
 import os
 from datetime import datetime
 import sys
+from scipy.interpolate import LinearNDInterpolator
 
 
 states_map = None
@@ -144,9 +145,20 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
         data = clouds_cover_over_time[entry]
         df = pd.DataFrame(data, columns=x_labels, index=y_labels)
 
-        x = df.columns
-        y = df.index
-        z = df.values  
+        cartcoord = [(x, y) for x in x_labels for y in y_labels]
+        print(cartcoord)
+        print(df.values.flatten())
+
+        X = np.linspace(min(x_labels), max(x_labels))
+        Y = np.linspace(min(y_labels), max(y_labels))
+        X, Y = np.meshgrid(X, Y)
+
+        interp_data = LinearNDInterpolator(cartcoord, df.values.flatten())
+        interp_df = pd.DataFrame(interp_data(X, Y), columns=X[0], index=Y[:,0])
+
+        x = interp_df.columns
+        y = interp_df.index
+        z = interp_df.values  
         cmesh = ax.pcolormesh(
             x,
             y,
@@ -175,7 +187,7 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
                 ax=ax,
                 orientation='vertical',
                 label=lm.get_string("weather_image.label_weather"),
-                fraction=0.047*(df.shape[0]/df.shape[1])
+                fraction=0.047*(interp_df.shape[0]/interp_df.shape[1])
             )
 
         plt.savefig(f'{data_dir}/originals/clouds_{figure_index}.png', dpi=150, transparent=False, format='png', bbox_inches='tight', pad_inches=0.1)
