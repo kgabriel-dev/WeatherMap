@@ -51,13 +51,13 @@ def finish_thread():
 
     set_log_text(lm.get_string("log.deleting_images"))
     for image_name in os.listdir(data_directory):
-        if image_name.startswith('clouds_'):
+        if image_name.startswith('image_'):
             os.remove(os.path.join(data_directory, image_name))
 
     scale_cloud_images()
     
     set_log_text(lm.get_string("log.finished_all_steps"))
-    number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('clouds_')])
+    number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('image_')])
 
     thread_blocks = False
 
@@ -94,6 +94,10 @@ def create_layout():
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
+        sg.Combo([], [], key='forecast_category', size=(30,1), readonly=True),
+        sg.Push(),
+        sg.VSeparator(),
+        sg.Push(),
         sg.Text(lm.get_string("main_window.latitude", suffix=':'), key='latitude_text'),
         sg.Input(key='latitude', size=(7,1), default_text=str(values['latitude'])),
         sg.Push(),
@@ -105,7 +109,7 @@ def create_layout():
         sg.VSeparator(),
         sg.Push(),
         sg.Text(lm.get_string("main_window.data_source", suffix=':'), key='source_text'),
-        sg.Combo(['OpenMeteo', 'BrightSky (DWD)'], key='source', default_value=str(values['source']), size=(15,1), readonly=True),
+        sg.Combo(['OpenMeteo', 'BrightSky (DWD)'], key='source', default_value=str(values['source']), size=(15,1), readonly=True, enable_events=True),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
@@ -165,12 +169,12 @@ def change_settings(new_settings_values):
 def scale_cloud_images():
     global last_resize_time, number_of_images, thread_blocks
 
-    number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('clouds_')])
+    number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('image_')])
 
     scaled_images = 0
 
     for file_name in os.listdir(data_directory + '/originals'):
-        if file_name.startswith('clouds_'):
+        if file_name.startswith('image_'):
             set_log_text(lm.get_string("log.scale_image_at_index", replace_dict={'index': str(scaled_images + 1), 'total': str(number_of_images)}))
 
             image = PIL.Image.open(os.path.join(data_directory + '/originals', file_name))
@@ -187,7 +191,8 @@ def scale_cloud_images():
     set_log_text(lm.get_string("log.finished_all_steps"))
 
 
-def update_texts_of_elements(window, lm):
+def update_texts_of_elements(window, lm, values):
+    # update the texts of most elements
     window['forecast_length_text'].update(lm.get_string("main_window.forecast", suffix=':'))
     window['latitude_text'].update(lm.get_string("main_window.latitude", suffix=':'))
     window['longitude_text'].update(lm.get_string("main_window.longitude", suffix=':'))
@@ -198,11 +203,24 @@ def update_texts_of_elements(window, lm):
     window['settings_button'].update(lm.get_string("main_window.settings"))
     window['animation_checkbox'].update(lm.get_string("main_window.animation"))
 
+    # update the entries of the forecast category
+    data_retreiver = None
+
+    match(values['source']):
+        case 'BrightSky (DWD)':
+            data_retreiver = BrightSky()
+        case 'OpenMeteo':
+            data_retreiver = OpenMeteo()
+
+    if data_retreiver is not None:
+        category_names = [lm.get_string(f"weather_image.bar_label.{data_retreiver.name}.{key}") for key in data_retreiver.categories.keys()]
+        window['forecast_category'].update(values=category_names, value=category_names[0])
+
 
 def run_gui():
     global thread, global_log_text, number_of_images, screen_factor, auto_start_data_retreival, last_resize_time, settings_gui, settings, settings_changed, thread_blocks, update_available_notification
 
-    number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('clouds_')])
+    number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('image_')])
 
     # create the window
     window = sg.Window(lm.get_string("main_window.title"), create_layout(), finalize=True, resizable=True, icon='app.ico')
@@ -212,6 +230,18 @@ def run_gui():
     window.bind('<Configure>', 'Configure')
     # bind the slider event to get the new image index
     window['index_slider'].bind('<ButtonRelease-1>', 'index_slider')
+
+    # set the selection values of the forecast category
+    data_retreiver = None
+    match(settings.get_settings()['source']):
+        case 'BrightSky (DWD)':
+            data_retreiver = BrightSky()
+        case 'OpenMeteo':
+            data_retreiver = OpenMeteo()
+
+    if data_retreiver is not None:
+        category_names = [lm.get_string(f"weather_image.bar_label.{data_retreiver.name}.{key}") for key in data_retreiver.categories.keys()]
+        window['forecast_category'].update(values=category_names, value=category_names[0])
 
     # create the settings GUI
     settings_gui = SettingsGUI(window, settings, change_settings, lm)
@@ -268,7 +298,7 @@ def run_gui():
             window['size'].update(value=settings_values['size'])
             window['resolution'].update(value=settings_values['resolution'])
 
-            update_texts_of_elements(window, lm)
+            update_texts_of_elements(window, lm, values)
 
         # check if the window was resized and rescale the images
         if event == 'Configure' and thread_blocks is False and (datetime.now() - last_resize_time).total_seconds() > 1:
@@ -300,17 +330,31 @@ def run_gui():
         elif values['animation_checkbox'] is False and thread_blocks is False:
             # update the image index and the image
             image_index = int(values['index_slider'])
-            window['forecast_image'].update(filename=f'{data_directory}/clouds_{image_index}.png')
+            window['forecast_image'].update(filename=f'{data_directory}/image_{image_index}.png')
 
         # on an timeout event, show the next image if wanted by the user
         if event == sg.TIMEOUT_KEY:
-            number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('clouds_')])
+            number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('image_')])
 
             if values['animation_checkbox'] is True and thread_blocks is False and number_of_images > 0:
-                window['forecast_image'].update(filename=f'{data_directory}/clouds_{image_index}.png')
+                window['forecast_image'].update(filename=f'{data_directory}/image_{image_index}.png')
                 window['index_slider'].update(value=image_index)
 
                 image_index = (image_index + 1) % number_of_images
+
+        # check if the user selected a different data source
+        if event == 'source':
+            data_retreiver = None
+
+            match(values['source']):
+                case 'BrightSky (DWD)':
+                    data_retreiver = BrightSky()
+                case 'OpenMeteo':
+                    data_retreiver = OpenMeteo()
+
+            if data_retreiver is not None:
+                category_names = [lm.get_string(f"weather_image.bar_label.{data_retreiver.name}.{key}") for key in data_retreiver.categories.keys()]
+                window['forecast_category'].update(values=category_names, value=category_names[0])
 
         # check if the user wants to calculate the data
         if (event == 'calculate_button' or auto_start_data_retreival is True) and thread_blocks is False:
@@ -335,7 +379,10 @@ def run_gui():
                 case 'OpenMeteo':
                     data_source = OpenMeteo()
 
-            thread = Thread(target=retreive_and_handle_data, args=(data_source, data_directory, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution, lm, settings.get_settings()['timezone'], settings.get_settings()['interpolation']))
+            forecast_category = lm.get_keys_by_value(values['forecast_category'], start_dotkey=f"weather_image.bar_label.{data_source.name}")[0].split('.')[-1]
+            print(f"Forecast category: {forecast_category}", values['forecast_category'])
+
+            thread = Thread(target=retreive_and_handle_data, args=(data_source, forecast_category, data_directory, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution, lm, settings.get_settings()['timezone'], settings.get_settings()['interpolation']))
             thread_blocks = True
 
             window['forecast_image'].update(filename=None)
@@ -343,10 +390,10 @@ def run_gui():
 
             # delete all images
             for image_name in os.listdir(data_directory):
-                if image_name.startswith('clouds_'):
+                if image_name.startswith('image_'):
                     os.remove(os.path.join(data_directory, image_name))
             for image_name in os.listdir(data_directory + '/originals'):
-                if image_name.startswith('clouds_'):
+                if image_name.startswith('image_'):
                     os.remove(os.path.join(data_directory + '/originals', image_name))
 
             # start the thread

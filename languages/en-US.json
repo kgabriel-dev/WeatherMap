@@ -43,8 +43,32 @@
         "label_latitude": "Latitude",
         "label_longitude": "Longitude",
         "label_position": "Position",
-        "label_weather": "Cloudiness (%)",
-        "label_time": "%month%/%day%/%year% %hour%:%minute%"
+        "label_time": "%month%/%day%/%year% %hour%:%minute%",
+        "bar_label": {
+            "OpenMeteo": {
+                "cloud_cover": "Cloudiness (%)",
+                "temperature_2m": "Temperature (°C)",
+                "relative_humidity_2m": "Relative humidity (%)",
+                "cloud_cover_low": "Cloudiness low (%)",
+                "cloud_cover_mid": "Cloudiness mid (%)",
+                "cloud_cover_high": "Cloudiness high (%)",
+                "dew_point_2m": "Dew point (°C)",
+                "pressure_msl": "Pressure (hPa)",
+                "precipitation": "Precipitation (mm)",
+                "precipitation_probability": "Precipitation probability (%)",
+                "visibility": "Visibility (m)"
+            },
+            "BrightSky": {
+                "cloud_cover": "Cloudiness (%)",
+                "dew_point": "Dew point (°C)",
+                "precipitation_probability": "Precipitation probability (%)",
+                "pressure_msl": "Pressure (hPa)",
+                "relative_humidity": "Relative humidity (%)",
+                "temperature": "Temperature (°C)",
+                "visibility": "Visibility (m)",
+                "wind_speed": "Wind speed (m/s)"
+            }
+        }
     },
     "update": {
         "title": "Update available",

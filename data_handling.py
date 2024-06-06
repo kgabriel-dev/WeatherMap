@@ -13,7 +13,7 @@ import sys
 states_map = None
 countries_map = None
 
-def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callback, start_date, last_date, lat, lon, size, number_of_size_steps, lm, timezone, interpolate):
+def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, finished_callback, start_date, last_date, lat, lon, size, number_of_size_steps, lm, timezone, interpolate):
     global states_map, countries_map
 
     weather_data = {}
@@ -46,7 +46,7 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
             }))
 
             # retrieve the weather data for the current location
-            data = data_retreiver.get_weather(start_date.isoformat(), last_date.isoformat(), latitude, longitude, timezone)
+            data = data_retreiver.get_weather(start_date.isoformat(), last_date.isoformat(), latitude, longitude, timezone, data_category)
 
             # iterate over the time entries in the data and store the cloud coverage
             for entry in data:
@@ -56,13 +56,13 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
                     weather_data[timestamp] = {}
 
                 # check if there was an error or if the cloud coverage is missing
-                if entry['error'] is True or 'cloud_cover' not in entry:
+                if entry['error'] is True or 'value' not in entry:
                     weather_data[timestamp][(latitude, longitude)] = None
                     continue
 
                 # no problems detected
-                cloud_coverage = entry['cloud_cover']
-                weather_data[timestamp][(latitude, longitude)] = cloud_coverage
+                time_info = entry['value']
+                weather_data[timestamp][(latitude, longitude)] = time_info
         
             # wait for the delay time, and log the waiting time if it is greater than 1 second
             if(data_retreiver.request_delay >= 1):
@@ -71,24 +71,24 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
             time.sleep(data_retreiver.request_delay)
     
     # convert the data to a format that returns all locations for a given timestamp
-    clouds_cover_over_time = {}
+    weather_info_over_time = {}
 
     for timestamp in weather_data:
-        clouds_cover_over_time[timestamp] = []
+        weather_info_over_time[timestamp] = []
 
         for lat_index in range(number_of_size_steps):
             lat_offset = negative_offset + lat_index
             latitude = lat + (lat_offset * lat_resolution)
             latitude = round(latitude, 2)
 
-            clouds_cover_over_time[timestamp].insert(0, [clouds for location, clouds in weather_data[timestamp].items() if location[0] == latitude])
+            weather_info_over_time[timestamp].insert(0, [info for location, info in weather_data[timestamp].items() if location[0] == latitude])
 
     # remove old images
     for file in os.listdir(data_dir):
-        if file.startswith('clouds_'):
+        if file.startswith('image_'):
             os.remove(os.path.join(data_dir, file))
     for file in os.listdir(data_dir + '/originals'):
-        if file.startswith('clouds_'):
+        if file.startswith('image_'):
             os.remove(os.path.join(data_dir + '/originals', file))
 
     # read the shapefiles if they are not already loaded
@@ -102,7 +102,7 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
     
 
     log_text(lm.get_string("log.preparing_images"))
-    number_of_keys = len(clouds_cover_over_time.keys())
+    number_of_keys = len(weather_info_over_time.keys())
 
     # create the labels for the x and y axis
     x_labels = [lon + ((negative_offset + x) * lon_resolution) for x in range(number_of_size_steps)]
@@ -112,10 +112,10 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
     y_labels.reverse()
 
     # create the color map for the cloud coverage
-    color_clear = np.array([1, 1, 1, 0.8])
-    color_clouds = np.array([0, 0, 1, 0.8])
-    color_vector = color_clouds - color_clear
-    colors = [color_clear + (color_vector * i) for i in np.linspace(0, 1, 256)]
+    color_good = np.array([1, 1, 1, 0.8])
+    color_bad = np.array([0, 0, 1, 0.8])
+    color_vector = color_bad - color_good
+    colors = [color_good + (color_vector * i) for i in np.linspace(0, 1, 256)]
     cmap = mpl.colors.LinearSegmentedColormap.from_list('custom', colors)
 
     # create folder if not exists
@@ -140,19 +140,22 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
             'total': number_of_keys
         }))
         
-        entry = list(clouds_cover_over_time.keys())[figure_index]
-        data = clouds_cover_over_time[entry]
+        entry = list(weather_info_over_time.keys())[figure_index]
+        data = weather_info_over_time[entry]
         df = pd.DataFrame(data, columns=x_labels, index=y_labels)
 
         x = df.columns
         y = df.index
         z = df.values
 
+        min_value = data_retreiver.categories[data_category]['min'] if data_retreiver.categories[data_category]['min'] is not None else min([min(row) for row in z])
+        max_value = data_retreiver.categories[data_category]['max'] if data_retreiver.categories[data_category]['max'] is not None else max([max(row) for row in z])
+
         im = ax.imshow(
             z,
             cmap=cmap,
-            vmin=data_retreiver.min_value,
-            vmax=data_retreiver.max_value,
+            vmin=min_value,
+            vmax=max_value,
             zorder=10,
             aspect=lon_resolution/lat_resolution,
             interpolation='bicubic' if interpolate else 'antialiased',
@@ -176,11 +179,11 @@ def retreive_and_handle_data(data_retreiver, data_dir, log_text, finished_callba
                 im,
                 ax=ax,
                 orientation='vertical',
-                label=lm.get_string("weather_image.label_weather"),
+                label=lm.get_string(f"weather_image.bar_label.{data_retreiver.name}.{data_category}"),
                 fraction=0.047*(df.shape[0]/df.shape[1])
             )
 
-        plt.savefig(f'{data_dir}/originals/clouds_{figure_index}.png', dpi=150, transparent=False, format='png', bbox_inches='tight', pad_inches=0.1)
+        plt.savefig(f'{data_dir}/originals/image_{figure_index}.png', dpi=150, transparent=False, format='png', bbox_inches='tight', pad_inches=0.1)
 
         im.remove()
 

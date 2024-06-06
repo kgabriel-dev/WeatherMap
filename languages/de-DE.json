@@ -43,8 +43,32 @@
         "label_latitude": "Breitengrad",
         "label_longitude": "Längengrad",
         "label_position": "Standort",
-        "label_weather": "Bewölkung (%)",
-        "label_time": "%day%.%month%.%year%, %hour%:%minute%"
+        "label_time": "%day%.%month%.%year%, %hour%:%minute%",
+        "bar_label": {
+            "OpenMeteo": {
+                "cloud_cover": "Bewölkung (%)",
+                "temperature_2m": "Temperatur (°C)",
+                "relative_humidity_2m": "Relative Luftfeuchte (%)",
+                "cloud_cover_low": "Bewölkung (%, niedrige Höhe)",
+                "cloud_cover_mid": "Bewölkung (%, mittlere Höhe)",
+                "cloud_cover_high": "Bewölkung (%, hohe Höhe)",
+                "dew_point_2m": "Taupunkt (°C)",
+                "pressure_msl": "Luftdruck (hPa)",
+                "precipitation": "Niederschlag (mm)",
+                "precipitation_probability": "Regenwahrscheinlichkeit (%)",
+                "visibility": "Sichtweite (m)"
+            },
+            "BrightSky": {
+                "cloud_cover": "Bewölkung (%)",
+                "dew_point": "Taupunkt (°C)",
+                "precipitation_probability": "Regenwahrscheinlichkeit (%)",
+                "pressure_msl": "Luftdruck (hPa)",
+                "relative_humidity": "Relative Luftfeuchte (%)",
+                "temperature": "Temperatur (°C)",
+                "visibility": "Sichtweite (m)",
+                "wind_speed": "Windgeschwindigkeit (m/s)"
+            }
+        }
     },
     "update": {
         "title": "Update verfügbar",

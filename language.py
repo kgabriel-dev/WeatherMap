@@ -52,6 +52,45 @@ class LanguageManager:
         
         return prefix + data + suffix
     
+    # Get a list of all keys that have a given value
+    def get_keys_by_value(self, lookup_value, key_list=[], start_dotkey=''):
+        if not key_list:
+            key_list = []
+        
+        # get the data for the current key
+        language_data = self.language_data
+        keys = start_dotkey.split('.')
+
+        for key in keys:
+            if not key:
+                continue
+
+            if key not in language_data:
+                return key_list
+            
+            language_data = language_data[key]
+
+        # iterate over the data
+        for key, value in language_data.items():
+
+            # recursively search for the value in the dictionary
+            if type(value) is dict:
+                for key in self.get_keys_by_value(lookup_value, key_list, (start_dotkey + '.' + key) if start_dotkey else key):
+                    if key not in key_list:
+                        key_list.append(key)
+
+                continue
+            
+            # check if the value is the one we are looking for
+            if value == lookup_value:
+                new_key = (start_dotkey + '.' + key) if start_dotkey else key
+
+                if new_key not in key_list:
+                    key_list.append(start_dotkey + '.' + key if start_dotkey else key)
+
+        return key_list
+
+
     @staticmethod
     def get_language_name_by_code(code):
         if code == 'en-US':

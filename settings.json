@@ -4,8 +4,8 @@
     "longitude": -73.94,
     "source": "OpenMeteo",
     "size": 100.0,
-    "resolution": 5,
-    "language": "en-US",
+    "resolution": 3,
+    "language": "de-DE",
     "load_data_on_start": false,
     "timezone": "America/New_York",
     "interpolation": false
