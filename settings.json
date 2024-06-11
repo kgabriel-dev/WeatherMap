@@ -8,5 +8,6 @@
     "language": "de-DE",
     "load_data_on_start": false,
     "timezone": "America/New_York",
-    "interpolation": false
+    "interpolation": false,
+    "data_category": "Cloudiness (%)"
 }
