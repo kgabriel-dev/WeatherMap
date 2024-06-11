@@ -3,6 +3,7 @@ import PySimpleGUI as sg
 from language import LanguageManager
 import pytz
 import os
+from data_retreivers import OpenMeteo, BrightSky
 
 
 class Settings:
@@ -18,7 +19,8 @@ class Settings:
             "language": "en-US",
             "load_data_on_start": False,
             "timezone": "America/New_York",
-            "interpolation": False
+            "interpolation": False,
+            "data_category": "cloud_cover"
         }
     
     def get_settings(self):
@@ -66,12 +68,29 @@ class SettingsGUI:
 
     def open_settings_window(self):
         layout = self.create_layout()
-        window = sg.Window(self.lm.get_string("settings_window.title"), layout, modal=True, finalize=True)
+        window = sg.Window(self.lm.get_string("settings_window.title"), layout, modal=True, finalize=True, icon='app.ico')
 
         self.settings_gui = window
 
         while True:
             event, values = window.read()
+
+            # check if the user selected a different data source
+            if event == 'source':
+                data_retreiver = None
+
+                match(values['source']):
+                    case 'BrightSky (DWD)':
+                        data_retreiver = BrightSky()
+                    case 'OpenMeteo':
+                        data_retreiver = OpenMeteo()
+
+                print(values['source'])
+
+                if data_retreiver is not None:
+                    print(values['source'])
+                    category_names = self.get_all_forecast_categories(values['source'])
+                    window['forecast_category'].update(values=category_names, value=category_names[0])
 
             if event == sg.WIN_CLOSED:
                 break
@@ -82,6 +101,35 @@ class SettingsGUI:
                 break
 
         window.close()
+
+
+    def get_all_forecast_categories(self, source_name):
+        data_retreiver = None
+
+        match(source_name):
+            case 'BrightSky (DWD)':
+                data_retreiver = BrightSky()
+            case 'OpenMeteo':
+                data_retreiver = OpenMeteo()
+
+        print(data_retreiver)
+
+        if data_retreiver is not None:
+            category_names = [self.lm.get_string(f"weather_image.bar_label.{data_retreiver.name}.{key}") for key in data_retreiver.categories.keys()]
+            return category_names
+        
+        return []
+    
+
+    def get_forecast_category(self, source_name):
+        current_selection = self.settings.get_settings()['data_category']
+        all_categories = self.get_all_forecast_categories(source_name)
+
+        if current_selection in all_categories:
+            return current_selection
+        else:
+            return current_selection if current_selection in all_categories else all_categories[0]
+
     
     def create_layout(self):
         layout = [
@@ -98,7 +146,10 @@ class SettingsGUI:
                         [sg.InputText(self.settings.get_settings()['longitude'], key='longitude')],
                         [sg.HSeparator()],
                         [sg.Text(self.lm.get_string("settings_window.data_source", suffix=':'))],
-                        [sg.Combo(['OpenMeteo', 'BrightSky (DWD)'], key='source', default_value=str(self.settings.get_settings()['source']), size=(15,1), readonly=True)],
+                        [sg.Combo(['OpenMeteo', 'BrightSky (DWD)'], key='source', default_value=str(self.settings.get_settings()['source']), size=(15,1), readonly=True, enable_events=True)],
+                        [sg.HSeparator()],
+                        [sg.Text(self.lm.get_string("settings_window.default_data_category", suffix=':'))],
+                        [sg.Combo(self.get_all_forecast_categories(self.settings.get_settings()['source']), key='forecast_category', default_value=self.get_forecast_category(self.settings.get_settings()['source']), readonly=True, size=(30, 1))],
                         [sg.HSeparator()],
                         [sg.Text(self.lm.get_string("settings_window.size", suffix=':'))],
                         [sg.InputText(self.settings.get_settings()['size'], key='size')],
@@ -153,6 +204,7 @@ class SettingsGUI:
             'latitude': float(values['latitude']),
             'longitude': float(values['longitude']),
             'source': values['source'],
+            'data_category': values['forecast_category'],
             'size': float(values['size']),
             'resolution': int(values['resolution']),
             'language': LanguageManager.get_language_code_by_name(values['language']),

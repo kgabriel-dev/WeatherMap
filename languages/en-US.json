@@ -37,7 +37,8 @@
         "cancel": "Cancel",
         "save": "Save",
         "interpolation": "Interpolation",
-        "interpolation_info": "(Interpolation is used to calculate weather data for the whole map. With a higher resolution, the result will be more accurate.)"
+        "interpolation_info": "(Interpolation is used to calculate weather data for the whole map. With a higher resolution, the result will be more accurate.)",
+        "default_data_category": "Default data category"
     },
     "weather_image": {
         "label_latitude": "Latitude",

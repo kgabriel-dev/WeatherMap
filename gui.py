@@ -203,19 +203,6 @@ def update_texts_of_elements(window, lm, values):
     window['settings_button'].update(lm.get_string("main_window.settings"))
     window['animation_checkbox'].update(lm.get_string("main_window.animation"))
 
-    # update the entries of the forecast category
-    data_retreiver = None
-
-    match(values['source']):
-        case 'BrightSky (DWD)':
-            data_retreiver = BrightSky()
-        case 'OpenMeteo':
-            data_retreiver = OpenMeteo()
-
-    if data_retreiver is not None:
-        category_names = [lm.get_string(f"weather_image.bar_label.{data_retreiver.name}.{key}") for key in data_retreiver.categories.keys()]
-        window['forecast_category'].update(values=category_names, value=category_names[0])
-
 
 def run_gui():
     global thread, global_log_text, number_of_images, screen_factor, auto_start_data_retreival, last_resize_time, settings_gui, settings, settings_changed, thread_blocks, update_available_notification
@@ -241,7 +228,8 @@ def run_gui():
 
     if data_retreiver is not None:
         category_names = [lm.get_string(f"weather_image.bar_label.{data_retreiver.name}.{key}") for key in data_retreiver.categories.keys()]
-        window['forecast_category'].update(values=category_names, value=category_names[0])
+        category_name = settings.get_settings()['data_category']
+        window['forecast_category'].update(values=category_names, value=category_name if category_name in category_names else category_names[0])
 
     # create the settings GUI
     settings_gui = SettingsGUI(window, settings, change_settings, lm)
@@ -298,6 +286,21 @@ def run_gui():
             window['size'].update(value=settings_values['size'])
             window['resolution'].update(value=settings_values['resolution'])
 
+            # update the entries of the forecast category
+            data_retreiver = None
+
+            match(values['source']):
+                case 'BrightSky (DWD)':
+                    data_retreiver = BrightSky()
+                case 'OpenMeteo':
+                    data_retreiver = OpenMeteo()
+
+            if data_retreiver is not None:
+                category_names = [lm.get_string(f"weather_image.bar_label.{data_retreiver.name}.{key}") for key in data_retreiver.categories.keys()]
+                category_name = settings.get_settings()['data_category']
+                window['forecast_category'].update(values=category_names, value=category_name if category_name in category_names else category_names[0])
+
+            # update the texts of most elements in the window
             update_texts_of_elements(window, lm, values)
 
         # check if the window was resized and rescale the images
@@ -354,7 +357,8 @@ def run_gui():
 
             if data_retreiver is not None:
                 category_names = [lm.get_string(f"weather_image.bar_label.{data_retreiver.name}.{key}") for key in data_retreiver.categories.keys()]
-                window['forecast_category'].update(values=category_names, value=category_names[0])
+                category_name = lm.get_string(f"weather_image.bar_label.{data_retreiver.name}.{settings.get_settings()['data_category']}")
+                window['forecast_category'].update(values=category_names, value=category_name if category_name in category_names else category_names[0])
 
         # check if the user wants to calculate the data
         if (event == 'calculate_button' or auto_start_data_retreival is True) and thread_blocks is False:
@@ -379,8 +383,8 @@ def run_gui():
                 case 'OpenMeteo':
                     data_source = OpenMeteo()
 
+            # get the key of the current forecast category by using the last element of the dot-key in the language manager
             forecast_category = lm.get_keys_by_value(values['forecast_category'], start_dotkey=f"weather_image.bar_label.{data_source.name}")[0].split('.')[-1]
-            print(f"Forecast category: {forecast_category}", values['forecast_category'])
 
             thread = Thread(target=retreive_and_handle_data, args=(data_source, forecast_category, data_directory, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution, lm, settings.get_settings()['timezone'], settings.get_settings()['interpolation']))
             thread_blocks = True

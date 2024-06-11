@@ -37,7 +37,8 @@
         "cancel": "Abbrechen",
         "save": "Speichern",
         "interpolation": "Interpolation",
-        "interpolation_info": "(Interpolation erzeugt Wetterdaten für die ganze Karte. Je höher die Auflösung ist, desto genauer sind die Daten.)"
+        "interpolation_info": "(Interpolation erzeugt Wetterdaten für die ganze Karte. Je höher die Auflösung ist, desto genauer sind die Daten.)",
+        "default_data_category": "Standarddatenkategorie"
     },
     "weather_image": {
         "label_latitude": "Breitengrad",

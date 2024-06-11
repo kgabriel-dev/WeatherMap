@@ -155,7 +155,6 @@ class OpenMeteo:
         hours = math.ceil((last_date - start_date).total_seconds() / 3600) + 1
 
         url = self.api_url.format(lat=lat, lon=lon, hours=hours, timezone=timezone, category=category)
-        print(url)
         request = requests.get(url)
 
         if(request.status_code != 200):
