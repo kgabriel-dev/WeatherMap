@@ -5,9 +5,9 @@
     "source": "OpenMeteo",
     "size": 100.0,
     "resolution": 3,
-    "language": "de-DE",
+    "language": "en-US",
     "load_data_on_start": false,
     "timezone": "America/New_York",
     "interpolation": false,
-    "data_category": "Cloudiness (%)"
+    "data_category": "OpenMeteo.cloud_cover"
 }

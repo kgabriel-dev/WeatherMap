@@ -85,10 +85,7 @@ class SettingsGUI:
                     case 'OpenMeteo':
                         data_retreiver = OpenMeteo()
 
-                print(values['source'])
-
                 if data_retreiver is not None:
-                    print(values['source'])
                     category_names = self.get_all_forecast_categories(values['source'])
                     window['forecast_category'].update(values=category_names, value=category_names[0])
 
@@ -112,8 +109,6 @@ class SettingsGUI:
             case 'OpenMeteo':
                 data_retreiver = OpenMeteo()
 
-        print(data_retreiver)
-
         if data_retreiver is not None:
             category_names = [self.lm.get_string(f"weather_image.bar_label.{data_retreiver.name}.{key}") for key in data_retreiver.categories.keys()]
             return category_names
@@ -122,13 +117,13 @@ class SettingsGUI:
     
 
     def get_forecast_category(self, source_name):
-        current_selection = self.settings.get_settings()['data_category']
+        current_selection_source_and_key = self.settings.get_settings()['data_category']
         all_categories = self.get_all_forecast_categories(source_name)
 
-        if current_selection in all_categories:
-            return current_selection
+        if self.lm.get_string(f"weather_image.bar_label.{current_selection_source_and_key}") in all_categories:
+            return self.lm.get_string(f"weather_image.bar_label.{current_selection_source_and_key}")
         else:
-            return current_selection if current_selection in all_categories else all_categories[0]
+            return all_categories[0]
 
     
     def create_layout(self):
@@ -199,12 +194,30 @@ class SettingsGUI:
         return layout
     
     def save_settings(self, values):
+        data_retreiver = None
+
+        match(values['source']):
+            case 'BrightSky (DWD)':
+                data_retreiver = BrightSky()
+            case 'OpenMeteo':
+                data_retreiver = OpenMeteo()
+        
+        if data_retreiver is None:
+            data_retreiver = OpenMeteo()
+
+        forecast_category_name = values['forecast_category']
+
+        if forecast_category_name not in self.get_all_forecast_categories(values['source']):
+            forecast_category_name = self.get_all_forecast_categories(values['source'])[0]
+
+        forecast_category_keys = self.lm.get_keys_by_value(forecast_category_name, start_dotkey=f"weather_image.bar_label.{data_retreiver.name}")[0].split('.')
+
         settings = {
             'forecast_length': int(values['forecast_length']),
             'latitude': float(values['latitude']),
             'longitude': float(values['longitude']),
             'source': values['source'],
-            'data_category': values['forecast_category'],
+            'data_category': f"{forecast_category_keys[-2]}.{forecast_category_keys[-1]}",  # e.g. 'OpenMeteo.cloud_cover'
             'size': float(values['size']),
             'resolution': int(values['resolution']),
             'language': LanguageManager.get_language_code_by_name(values['language']),

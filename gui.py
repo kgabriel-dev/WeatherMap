@@ -228,7 +228,8 @@ def run_gui():
 
     if data_retreiver is not None:
         category_names = [lm.get_string(f"weather_image.bar_label.{data_retreiver.name}.{key}") for key in data_retreiver.categories.keys()]
-        category_name = settings.get_settings()['data_category']
+        category_source_and_key = settings.get_settings()['data_category']
+        category_name = lm.get_string(f"weather_image.bar_label.{category_source_and_key}")
         window['forecast_category'].update(values=category_names, value=category_name if category_name in category_names else category_names[0])
 
     # create the settings GUI
@@ -297,7 +298,8 @@ def run_gui():
 
             if data_retreiver is not None:
                 category_names = [lm.get_string(f"weather_image.bar_label.{data_retreiver.name}.{key}") for key in data_retreiver.categories.keys()]
-                category_name = settings.get_settings()['data_category']
+                category_source_and_key = settings.get_settings()['data_category']
+                category_name = lm.get_string(f"weather_image.bar_label.{category_source_and_key}")
                 window['forecast_category'].update(values=category_names, value=category_name if category_name in category_names else category_names[0])
 
             # update the texts of most elements in the window
@@ -357,7 +359,8 @@ def run_gui():
 
             if data_retreiver is not None:
                 category_names = [lm.get_string(f"weather_image.bar_label.{data_retreiver.name}.{key}") for key in data_retreiver.categories.keys()]
-                category_name = lm.get_string(f"weather_image.bar_label.{data_retreiver.name}.{settings.get_settings()['data_category']}")
+                category_source_and_key = lm.get_string(f"weather_image.bar_label.{data_retreiver.name}.{settings.get_settings()['data_category']}")
+                category_name = lm.get_string(f"weather_image.bar_label.{category_source_and_key}")
                 window['forecast_category'].update(values=category_names, value=category_name if category_name in category_names else category_names[0])
 
         # check if the user wants to calculate the data
