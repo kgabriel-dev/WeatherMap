@@ -74,15 +74,16 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
     # convert the data to a format that returns all locations for a given timestamp
     weather_info_over_time = {}
 
-    for timestamp in weather_data:
-        weather_info_over_time[timestamp] = []
-
-        for lat_index in range(number_of_size_steps):
-            lat_offset = negative_offset + lat_index
-            latitude = lat + (lat_offset * lat_resolution)
-            latitude = round(latitude, 6)
-
-            weather_info_over_time[timestamp].insert(0, [info for location, info in weather_data[timestamp].items() if location[0] == latitude])
+    for timestamp, locations in weather_data.items():
+        # Precompute latitudes to improve efficiency
+        latitudes = [round(lat + (negative_offset + lat_index) * lat_resolution, 6) 
+                    for lat_index in range(number_of_size_steps)]
+        
+        # Iterate over all locations and store the data in the correct order
+        weather_info_over_time[timestamp] = [
+            [info for location, info in locations.items() if location[0] == latitude]
+            for latitude in reversed(latitudes)  # Reverse to maintain the original order
+        ]
 
     # remove old images
     for file in os.listdir(data_dir):
