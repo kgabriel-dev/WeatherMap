@@ -32,8 +32,9 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
             lon_offset = negative_offset + lon_index
             latitude = lat + (lat_offset * lat_resolution)
             longitude = lon + (lon_offset * lon_resolution)
-            latitude = round(latitude, 2)
-            longitude = round(longitude, 2)
+
+            latitude = round(latitude, 6)
+            longitude = round(longitude, 6)
 
             searched_locations += 1
 
@@ -79,7 +80,7 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
         for lat_index in range(number_of_size_steps):
             lat_offset = negative_offset + lat_index
             latitude = lat + (lat_offset * lat_resolution)
-            latitude = round(latitude, 2)
+            latitude = round(latitude, 6)
 
             weather_info_over_time[timestamp].insert(0, [info for location, info in weather_data[timestamp].items() if location[0] == latitude])
 
