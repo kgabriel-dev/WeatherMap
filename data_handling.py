@@ -48,7 +48,6 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
 
             # retrieve the weather data for the current location
             data = data_retreiver.get_weather(start_date.isoformat(), last_date.isoformat(), latitude, longitude, timezone, data_category)
-            print('retreived', data)
 
             # iterate over the time entries in the data and store the cloud coverage
             for entry in data:
@@ -59,7 +58,6 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
             
                 # check if there was an error or if the cloud coverage is missing
                 if entry['error'] is True or 'value' not in entry:
-                    print(f"Error at {latitude}, {longitude}")
                     time_info = None
             
                 # no problems detected
@@ -148,7 +146,6 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
         
         entry = list(weather_info_over_time.keys())[figure_index]
         data = weather_info_over_time[entry]
-        print(figure_index, data)
         df = pd.DataFrame(data, columns=x_labels, index=y_labels)
 
         x = df.columns
