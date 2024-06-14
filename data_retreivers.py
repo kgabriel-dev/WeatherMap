@@ -53,14 +53,14 @@ class BrightSky:
         start_date = start_date.replace(minute=0, second=0, microsecond=0)
 
         url = self.api_url.format(date=start_date.isoformat(), last_date=last_date_iso, lat=lat, lon=lon, timezone=timezone)
-        
         request = requests.get(url)
 
         if(request.status_code != 200):
-            print(f"Error: {request.status_code}")
+            print(f"Error {request.status_code}")
+            print(url)
 
             last_date = datetime.fromisoformat(last_date_iso)
-            hours = math.ceil((last_date - start_date).total_seconds() / 3600) + 1
+            hours = math.ceil((last_date - start_date).total_seconds() / 3600)
 
             forecast = []
 
