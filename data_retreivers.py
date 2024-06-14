@@ -57,7 +57,6 @@ class BrightSky:
 
         if(request.status_code != 200):
             print(f"Error {request.status_code}")
-            print(url)
 
             last_date = datetime.fromisoformat(last_date_iso)
             hours = math.ceil((last_date - start_date).total_seconds() / 3600)
