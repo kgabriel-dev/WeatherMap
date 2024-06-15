@@ -38,7 +38,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "D:\Programmieren\Python\CloudMap\dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\Programmieren\Python\CloudMap\dist\settings.json"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\Programmieren\Python\CloudMap\dist\settings.json"; DestDir: "{app}"; Flags: ignoreversion onlyifdoesntexist
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
