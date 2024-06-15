@@ -16,7 +16,7 @@ from packaging.version import Version
 import webbrowser
 
 
-CURRENT_VERSION = Version('1.0.0')
+CURRENT_VERSION = Version('1.1.0')
 
 data_directory = 'WeatherMap_Data'
 settings_path = 'settings.json'
