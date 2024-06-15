@@ -3,6 +3,7 @@ import PySimpleGUI as sg
 from language import LanguageManager
 import pytz
 import os
+import sys
 from data_retreivers import OpenMeteo, BrightSky
 
 
@@ -67,8 +68,10 @@ class SettingsGUI:
         self.lm = language_manager
 
     def open_settings_window(self):
+        bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+
         layout = self.create_layout()
-        window = sg.Window(self.lm.get_string("settings_window.title"), layout, modal=True, finalize=True, icon='app.ico')
+        window = sg.Window(self.lm.get_string("settings_window.title"), layout, modal=True, finalize=True, icon=os.path.join(bundle_dir, './app.ico'))
 
         self.settings_gui = window
 

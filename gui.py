@@ -36,6 +36,9 @@ auto_start_data_retreival = False
 
 update_available_notification = False
 
+# path to the bundle directory if the program is bundled with PyInstaller
+bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+
 
 # This function is used to set the log text in the GUI
 def set_log_text(text):
@@ -210,7 +213,8 @@ def run_gui():
     number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('image_')])
 
     # create the window
-    window = sg.Window(lm.get_string("main_window.title"), create_layout(), finalize=True, resizable=True, icon='app.ico')
+    print(bundle_dir, os.path.join(bundle_dir, 'app.ico'))
+    window = sg.Window(lm.get_string("main_window.title"), create_layout(), finalize=True, resizable=True, icon=os.path.join(bundle_dir, './app.ico'))
     window.maximize()
 
     # bind the configure event of the window to later get the new size of the window

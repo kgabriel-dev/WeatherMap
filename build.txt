@@ -1,1 +1,1 @@
-.venv\Scripts\python.exe -m PyInstaller gui.py -c -n "WeatherMap" -y --clean --onefile --add-data "./shapefiles;./shapefiles" --add-data "./languages;./languages" --icon app.ico
+.venv\Scripts\python.exe -m PyInstaller gui.py -c -n "WeatherMap" -y --clean --onefile --add-data "./shapefiles;./shapefiles" --add-data "./languages;./languages" --add-data "./app.ico;." --icon app.ico
