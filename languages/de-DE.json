@@ -38,7 +38,10 @@
         "save": "Speichern",
         "interpolation": "Interpolation",
         "interpolation_info": "(Interpolation erzeugt Wetterdaten für die ganze Karte. Je höher die Auflösung ist, desto genauer sind die Daten.)",
-        "default_data_category": "Standarddatenkategorie"
+        "default_data_category": "Standarddatenkategorie",
+        "color_minimum": "Farbe für min. Wert",
+        "color_maximum": "Farbe für max. Wert",
+        "choose_color": "Farbe wählen"
     },
     "weather_image": {
         "label_latitude": "Breitengrad",

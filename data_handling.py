@@ -8,6 +8,7 @@ import numpy as np
 import os
 from datetime import datetime
 import sys
+from settings import Settings
 
 
 states_map = None
@@ -15,6 +16,11 @@ countries_map = None
 
 def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, finished_callback, start_date, last_date, lat, lon, size, number_of_size_steps, lm, timezone, interpolate):
     global states_map, countries_map
+    bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+
+    settings = Settings()
+    settings.load_settings_from_file(os.path.join(bundle_dir, 'settings.json'))
+    settings = settings.get_settings()
 
     weather_data = {}
     searched_locations = 0
@@ -116,8 +122,14 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
     y_labels.reverse()
 
     # create the color map for the cloud coverage
-    color_good = np.array([1, 1, 1, 0.8])
-    color_bad = np.array([0, 0, 1, 0.8])
+    value_min_color = settings['color_minimum'].lstrip('#')
+    value_max_color = settings['color_maximum'].lstrip('#')
+    # --> convert the color values from hex to rgb
+    value_min_color = tuple(int(value_min_color[i:i+2], 16)/255 for i in (0, 2, 4))
+    value_max_color = tuple(int(value_max_color[i:i+2], 16)/255 for i in (0, 2, 4))
+
+    color_good = np.array([value_min_color[0], value_min_color[1], value_min_color[2], 0.8])
+    color_bad = np.array([value_max_color[0], value_max_color[1], value_max_color[2], 0.8])
     color_vector = color_bad - color_good
     colors = [color_good + (color_vector * i) for i in np.linspace(0, 1, 256)]
     cmap = mpl.colors.LinearSegmentedColormap.from_list('custom', colors)

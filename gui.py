@@ -213,7 +213,6 @@ def run_gui():
     number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('image_')])
 
     # create the window
-    print(bundle_dir, os.path.join(bundle_dir, 'app.ico'))
     window = sg.Window(lm.get_string("main_window.title"), create_layout(), finalize=True, resizable=True, icon=os.path.join(bundle_dir, './app.ico'))
     window.maximize()
 

@@ -5,6 +5,7 @@ import pytz
 import os
 import sys
 from data_retreivers import OpenMeteo, BrightSky
+import gc # garbage collector
 
 
 class Settings:
@@ -21,7 +22,9 @@ class Settings:
             "load_data_on_start": False,
             "timezone": "America/New_York",
             "interpolation": False,
-            "data_category": "cloud_cover"
+            "data_category": "cloud_cover",
+            "color_maximum": "#0000ff",
+            "color_minimum": "#ffffff"
         }
     
     def get_settings(self):
@@ -67,17 +70,16 @@ class SettingsGUI:
         self.change_settings_callback = change_settings_callback
         self.lm = language_manager
 
+
     def open_settings_window(self):
         bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
 
         layout = self.create_layout()
-        window = sg.Window(self.lm.get_string("settings_window.title"), layout, modal=True, finalize=True, icon=os.path.join(bundle_dir, './app.ico'))
-
-        self.settings_gui = window
+        window = sg.Window(self.lm.get_string("settings_window.title"), layout, modal=True, icon=os.path.join(bundle_dir, './app.ico'))
 
         while True:
-            event, values = window.read()
-
+            event, values = window.read(timeout=250)
+            
             # check if the user selected a different data source
             if event == 'source':
                 data_retreiver = None
@@ -95,12 +97,28 @@ class SettingsGUI:
             if event == sg.WIN_CLOSED:
                 break
             elif event == 'save_button':
-                self.save_settings(values)
+                save_values = {'minimum_color': window['color_minimum_preview'].get(), 'maximum_color': window['color_maximum_preview'].get()}
+                save_values.update(values)
+
+                self.save_settings(save_values)
                 break
             elif event == 'cancel_button':
                 break
+            
+            # update color preview every 250ms (timeout value)
+            if event == sg.TIMEOUT_KEY:
+                max_color_preview = window['color_maximum_preview']
+                min_color_preview = window['color_minimum_preview']
+
+                if max_color_preview.get():
+                    max_color_preview.update(background_color=max_color_preview.get())
+                if min_color_preview.get():
+                    min_color_preview.update(background_color=min_color_preview.get())
 
         window.close()
+        layout = None
+        window = None
+        gc.collect()
 
 
     def get_all_forecast_categories(self, source_name):
@@ -128,8 +146,10 @@ class SettingsGUI:
         else:
             return all_categories[0]
 
-    
     def create_layout(self):
+        val_color_maximum = self.settings.get_settings()['color_maximum'] if 'color_maximum' in self.settings.get_settings() else '#0000ff'
+        val_color_minimum = self.settings.get_settings()['color_minimum'] if 'color_minimum' in self.settings.get_settings() else '#ffffff'
+
         layout = [
             [
                 sg.Column(
@@ -179,7 +199,19 @@ class SettingsGUI:
                         [sg.Combo(pytz.common_timezones, key='timezone', default_value=str(self.settings.get_settings()['timezone']), readonly=True)],
                         [sg.HSeparator()],
                         [sg.Checkbox(self.lm.get_string("settings_window.interpolation"), default=self.settings.get_settings()['interpolation'], key='interpolation')],
-                        [sg.Text(self.lm.get_string("settings_window.interpolation_info"), size=(35, 4))]
+                        [sg.Text(self.lm.get_string("settings_window.interpolation_info"), size=(35, 4))],
+                        [sg.HSeparator()],
+                        [sg.Text(self.lm.get_string("settings_window.color_maximum", suffix=':'))],
+                        [
+                            sg.ColorChooserButton(self.lm.get_string("settings_window.choose_color"), key='color_maximum', target='color_maximum_preview'),
+                            sg.Text(val_color_maximum, visible=True, enable_events=False, key='color_maximum_preview', size=(7, 1), background_color=val_color_maximum)
+                        ],
+                        [sg.HSeparator()],
+                        [sg.Text(self.lm.get_string("settings_window.color_minimum", suffix=':'))],
+                        [
+                            sg.ColorChooserButton(self.lm.get_string("settings_window.choose_color"), key='color_minimum', target='color_minimum_preview'),
+                            sg.Text(val_color_minimum, visible=True, enable_events=False, key='color_minimum_preview', size=(7, 1), background_color=val_color_minimum),
+                        ]
                     ],
                     vertical_alignment='top',
                     element_justification='left'
@@ -226,7 +258,9 @@ class SettingsGUI:
             'language': LanguageManager.get_language_code_by_name(values['language']),
             'load_data_on_start': values['load_data_on_start'],
             'timezone': values['timezone'],
-            'interpolation': values['interpolation']
+            'interpolation': values['interpolation'],
+            'color_maximum': values['maximum_color'],
+            'color_minimum': values['minimum_color']
         }
 
         self.settings.change_settings(settings)
@@ -234,5 +268,3 @@ class SettingsGUI:
         
         self.change_settings_callback(settings)
         self.lm.set_language(settings['language'])
-
-        self.settings_gui.close()

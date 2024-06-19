@@ -38,7 +38,10 @@
         "save": "Save",
         "interpolation": "Interpolation",
         "interpolation_info": "(Interpolation is used to calculate weather data for the whole map. With a higher resolution, the result will be more accurate.)",
-        "default_data_category": "Default data category"
+        "default_data_category": "Default data category",
+        "color_minimum": "Min. value color",
+        "color_maximum": "Max. value color",
+        "choose_color": "Choose color"
     },
     "weather_image": {
         "label_latitude": "Latitude",
