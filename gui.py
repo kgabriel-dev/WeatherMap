@@ -24,6 +24,8 @@ settings = Settings()
 settings_gui = None
 lm = None
 
+main_window = None
+
 global_log_text = ""
 thread = Thread()
 thread_blocks = False
@@ -31,6 +33,7 @@ number_of_images = 0
 screen_factor = 1.0
 last_resize_time = datetime.now()
 settings_changed = False
+progress_in_percent = 100
 
 auto_start_data_retreival = False
 
@@ -46,19 +49,31 @@ def set_log_text(text):
     global_log_text = lm.get_string("log.output_beginning", suffix=': ') + str(text)
 
 
+def set_progress(progress):
+    if main_window is not None and main_window['progress_bar'] is not None:
+        main_window['progress_bar'].update(progress)
+        
+        global progress_in_percent
+        progress_in_percent = progress
+
+
 # This function is used to finish the thread and do the final steps
 def finish_thread():
     global global_log_text, thread, number_of_images, screen_factor, thread_blocks
     global_log_text = lm.get_string("log.calculation_finished")
     
+    remaining_progress = 100 - progress_in_percent
+    set_progress(progress_in_percent + remaining_progress/3)
 
     set_log_text(lm.get_string("log.deleting_images"))
     for image_name in os.listdir(data_directory):
         if image_name.startswith('image_'):
             os.remove(os.path.join(data_directory, image_name))
 
+    set_progress(progress_in_percent + remaining_progress/3)
     scale_cloud_images()
     
+    set_progress(100)
     set_log_text(lm.get_string("log.finished_all_steps"))
     number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('image_')])
 
@@ -154,7 +169,7 @@ def create_layout():
         [sg.HSeparator()],
         animation,
         [sg.HSeparator()],
-        [sg.Text(key='log_text')]
+        [sg.Text(key='log_text'), sg.Push(), sg.ProgressBar(100, orientation='h', size=(50, 20), key='progress_bar', visible=False)]
     ]
 
     return layout
@@ -194,7 +209,7 @@ def scale_cloud_images():
     set_log_text(lm.get_string("log.finished_all_steps"))
 
 
-def update_texts_of_elements(window, lm, values):
+def update_texts_of_elements(window, lm):
     # update the texts of most elements
     window['forecast_length_text'].update(lm.get_string("main_window.forecast", suffix=':'))
     window['latitude_text'].update(lm.get_string("main_window.latitude", suffix=':'))
@@ -209,12 +224,15 @@ def update_texts_of_elements(window, lm, values):
 
 def run_gui():
     global thread, global_log_text, number_of_images, screen_factor, auto_start_data_retreival, last_resize_time, settings_gui, settings, settings_changed, thread_blocks, update_available_notification
+    global main_window
 
     number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('image_')])
 
     # create the window
     window = sg.Window(lm.get_string("main_window.title"), create_layout(), finalize=True, resizable=True, icon=os.path.join(bundle_dir, './app.ico'))
     window.maximize()
+
+    main_window = window
 
     # bind the configure event of the window to later get the new size of the window
     window.bind('<Configure>', 'Configure')
@@ -348,6 +366,9 @@ def run_gui():
             else:
                 window['calculate_button'].update(lm.get_string("main_window.calc_and_show"))
 
+            # update visibility of the progress bar
+            window['progress_bar'].update(visible=thread_blocks)
+
             # check if the animation checkbox is checked and the thread is not blocked
             # and if so, update the image index and the image
             number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('image_')])
@@ -389,6 +410,9 @@ def run_gui():
                     if image_name.startswith('image_'):
                         os.remove(os.path.join(data_directory + '/originals', image_name))
 
+                # reset the progress bar
+                set_progress(100)
+
                 thread_blocks = False
                 set_log_text(lm.get_string("log.stopped_thread"))
             else:
@@ -416,7 +440,7 @@ def run_gui():
                 # get the key of the current forecast category by using the last element of the dot-key in the language manager
                 forecast_category = lm.get_keys_by_value(values['forecast_category'], start_dotkey=f"weather_image.bar_label.{data_source.name}")[0].split('.')[-1]
 
-                thread = Thread(target=retreive_and_handle_data, args=(data_source, forecast_category, data_directory, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution, lm, settings.get_settings()['timezone'], settings.get_settings()['interpolation']))
+                thread = Thread(target=retreive_and_handle_data, args=(data_source, forecast_category, data_directory, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution, lm, settings.get_settings()['timezone'], settings.get_settings()['interpolation'], set_progress))
                 thread_blocks = True
 
                 window['forecast_image'].update(filename=None)
@@ -443,9 +467,12 @@ def run_gui():
         thread.join()
 
     window.close()
+    main_window = None
 
     # remove old images
     shutil.rmtree(data_directory)
+
+    sys.exit(0)
 
 
 if __name__ == '__main__':

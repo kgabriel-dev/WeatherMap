@@ -22,13 +22,18 @@ def check_if_thread_should_stop():
     return getattr(thread, "do_stop", False)
 
 
-def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, finished_callback, start_date, last_date, lat, lon, size, number_of_size_steps, lm, timezone, interpolate):
+def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, finished_callback, start_date, last_date, lat, lon, size, number_of_size_steps, lm, timezone, interpolate, set_progress):
     global states_map, countries_map
     bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
 
     settings = Settings()
     settings.load_settings_from_file(os.path.join(bundle_dir, 'settings.json'))
     settings = settings.get_settings()
+
+    # calculate the total number of steps
+    num_of_hours = (last_date - start_date).total_seconds() / 3600 + 1
+    num_of_total_steps = number_of_size_steps ** 2 + num_of_hours + 2 + 3 # (2 = (reading in map data, preparing images), 3 = (in gui.py: calculations finished, deleting old images, scaling images))
+    num_of_steps_done = 0
 
     weather_data = {}
     searched_locations = 0
@@ -90,10 +95,13 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
                 # store the data
                 weather_data[timestamp][(latitude, longitude)] = time_info
         
+            # set the progress
+            num_of_steps_done += 1
+            set_progress((num_of_steps_done / num_of_total_steps) * 100)
+
             # wait for the delay time, and log the waiting time if it is greater than 1 second
             if(data_retreiver.request_delay >= 1):
                 log_text(lm.get_string('waiting_delay_time', replace_dict={'time': data_retreiver.request_delay}))
-
             time.sleep(data_retreiver.request_delay)
     
     # convert the data to a format that returns all locations for a given timestamp
@@ -135,6 +143,10 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
     if countries_map is None:
         countries_map = geopandas.read_file(os.path.join(bundle_dir, 'shapefiles/ne_10m_admin_0_countries.shp'))
     
+    # update the progress
+    num_of_steps_done += 1
+    set_progress((num_of_steps_done / num_of_total_steps) * 100)
+
     # check if the thread should stop before continuing calculations/actions
     if check_if_thread_should_stop():
         return
@@ -180,6 +192,10 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
 
     ax.plot(lon, lat, 'ro', markersize=5, zorder=20)
     ax.text(lon + lon_resolution/15, lat + lat_resolution/15, lm.get_string("weather_image.label_position"), zorder=20)
+
+    # update the progress
+    num_of_steps_done += 1
+    set_progress((num_of_steps_done / num_of_total_steps) * 100)
 
     # iterate over all images and create them
     for figure_index in range(number_of_keys):
@@ -239,7 +255,11 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
 
         im.remove()
 
+        # update the progress
+        num_of_steps_done += 1
+        set_progress((num_of_steps_done / num_of_total_steps) * 100)
+
     plt.close(fig)
-    
+
     # call the callback function
     finished_callback()
