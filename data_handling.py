@@ -9,10 +9,18 @@ import os
 from datetime import datetime
 import sys
 from settings import Settings
+import threading
 
 
 states_map = None
 countries_map = None
+
+
+def check_if_thread_should_stop():
+    thread = threading.current_thread()
+
+    return getattr(thread, "do_stop", False)
+
 
 def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, finished_callback, start_date, last_date, lat, lon, size, number_of_size_steps, lm, timezone, interpolate):
     global states_map, countries_map
@@ -30,9 +38,17 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
 
     negative_offset = -math.ceil(number_of_size_steps // 2)
 
+    # check if the thread should stop before continuing calculations/actions
+    if check_if_thread_should_stop():
+        return
+
     # iterate over all locations in the grid and get the weather data
     for lat_index in range(number_of_size_steps):
         for lon_index in range(number_of_size_steps):
+            # check if the thread should stop before continuing calculations/actions
+            if check_if_thread_should_stop():
+                return
+            
             # calculate the latitude and longitude of the current location
             lat_offset = negative_offset + lat_index
             lon_offset = negative_offset + lon_index
@@ -93,6 +109,10 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
             for latitude in reversed(latitudes)  # Reverse to maintain the original order
         ]
 
+    # check if the thread should stop before continuing calculations/actions
+    if check_if_thread_should_stop():
+        return
+
     # remove old images
     for file in os.listdir(data_dir):
         if file.startswith('image_'):
@@ -100,6 +120,10 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
     for file in os.listdir(data_dir + '/originals'):
         if file.startswith('image_'):
             os.remove(os.path.join(data_dir + '/originals', file))
+
+    # check if the thread should stop before continuing calculations/actions
+    if check_if_thread_should_stop():
+        return
 
     # read the shapefiles if they are not already loaded
     log_text(lm.get_string("log.reading_in_map_data"))
@@ -110,7 +134,10 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
     if countries_map is None:
         countries_map = geopandas.read_file(os.path.join(bundle_dir, 'shapefiles/ne_10m_admin_0_countries.shp'))
     
-
+    # check if the thread should stop before continuing calculations/actions
+    if check_if_thread_should_stop():
+        return
+    
     log_text(lm.get_string("log.preparing_images"))
     number_of_keys = len(weather_info_over_time.keys())
 
@@ -137,6 +164,10 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
     # create folder if not exists
     os.makedirs(data_dir + '/originals', exist_ok=True)
 
+    # check if the thread should stop before continuing calculations/actions
+    if check_if_thread_should_stop():
+        return
+
     # prepare the images
     fig, ax = plt.subplots(figsize=(6,6))
     ax.set_aspect(lon_resolution/lat_resolution)
@@ -151,6 +182,10 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
 
     # iterate over all images and create them
     for figure_index in range(number_of_keys):
+        # check if the thread should stop before continuing calculations/actions
+        if check_if_thread_should_stop():
+            return
+
         log_text(lm.get_string('log.creating_image_at_index', replace_dict={
             'index': figure_index + 1,
             'total': number_of_keys

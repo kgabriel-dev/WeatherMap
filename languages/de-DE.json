@@ -9,7 +9,9 @@
         "waiting_delay_time": "Warte %time% Sekunden...",
         "reading_in_map_data": "Lese Kartendaten ein...",
         "preparing_images": "Bereite Erstellung der Wetterbilder vor...",
-        "creating_image_at_index": "Erstelle Bild %index% von %total%..."
+        "creating_image_at_index": "Erstelle Bild %index% von %total%...",
+        "stopping_thread": "Stoppe Thread sobald möglich...",
+        "stopped_thread": "Thread gestoppt."
     },
     "main_window": {
         "title": "WeatherMap",
@@ -20,6 +22,7 @@
         "size": "Größe (km)",
         "resolution": "Auflösung",
         "calc_and_show": "Berechnen & Anzeigen",
+        "cancel": "Abbrechen",
         "settings": "Einstellungen",
         "animation": "Animation"
     },

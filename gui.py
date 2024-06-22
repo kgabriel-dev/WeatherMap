@@ -340,8 +340,16 @@ def run_gui():
             image_index = int(values['index_slider'])
             window['forecast_image'].update(filename=f'{data_directory}/image_{image_index}.png')
 
-        # on an timeout event, show the next image if wanted by the user
+        # a timeout event occured
         if event == sg.TIMEOUT_KEY:
+            # update the text of the start/cancel button
+            if thread_blocks is True:
+                window['calculate_button'].update(lm.get_string("main_window.cancel"))
+            else:
+                window['calculate_button'].update(lm.get_string("main_window.calc_and_show"))
+
+            # check if the animation checkbox is checked and the thread is not blocked
+            # and if so, update the image index and the image
             number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('image_')])
 
             if values['animation_checkbox'] is True and thread_blocks is False and number_of_images > 0:
@@ -367,47 +375,63 @@ def run_gui():
                 window['forecast_category'].update(values=category_names, value=category_name if category_name in category_names else category_names[0])
 
         # check if the user wants to calculate the data
-        if (event == 'calculate_button' or auto_start_data_retreival is True) and thread_blocks is False:
-            auto_start_data_retreival = False
-            forecast_length = int(values['forecast_length'])
-            longitude = float(values['longitude'])
-            latitude = float(values['latitude'])
-            resolution = int(values['resolution'])
-            
-            # convert size from km to degrees
-            size_km = float(values['size'])
-            size_lat = size_km / 110.57
-            size_lon = size_km / (111.32 * math.cos(math.radians(latitude)))
+        if (event == 'calculate_button' or auto_start_data_retreival is True):
+            if thread_blocks is True:
+                set_log_text(lm.get_string("log.stopping_thread"))
+                thread.do_stop = True
+                thread.join()
 
-            start_date = datetime.now(pytz.timezone(settings.get_settings()['timezone']))
-            last_date = start_date + timedelta(hours=forecast_length)
+                # delete all images
+                for image_name in os.listdir(data_directory):
+                    if image_name.startswith('image_'):
+                        os.remove(os.path.join(data_directory, image_name))
+                for image_name in os.listdir(data_directory + '/originals'):
+                    if image_name.startswith('image_'):
+                        os.remove(os.path.join(data_directory + '/originals', image_name))
 
-            data_source = None
-            match(values['source']):
-                case 'BrightSky (DWD)':
-                    data_source = BrightSky()
-                case 'OpenMeteo':
-                    data_source = OpenMeteo()
+                thread_blocks = False
+                set_log_text(lm.get_string("log.stopped_thread"))
+            else:
+                auto_start_data_retreival = False
+                forecast_length = int(values['forecast_length'])
+                longitude = float(values['longitude'])
+                latitude = float(values['latitude'])
+                resolution = int(values['resolution'])
+                
+                # convert size from km to degrees
+                size_km = float(values['size'])
+                size_lat = size_km / 110.57
+                size_lon = size_km / (111.32 * math.cos(math.radians(latitude)))
 
-            # get the key of the current forecast category by using the last element of the dot-key in the language manager
-            forecast_category = lm.get_keys_by_value(values['forecast_category'], start_dotkey=f"weather_image.bar_label.{data_source.name}")[0].split('.')[-1]
+                start_date = datetime.now(pytz.timezone(settings.get_settings()['timezone']))
+                last_date = start_date + timedelta(hours=forecast_length)
 
-            thread = Thread(target=retreive_and_handle_data, args=(data_source, forecast_category, data_directory, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution, lm, settings.get_settings()['timezone'], settings.get_settings()['interpolation']))
-            thread_blocks = True
+                data_source = None
+                match(values['source']):
+                    case 'BrightSky (DWD)':
+                        data_source = BrightSky()
+                    case 'OpenMeteo':
+                        data_source = OpenMeteo()
 
-            window['forecast_image'].update(filename=None)
-            window['index_slider'].update(range=(0,1), value=0)
+                # get the key of the current forecast category by using the last element of the dot-key in the language manager
+                forecast_category = lm.get_keys_by_value(values['forecast_category'], start_dotkey=f"weather_image.bar_label.{data_source.name}")[0].split('.')[-1]
 
-            # delete all images
-            for image_name in os.listdir(data_directory):
-                if image_name.startswith('image_'):
-                    os.remove(os.path.join(data_directory, image_name))
-            for image_name in os.listdir(data_directory + '/originals'):
-                if image_name.startswith('image_'):
-                    os.remove(os.path.join(data_directory + '/originals', image_name))
+                thread = Thread(target=retreive_and_handle_data, args=(data_source, forecast_category, data_directory, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution, lm, settings.get_settings()['timezone'], settings.get_settings()['interpolation']))
+                thread_blocks = True
 
-            # start the thread
-            thread.start()
+                window['forecast_image'].update(filename=None)
+                window['index_slider'].update(range=(0,1), value=0)
+
+                # delete all images
+                for image_name in os.listdir(data_directory):
+                    if image_name.startswith('image_'):
+                        os.remove(os.path.join(data_directory, image_name))
+                for image_name in os.listdir(data_directory + '/originals'):
+                    if image_name.startswith('image_'):
+                        os.remove(os.path.join(data_directory + '/originals', image_name))
+
+                # start the thread
+                thread.start()
 
         # check if the user wants to open the settings window
         if event == 'settings_button' and SettingsGUI is not None:
