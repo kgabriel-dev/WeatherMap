@@ -36,7 +36,8 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
     lat_resolution = lat_size / number_of_size_steps
     lon_resolution = lon_size / number_of_size_steps
 
-    negative_offset = -math.ceil(number_of_size_steps // 2)
+    # calculate the offset for the latitude and longitude so that the center of the grid is the location
+    negative_offset = -number_of_size_steps // 2 + (0.5 if number_of_size_steps % 2 == 0 else 1)
 
     # check if the thread should stop before continuing calculations/actions
     if check_if_thread_should_stop():
