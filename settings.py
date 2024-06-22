@@ -24,7 +24,8 @@ class Settings:
             "interpolation": False,
             "data_category": "cloud_cover",
             "color_maximum": "#0000ff",
-            "color_minimum": "#ffffff"
+            "color_minimum": "#ffffff",
+            "update_notification": True
         }
     
     def get_settings(self):
@@ -53,7 +54,6 @@ class Settings:
             for key in self.settings.keys():
                 if key not in settings:
                     print(f"Key '{key}' not found in settings file.")
-                    return
 
             self.change_settings(settings)
     
@@ -211,7 +211,9 @@ class SettingsGUI:
                         [
                             sg.ColorChooserButton(self.lm.get_string("settings_window.choose_color"), key='color_minimum', target='color_minimum_preview'),
                             sg.Text(val_color_minimum, visible=True, enable_events=False, key='color_minimum_preview', size=(7, 1), background_color=val_color_minimum),
-                        ]
+                        ],
+                        [sg.HSeparator()],
+                        [sg.Checkbox(self.lm.get_string("settings_window.update_notification"), default=self.settings.get_settings()['update_notification'], key='update_notification')]
                     ],
                     vertical_alignment='top',
                     element_justification='left'
@@ -260,7 +262,8 @@ class SettingsGUI:
             'timezone': values['timezone'],
             'interpolation': values['interpolation'],
             'color_maximum': values['maximum_color'],
-            'color_minimum': values['minimum_color']
+            'color_minimum': values['minimum_color'],
+            'update_notification': values['update_notification']
         }
 
         self.settings.change_settings(settings)

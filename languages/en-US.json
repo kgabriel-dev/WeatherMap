@@ -41,7 +41,8 @@
         "default_data_category": "Default data category",
         "color_minimum": "Min. value color",
         "color_maximum": "Max. value color",
-        "choose_color": "Choose color"
+        "choose_color": "Choose color",
+        "update_notification": "Notify about updates"
     },
     "weather_image": {
         "label_latitude": "Latitude",
@@ -79,6 +80,7 @@
         "title": "Update available",
         "message": "A new version is available. Do you want to download it now?",
         "option_yes": "Yes",
-        "option_no": "No"
+        "option_no": "No",
+        "option_auto_check": "Automatically check for updates"
     }
 }

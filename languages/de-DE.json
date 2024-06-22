@@ -41,7 +41,8 @@
         "default_data_category": "Standarddatenkategorie",
         "color_minimum": "Farbe für min. Wert",
         "color_maximum": "Farbe für max. Wert",
-        "choose_color": "Farbe wählen"
+        "choose_color": "Farbe wählen",
+        "update_notification": "Bei Update benachrichtigen"
     },
     "weather_image": {
         "label_latitude": "Breitengrad",
@@ -79,6 +80,7 @@
         "title": "Update verfügbar",
         "message": "Es ist ein Update verfügbar. Möchten Sie es jetzt herunterladen?",
         "option_yes": "Ja",
-        "option_no": "Nein"
+        "option_no": "Nein",
+        "option_auto_check": "Bei Start automatisch prüfen"
     }
 }

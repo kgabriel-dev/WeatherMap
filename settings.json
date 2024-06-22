@@ -11,5 +11,6 @@
     "interpolation": false,
     "data_category": "OpenMeteo.cloud_cover",
     "color_maximum": "#0000ff",
-    "color_minimum": "#ffffff"
+    "color_minimum": "#ffffff",
+    "update_notification": true
 }
