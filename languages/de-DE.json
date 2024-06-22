@@ -60,7 +60,8 @@
                 "pressure_msl": "Luftdruck (hPa)",
                 "precipitation": "Niederschlag (mm)",
                 "precipitation_probability": "Regenwahrscheinlichkeit (%)",
-                "visibility": "Sichtweite (m)"
+                "visibility": "Sichtweite (m)",
+                "uv_index": "UV-Index"
             },
             "BrightSky": {
                 "cloud_cover": "Bewölkung (%)",

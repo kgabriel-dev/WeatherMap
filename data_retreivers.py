@@ -144,6 +144,10 @@ class OpenMeteo:
             'visibility': {
                 'min': None,
                 'max': None
+            },
+            'uv_index': {
+                'min': 0,
+                'max': 11
             }
         }
 
