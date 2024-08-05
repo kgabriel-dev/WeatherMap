@@ -324,7 +324,7 @@ def run_gui():
                 window['forecast_category'].update(values=category_names, value=category_name if category_name in category_names else category_names[0])
 
             # update the texts of most elements in the window
-            update_texts_of_elements(window, lm, values)
+            update_texts_of_elements(window, lm)
 
         # check if the window was resized and rescale the images
         if event == 'Configure' and thread_blocks is False and (datetime.now() - last_resize_time).total_seconds() > 1:
