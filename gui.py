@@ -12,7 +12,7 @@ import shutil
 from settings import Settings, SettingsGUI
 from language import LanguageManager
 
-from helpers import is_update_available, open_update_notification
+from helpers import is_update_available, open_update_notification, get_file_path_in_bundle
 
 data_directory = 'WeatherMap_Data'
 settings_path = 'settings.json'
@@ -34,9 +34,6 @@ progress_in_percent = 100
 auto_start_data_retreival = False
 
 update_available_notification = False
-
-# path to the bundle directory if the program is bundled with PyInstaller
-bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
 
 
 # This function is used to set the log text in the GUI
@@ -205,7 +202,7 @@ def run_gui():
     number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('image_')])
 
     # create the window
-    window = sg.Window(lm.get_string("main_window.title"), create_layout(), finalize=True, resizable=True, icon=os.path.join(bundle_dir, './app.ico'))
+    window = sg.Window(lm.get_string("main_window.title"), create_layout(), finalize=True, resizable=True, icon=get_file_path_in_bundle('./app.ico'))
     window.maximize()
 
     main_window = window

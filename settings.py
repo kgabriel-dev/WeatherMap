@@ -3,10 +3,9 @@ import PySimpleGUI as sg
 from language import LanguageManager
 import pytz
 import os
-import sys
 from data_retreivers import OpenMeteo, BrightSky
 import gc # garbage collector
-from helpers import is_update_available, open_update_notification
+from helpers import is_update_available, open_update_notification, get_file_path_in_bundle
 
 
 class Settings:
@@ -73,10 +72,8 @@ class SettingsGUI:
 
 
     def open_settings_window(self):
-        bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
-
         layout = self.create_layout()
-        window = sg.Window(self.lm.get_string("settings_window.title"), layout, modal=True, icon=os.path.join(bundle_dir, './app.ico'))
+        window = sg.Window(self.lm.get_string("settings_window.title"), layout, modal=True, icon=get_file_path_in_bundle('./app.ico'))
 
         while True:
             event, values = window.read(timeout=250)

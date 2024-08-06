@@ -1,7 +1,6 @@
 import requests
 from packaging.version import Version
 import PySimpleGUI as sg
-from language import LanguageManager
 import webbrowser
 import os
 import sys
@@ -28,13 +27,15 @@ def is_update_available() -> bool:
         return False
     
 
-def open_update_notification(lm: LanguageManager) -> None:
-    bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+def open_update_notification(lm) -> None:
+    from language import LanguageManager    
+    if not type(lm) is LanguageManager:
+        raise TypeError("The language manager must be an instance of LanguageManager")
 
     update_window = sg.Window(
         title=lm.get_string("update.title"),
         modal=True,
-        icon=os.path.join(bundle_dir, './app.ico'),
+        icon=get_file_path_in_bundle("app.ico"),
         layout=[
             [sg.Text(lm.get_string("update.message"))],
             [
@@ -56,3 +57,8 @@ def open_update_notification(lm: LanguageManager) -> None:
             break
     
     update_window.close()
+
+
+def get_file_path_in_bundle(file_name: str) -> str:
+    bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+    return os.path.join(bundle_dir, file_name)

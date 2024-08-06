@@ -7,9 +7,9 @@ import matplotlib as mpl
 import numpy as np
 import os
 from datetime import datetime
-import sys
 from settings import Settings
 import threading
+from helpers import get_file_path_in_bundle
 
 
 states_map = None
@@ -24,10 +24,9 @@ def check_if_thread_should_stop():
 
 def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, finished_callback, start_date, last_date, lat, lon, size, number_of_size_steps, lm, timezone, interpolate, set_progress):
     global states_map, countries_map
-    bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
 
     settings = Settings()
-    settings.load_settings_from_file(os.path.join(bundle_dir, 'settings.json'))
+    settings.load_settings_from_file(get_file_path_in_bundle('settings.json'))
     settings = settings.get_settings()
 
     # calculate the total number of steps
@@ -136,12 +135,11 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
 
     # read the shapefiles if they are not already loaded
     log_text(lm.get_string("log.reading_in_map_data"))
-    bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
 
     if states_map is None:
-        states_map = geopandas.read_file(os.path.join(bundle_dir, 'shapefiles/ne_10m_admin_1_states_provinces_lines.shp'))
+        states_map = geopandas.read_file(get_file_path_in_bundle('shapefiles/ne_10m_admin_1_states_provinces_lines.shp'))
     if countries_map is None:
-        countries_map = geopandas.read_file(os.path.join(bundle_dir, 'shapefiles/ne_10m_admin_0_countries.shp'))
+        countries_map = geopandas.read_file(get_file_path_in_bundle('shapefiles/ne_10m_admin_0_countries.shp'))
     
     # update the progress
     num_of_steps_done += 1

@@ -1,6 +1,5 @@
 import json
-import os
-import sys
+from helpers import get_file_path_in_bundle
 
 
 class LanguageManager:
@@ -31,8 +30,7 @@ class LanguageManager:
             raise Exception('Language not supported')
         
         
-        bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__  )))
-        file_dir = os.path.join(bundle_dir, 'languages/' + self.language + '.json')
+        file_dir = get_file_path_in_bundle('languages/' + self.language + '.json')
 
         self.language_file = open(file_dir, 'r', encoding='utf-8')
         self.language_data = json.load(self.language_file)
