@@ -45,7 +45,8 @@
         "color_minimum": "Farbe für min. Wert",
         "color_maximum": "Farbe für max. Wert",
         "choose_color": "Farbe wählen",
-        "update_notification": "Bei Update benachrichtigen"
+        "update_notification": "Bei Update benachrichtigen",
+        "update_check": "Auf Updates prüfen"
     },
     "weather_image": {
         "label_latitude": "Breitengrad",

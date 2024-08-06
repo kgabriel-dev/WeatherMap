@@ -11,14 +11,8 @@ import sys
 import shutil
 from settings import Settings, SettingsGUI
 from language import LanguageManager
-import requests
-from packaging.version import Version
-import webbrowser
 
-from helpers import is_update_available
-
-
-CURRENT_VERSION = Version('1.2.0')
+from helpers import is_update_available, open_update_notification
 
 data_directory = 'WeatherMap_Data'
 settings_path = 'settings.json'
@@ -205,7 +199,7 @@ def update_texts_of_elements(window, lm):
 
 
 def run_gui():
-    global thread, global_log_text, number_of_images, screen_factor, auto_start_data_retreival, last_resize_time, settings_gui, settings, settings_changed, thread_blocks, update_available_notification
+    global thread, global_log_text, number_of_images, screen_factor, auto_start_data_retreival, last_resize_time, settings_gui, settings, settings_changed, thread_blocks
     global main_window
 
     number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('image_')])
@@ -244,33 +238,9 @@ def run_gui():
 
     last_resize_time = datetime.now()
 
-    # check if an update is available and show a notification
+    # open the update notification window if there is an update available
     if update_available_notification is True:
-        update_available_notification = False
-
-        update_window = sg.Window(
-            title=lm.get_string("update.title"),
-            layout=[
-                [sg.Text(lm.get_string("update.message"))],
-                [
-                    sg.Button(lm.get_string("update.option_yes"), key='update_yes'),
-                    sg.Button(lm.get_string("update.option_no"), key='update_no')
-                ]
-            ]
-        )
-
-        while True:
-            event, _ = update_window.read()
-
-            if event == sg.WIN_CLOSED or event == 'update_no':
-                break
-
-            if event == 'update_yes':
-                update_window.close()
-                webbrowser.open("https://github.com/kgabriel-dev/WeatherMap/releases/latest", new=0, autoraise=True)
-                break
-        
-        update_window.close()
+        open_update_notification(lm)
 
     # main event loop of the GUI
     while True:
@@ -481,7 +451,7 @@ if __name__ == '__main__':
         auto_start_data_retreival = True
     
     if settings.get_settings()['update_notification'] is True:
-        update_available_notification = is_update_available(CURRENT_VERSION)
+        update_available_notification = is_update_available()
     
 
     run_gui()

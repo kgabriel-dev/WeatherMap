@@ -6,6 +6,7 @@ import os
 import sys
 from data_retreivers import OpenMeteo, BrightSky
 import gc # garbage collector
+from helpers import is_update_available, open_update_notification
 
 
 class Settings:
@@ -104,6 +105,9 @@ class SettingsGUI:
                 break
             elif event == 'cancel_button':
                 break
+            elif event == 'update_check':
+                if is_update_available():
+                    open_update_notification(self.lm)
             
             # update color preview every 250ms (timeout value)
             if event == sg.TIMEOUT_KEY:
@@ -213,7 +217,8 @@ class SettingsGUI:
                             sg.Text(val_color_minimum, visible=True, enable_events=False, key='color_minimum_preview', size=(7, 1), background_color=val_color_minimum),
                         ],
                         [sg.HSeparator()],
-                        [sg.Checkbox(self.lm.get_string("settings_window.update_notification"), default=self.settings.get_settings()['update_notification'], key='update_notification')]
+                        [sg.Checkbox(self.lm.get_string("settings_window.update_notification"), default=self.settings.get_settings()['update_notification'], key='update_notification')],
+                        [sg.Button(self.lm.get_string("settings_window.update_check"), key='update_check')]
                     ],
                     vertical_alignment='top',
                     element_justification='left'
