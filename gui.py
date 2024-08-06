@@ -15,6 +15,8 @@ import requests
 from packaging.version import Version
 import webbrowser
 
+from helpers import is_update_available
+
 
 CURRENT_VERSION = Version('1.2.0')
 
@@ -78,26 +80,6 @@ def finish_thread():
     number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('image_')])
 
     thread_blocks = False
-
-
-# This function is used to check for updates
-def check_for_updates():
-    global update_available_notification
-
-    try:
-        github_response = requests.get('https://api.github.com/repos/kgabriel-dev/WeatherMap/releases/latest')
-
-        if github_response.status_code == 200:
-            github_json = github_response.json()
-
-            if 'tag_name' in github_json:
-                latest_version = Version(github_json['tag_name'])
-
-                if latest_version and latest_version > CURRENT_VERSION:
-                    update_available_notification = True
-    
-    except requests.exceptions.RequestException as e:
-        print(f"Error while checking for updates: {e}")
 
 
 def create_layout():
@@ -498,6 +480,8 @@ if __name__ == '__main__':
         settings['size'] = 150.0
         auto_start_data_retreival = True
     
-    check_for_updates()
+    if settings.get_settings()['update_notification'] is True:
+        update_available_notification = is_update_available(CURRENT_VERSION)
+    
 
     run_gui()
