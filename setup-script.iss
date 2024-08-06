@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "WeatherMap"
-#define MyAppVersion "1.2.0"
+#define MyAppVersion "1.2.1"
 #define MyAppPublisher "Gabriel Kleebaum"
 #define MyAppURL "https://github.com/kgabriel-dev/WeatherMap"
 #define MyAppExeName "WeatherMap.exe"
