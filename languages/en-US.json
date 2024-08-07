@@ -83,6 +83,7 @@
     "update": {
         "title": "Update available",
         "message": "A new version is available. Do you want to download it now?",
+        "version": "Current version: {current}, New version: {latest}",
         "option_yes": "Yes",
         "option_no": "No",
         "option_auto_check": "Automatically check for updates"

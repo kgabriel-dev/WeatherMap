@@ -83,6 +83,7 @@
     "update": {
         "title": "Update verfügbar",
         "message": "Es ist ein Update verfügbar. Möchten Sie es jetzt herunterladen?",
+        "version": "Aktuelle Version: {current}, Verfügbare Version: {latest}",
         "option_yes": "Ja",
         "option_no": "Nein",
         "option_auto_check": "Bei Start automatisch prüfen"

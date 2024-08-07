@@ -11,6 +11,15 @@ CURRENT_VERSION = Version('1.2.1')
 
 
 def is_update_available() -> bool:
+    latest_version = get_latest_version()
+
+    if latest_version is None:
+        return False
+    
+    return latest_version > CURRENT_VERSION
+    
+
+def get_latest_version() -> Version:
     try:
         github_response = requests.get('https://api.github.com/repos/kgabriel-dev/WeatherMap/releases/latest')
 
@@ -18,14 +27,12 @@ def is_update_available() -> bool:
             github_json = github_response.json()
 
             if 'tag_name' in github_json:
-                latest_version = Version(github_json['tag_name'])
-
-                return latest_version and latest_version > CURRENT_VERSION
+                return Version(github_json['tag_name'])
     
     except requests.exceptions.RequestException as e:
         print(f"Error while checking for updates: {e}")
-        return False
-    
+        return None
+
 
 def open_update_notification(lm) -> None:
     from language import LanguageManager    
@@ -38,6 +45,7 @@ def open_update_notification(lm) -> None:
         icon=get_file_path_in_bundle("app.ico"),
         layout=[
             [sg.Text(lm.get_string("update.message"))],
+            [sg.Text("(" + lm.get_string("update.version").format(current=CURRENT_VERSION, latest=get_latest_version()) + ")")],
             [
                 sg.Button(lm.get_string("update.option_yes"), key='update_yes'),
                 sg.Button(lm.get_string("update.option_no"), key='update_no')
