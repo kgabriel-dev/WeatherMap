@@ -5,7 +5,7 @@ import pytz
 import os
 from data_retreivers import OpenMeteo, BrightSky
 import gc # garbage collector
-from helpers import is_update_available, open_update_notification, get_file_path_in_bundle
+from helpers import is_update_available, open_update_notification, open_no_update_available_notification, get_file_path_in_bundle
 
 
 class Settings:
@@ -106,6 +106,8 @@ class SettingsGUI:
             elif event == 'update_check':
                 if is_update_available():
                     open_update_notification(self.lm)
+                else:
+                    open_no_update_available_notification(self.lm)
             
             # update color preview every 250ms (timeout value)
             if event == sg.TIMEOUT_KEY:

@@ -86,6 +86,8 @@
         "version": "Current version: {current}, New version: {latest}",
         "option_yes": "Yes",
         "option_no": "No",
-        "option_auto_check": "Automatically check for updates"
+        "option_ok": "OK",
+        "option_auto_check": "Automatically check for updates",
+        "no_update": "There is no update available."
     }
 }

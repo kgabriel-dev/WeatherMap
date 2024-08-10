@@ -67,6 +67,30 @@ def open_update_notification(lm) -> None:
     update_window.close()
 
 
+def open_no_update_available_notification(lm) -> None:
+    from language import LanguageManager    
+    if not type(lm) is LanguageManager:
+        raise TypeError("The language manager must be an instance of LanguageManager")
+
+    no_update_window = sg.Window(
+        title=lm.get_string("update.title"),
+        modal=True,
+        icon=get_file_path_in_bundle("app.ico"),
+        layout=[
+            [sg.Text(lm.get_string("update.no_update"))],
+            [sg.Button(lm.get_string("update.option_ok"), key='ok_button')]
+        ]
+    )
+
+    while True:
+        event, _ = no_update_window.read()
+
+        if event == sg.WIN_CLOSED or event == 'ok_button':
+            break
+    
+    no_update_window.close()
+
+
 def get_file_path_in_bundle(file_name: str) -> str:
     bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
     return os.path.join(bundle_dir, file_name)
