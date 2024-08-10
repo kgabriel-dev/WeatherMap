@@ -26,7 +26,7 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
     global states_map, countries_map
 
     settings = Settings()
-    settings.load_settings_from_file(get_file_path_in_bundle('settings.json'))
+    settings.load_settings_from_file()
     settings = settings.get_settings()
 
     # calculate the total number of steps

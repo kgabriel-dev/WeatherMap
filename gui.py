@@ -15,7 +15,6 @@ from language import LanguageManager
 from helpers import is_update_available, open_update_notification, get_file_path_in_bundle
 
 data_directory = 'WeatherMap_Data'
-settings_path = 'settings.json'
 settings = Settings()
 settings_gui = None
 lm = None
@@ -152,7 +151,7 @@ def change_settings(new_settings_values):
     global settings, settings_changed
 
     settings.change_settings(new_settings_values)
-    settings.save_settings_to_file(settings_path)
+    settings.save_settings_to_file()
 
     settings_changed = True
 
@@ -433,7 +432,7 @@ if __name__ == '__main__':
     os.makedirs(data_directory + '/originals', exist_ok=True)
 
     # read the settings from the settings file, otherwise it uses the default settings
-    settings.load_settings_from_file(settings_path)
+    settings.load_settings_from_file()
 
     lm = LanguageManager(settings.get_settings()['language'])
     

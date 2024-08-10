@@ -43,7 +43,7 @@ class Settings:
         
         
 
-    def load_settings_from_file(self, file_path):
+    def load_settings_from_file(self, file_path='settings.json'):
         if not os.path.exists(file_path):
             self.save_settings_to_file(file_path)
 
@@ -56,8 +56,9 @@ class Settings:
                     print(f"Key '{key}' not found in settings file.")
 
             self.change_settings(settings)
+
     
-    def save_settings_to_file(self, file_path):
+    def save_settings_to_file(self, file_path='settings.json'):
         with open(file_path, 'w') as file:
             json.dump(self.settings, file, indent=4)
 
