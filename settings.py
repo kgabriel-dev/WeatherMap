@@ -6,6 +6,7 @@ import os
 from data_retreivers import OpenMeteo, BrightSky
 import gc # garbage collector
 from helpers import is_update_available, open_update_notification, open_no_update_available_notification, get_file_path_in_bundle
+from locations import Locations
 
 
 class Settings:
@@ -25,8 +26,11 @@ class Settings:
             "data_category": "cloud_cover",
             "color_maximum": "#0000ff",
             "color_minimum": "#ffffff",
-            "update_notification": True
+            "update_notification": True,
+            "selected_region": 1
         }
+
+        self.locations_handler = Locations()
     
     def get_settings(self):
         return self.settings
@@ -238,6 +242,7 @@ class SettingsGUI:
     def save_settings(self, values):
         data_retreiver = None
 
+        # determine the data retreiver based on the selected source
         match(values['source']):
             case 'BrightSky (DWD)':
                 data_retreiver = BrightSky()
@@ -249,10 +254,18 @@ class SettingsGUI:
 
         forecast_category_name = values['forecast_category']
 
+        # check if the selected forecast category is available for the selected source
         if forecast_category_name not in self.get_all_forecast_categories(values['source']):
             forecast_category_name = self.get_all_forecast_categories(values['source'])[0]
 
+        # get the keys for the selected forecast category
         forecast_category_keys = self.lm.get_keys_by_value(forecast_category_name, start_dotkey=f"weather_image.bar_label.{data_retreiver.name}")[0].split('.')
+
+        # determine the id of the selected region (0 is None)
+        selected_region_id = 0
+        selected_region = self.locations_handler.find_location_by_name(values['location'])
+        if selected_region is not None:
+            selected_region_id = selected_region['id']
 
         settings = {
             'forecast_length': int(values['forecast_length']),
@@ -268,7 +281,8 @@ class SettingsGUI:
             'interpolation': values['interpolation'],
             'color_maximum': values['maximum_color'],
             'color_minimum': values['minimum_color'],
-            'update_notification': values['update_notification']
+            'update_notification': values['update_notification'],
+            'selected_region': selected_region_id
         }
 
         self.settings.change_settings(settings)

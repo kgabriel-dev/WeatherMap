@@ -9,6 +9,7 @@ import math
 import PIL.Image
 import sys
 import shutil
+from locations import Locations
 from settings import Settings, SettingsGUI
 from language import LanguageManager
 
@@ -18,6 +19,8 @@ data_directory = 'WeatherMap_Data'
 settings = Settings()
 settings_gui = None
 lm = None
+locations_handler = Locations()
+selected_region_id = None
 
 main_window = None
 
@@ -117,6 +120,10 @@ def create_layout():
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
+        sg.Combo([location['name'] for location in locations_handler.get_locations()], key='location', size=(20,1), readonly=True, enable_events=True),
+        sg.Push(),
+        sg.VSeparator(),
+        sg.Push(),
         sg.Button(lm.get_string("main_window.settings"), key='settings_button'),
         sg.Push()
     ]
@@ -197,6 +204,7 @@ def update_texts_of_elements(window, lm):
 def run_gui():
     global thread, global_log_text, number_of_images, screen_factor, auto_start_data_retreival, last_resize_time, settings_gui, settings, settings_changed, thread_blocks
     global main_window
+    global selected_region_id
 
     number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('image_')])
 
@@ -255,6 +263,9 @@ def run_gui():
             window['source'].update(value=settings_values['source'])
             window['size'].update(value=settings_values['size'])
             window['resolution'].update(value=settings_values['resolution'])
+            window['location'].update(values=[location['name'] for location in locations_handler.get_locations()])
+
+            selected_region_id = settings_values['selected_region']
 
             # update the entries of the forecast category
             data_retreiver = None
@@ -408,7 +419,22 @@ def run_gui():
         # check if the user wants to open the settings window
         if event == 'settings_button' and SettingsGUI is not None:
             settings_gui.open_settings_window()
-            
+
+        # check if the user selected a location (either loaded from settings.json at startup or by the user in the settings window)
+        if event == 'location':
+            selected_region_id = locations_handler.find_location_by_name(values['location'])['id']
+
+        if selected_region_id is not None:
+            selected_region = locations_handler.get_location_by_id(selected_region_id)
+
+            if selected_region is not None:
+                window['latitude'].update(value=str(selected_region['coordinates']['latitude']))
+                window['longitude'].update(value=str(selected_region['coordinates']['longitude']))
+                window['location'].update(value=selected_region['name'])
+                window['size'].update(value=str(selected_region['region']['size']))
+                window['resolution'].update(value=str(selected_region['steps']))
+
+            selected_region_id = None
 
     # wait for the thread to finish
     if thread.is_alive() is True:
@@ -448,6 +474,8 @@ if __name__ == '__main__':
     
     if settings.get_settings()['update_notification'] is True:
         update_available_notification = is_update_available()
-    
+
+    if settings.get_settings()['selected_region'] is not None:
+        selected_region_id = settings.get_settings()['selected_region']
 
     run_gui()

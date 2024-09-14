@@ -1,0 +1,30 @@
+[
+    {
+        "id": 1,
+        "name": "New York",
+        "coordinates": {
+            "lat": 40.7128,
+            "lng": -74.0060
+        },
+        "timezone": "America/New_York",
+        "region": {
+            "size": 100,
+            "unit": "km"
+        },
+        "steps": 10
+    },
+    {
+        "id": 2,
+        "name": "Washington DC",
+        "coordinates": {
+            "lat": 38.9072,
+            "lng": -77.0369
+        },
+        "timezone": "America/New_York",
+        "region": {
+            "size": 125,
+            "unit": "km"
+        },
+        "steps": 5
+    }
+]
