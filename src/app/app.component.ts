@@ -10,4 +10,9 @@ import { RouterOutlet } from '@angular/router';
 })
 export class AppComponent {
   title = 'WeatherMap';
+
+  constructor() {
+    var app = electron.remote.app;
+    this.title = app.getAppPath();
+  }
 }
