@@ -12,6 +12,9 @@ interface Window {
     node: () => string;
   },
   files: {
-    readFile: (filePath: string) => Promise<string>
+    readFile: (filePath: string, encoding: string) => Promise<string>
+    readAppFile: (filePath: string, encoding: string) => Promise<string>
   }
 }
+
+type AppPathContext = "home" | "appData" | "userData" | "sessionData" | "temp" | "exe" | "module" | "desktop" | "documents" | "downloads" | "music" | "pictures" | "videos" | "recent" | "logs" | "crashDumps"

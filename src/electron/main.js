@@ -36,11 +36,22 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
 })
 
-ipcMain.handle('read-file', (event, path) => {
+// IPC handlers
+ipcMain.handle('read-file', (event, filePath, encoding) => {
+  return readFile(filePath, encoding);
+})
+
+ipcMain.handle('read-app-file', (event, filePath, encoding) => {
+  // use the app's path and the read-file function to read the file
+  return readFile(path.join(app.getAppPath(), filePath), encoding);
+});
+
+// Helper functions
+function readFile(filePath, encoding) {
   try {
-    return fs.readFileSync(path, 'base64').toString()
+    return fs.readFileSync(filePath, { encoding }).toString()
   } catch (err) {
     console.error('Error reading file:', err)
     throw err;
   }
-})
+}

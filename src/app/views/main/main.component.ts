@@ -1,7 +1,8 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
-import { Image, ImageModule } from 'primeng/image';
+import { ImageModule } from 'primeng/image';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { LocationService } from '../../services/location/location.service';
 
 @Component({
   selector: 'app-main',
@@ -17,8 +18,12 @@ export class MainComponent implements OnInit {
   currentWeatherImageIndex = 0;
   numberOfWeatherImages = 7;
 
+  constructor(
+    public locationsService: LocationService
+  ) { }
+
   ngOnInit(): void {
-    window.files.readFile(this.filePath)
+    window.files.readFile(this.filePath, 'base64')
       .then((data) => {
         const extension = this.filePath.split('.').pop();
         this.currentWeatherImageSrc = 'data:image/' + extension + ';base64,' + data;

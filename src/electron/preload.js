@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer, app } = require('electron');
 
 contextBridge.exposeInMainWorld('versions', {
   node: () => process.versions.node,
@@ -7,5 +7,6 @@ contextBridge.exposeInMainWorld('versions', {
 });
 
 contextBridge.exposeInMainWorld('files', {
-  readFile: (filePath) => ipcRenderer.invoke('read-file', filePath)
+  readFile: (filePath, encoding) => ipcRenderer.invoke('read-file', filePath, encoding),
+  readAppFile: (filePath, encoding) => ipcRenderer.invoke('read-app-file', filePath, encoding)
 });

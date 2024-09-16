@@ -20,7 +20,14 @@
   </div>
 
   <div class="flex flex-column flex-grow-0 gap-2">
-    Location:<br>
-    <input type="text" value="Rostock">
+    <label for="location">Location:</label>
+    <select id="location">
+      @for (location of locationsService.getLocations(); track location.id) {
+        <option [value]="location.id">{{location.name}}</option>
+      }
+      @empty {
+        <option value="" disabled selected>No locations available</option>
+      }
+    </select>
   </div>
 </div>
