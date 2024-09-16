@@ -1,6 +1,7 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('node:path')
 const url = require('node:url')
+const fs = require('node:fs')
 
 const createWindow = () => {
   // Create the browser window.
@@ -33,4 +34,13 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
+})
+
+ipcMain.handle('read-file', (event, path) => {
+  try {
+    return fs.readFileSync(path, 'base64').toString()
+  } catch (err) {
+    console.error('Error reading file:', err)
+    throw err;
+  }
 })
