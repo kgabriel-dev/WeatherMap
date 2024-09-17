@@ -3,11 +3,14 @@ import { ButtonModule } from 'primeng/button';
 import { ImageModule } from 'primeng/image';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { LocationService } from '../../services/location/location.service';
+import { DropdownModule } from 'primeng/dropdown';
+import { FormsModule } from '@angular/forms';
+import { InputNumberModule } from 'primeng/inputnumber';
 
 @Component({
   selector: 'app-main',
   standalone: true,
-  imports: [ProgressBarModule, ButtonModule, ImageModule],
+  imports: [FormsModule, ProgressBarModule, ButtonModule, ImageModule, DropdownModule, InputNumberModule],
   templateUrl: './main.component.html',
   styleUrl: './main.component.scss'
 })
@@ -17,6 +20,10 @@ export class MainComponent implements OnInit {
   currentWeatherImageSrc = '';
   currentWeatherImageIndex = 0;
   numberOfWeatherImages = 7;
+  selectedLocation?: Location;
+  latitude = 51.5074;
+  longitude = 0.1278;
+  resolution = 5
 
   constructor(
     public locationsService: LocationService

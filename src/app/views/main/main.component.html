@@ -1,12 +1,13 @@
-<div class="flex flex-row gap-4" style="max-width: 100vw; max-height: 100vh;">
+<div class="flex flex-row gap-4 p-4" style="width: 100%; height: 100%">
   <div class="flex flex-column flex-grow-1 gap-2 pr-4 border-right-2 border-primary-500 h-full">
-    <img class="flex flex-grow-1" style="object-fit: contain; max-height: 100%; max-height: calc(100vh - 75px);" #weatherImage [src]="currentWeatherImageSrc" />
+    <img style="object-fit: contain; max-height: 87vh;" #weatherImage [src]="currentWeatherImageSrc" />
 
-    <div class="flex flex-grow-1"></div>
+    <!-- spacing -->
+    <div class="flex-grow-1"></div>
 
     <div class="flex flex-row align-items-center gap-4 pl-4" style="height: 30px;">
       <p-progressBar [value]="((currentWeatherImageIndex + 1) / numberOfWeatherImages) * 100" class="w-full">
-        <ng-template pTemplate="content" let-value>
+        <ng-template pTemplate="content">
           <span>{{currentWeatherImageIndex + 1}} / {{numberOfWeatherImages}}</span>
         </ng-template>
       </p-progressBar>
@@ -19,15 +20,55 @@
     </div>
   </div>
 
-  <div class="flex flex-column flex-grow-0 gap-2">
-    <label for="location">Location:</label>
-    <select id="location">
-      @for (location of locationsService.getLocations(); track location.id) {
-        <option [value]="location.id">{{location.name}}</option>
-      }
-      @empty {
-        <option value="" disabled selected>No locations available</option>
-      }
-    </select>
+  <div class="flex flex-column flex-grow-0 gap-3 h-full" style="width: 20%; min-width: 180px; max-width: 350px;">
+    <div class="flex flex-column flex-grow-1 gap-3 pr-4 overflow-y-auto">
+      <label for="location">Location:</label>
+    <p-dropdown
+      [options]="locationsService.getLocations()"
+      [(ngModel)]="selectedLocation"
+      optionLabel="name"
+      optionValue="id"
+      placeholder="Select a location"
+      [style]="{'width': '100%'}" />
+
+      <label for="latitude">Latitude:</label>
+      <p-inputNumber inputId="latitude" [(ngModel)]="latitude" mode="decimal" [minFractionDigits]="0" [maxFractionDigits]="6" [inputStyle]="{'width': '100%'}" styleClass="w-full" />
+
+      <label for="longitude">Latitude:</label>
+      <p-inputNumber inputId="longitude" [(ngModel)]="longitude" mode="decimal" [minFractionDigits]="0" [maxFractionDigits]="6" [inputStyle]="{'width': '100%'}" styleClass="w-full" />
+
+      <label for="size">Size:</label>
+      <div class="flex flex-row">
+        <p-inputNumber inputId="size" [inputStyle]="{'text-align': 'right' , 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'width': '100%'}" styleClass="w-full" class="w-full" />
+        <p-dropdown
+          [options]="['km', 'mi']"
+          [style]="{'width': '7rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0'}" />
+      </div>
+
+      <label for="resolution">Resolution (n &#x2715; n steps):</label>
+      <p-inputNumber inputId="resolution" [(ngModel)]="resolution" mode="decimal" [inputStyle]="{'width': '100%'}" styleClass="w-full" />
+
+      <label for="forecast">Forecast length:</label>
+      <div class="flex flex-row">
+        <p-inputNumber inputId="forecast" [inputStyle]="{'text-align': 'right' , 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'width': '100%'}" styleClass="w-full" class="w-full" />
+        <p-dropdown
+          [options]="['hours', 'days']"
+          [style]="{'width': '7rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0'}" />
+      </div>
+
+      <label for="source">Source:</label>
+      <p-dropdown
+        [options]="['OpenMeteo', 'BrightSky (DWD)']"
+        [style]="{'width': '100%'}" />
+
+      <label for="condition">Condition:</label>
+      <p-dropdown
+        inputId="condition"
+        [options]="['Cloudiness (%)']"
+        [style]="{'width': '100%'}" />
+    </div>
+
+    <div class="flex-grow-1 border-bottom-2 border-primary-500"></div>
+    <p-button label="Generate images" styleClass="w-full" />
   </div>
 </div>
