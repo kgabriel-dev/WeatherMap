@@ -13,7 +13,9 @@ interface Window {
   },
   files: {
     readFile: (filePath: string, encoding: string) => Promise<string>
-    readAppFile: (filePath: string, encoding: string) => Promise<string>
+    readAppFile: (filePath: string, encoding: string) => Promise<string>,
+    checkAppFileExists: (filePath: string) => Promise<boolean>,
+    writeAppFile: (filePath: string, data: string, encoding: string) => Promise<boolean>,
   }
 }
 

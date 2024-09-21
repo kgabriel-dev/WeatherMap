@@ -1,0 +1,99 @@
+import { Injectable } from '@angular/core';
+import type { Location } from './../location/location.type';
+import { BehaviorSubject } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SettingsService {
+
+  private readonly defaultSettings: Settings = {
+    version: '0.1.0',
+    languageCode: 'en-US',
+    timezoneCode: 'America/New_York',
+    weatherCondition: 'openmeteo.cloudiness',
+    forecastLength: {
+      value: 12,
+      unit: 'hours'
+    },
+    updateCheck: true,
+    defaultLocationId: 1
+  }
+  private settings: Settings = this.defaultSettings;
+  private readonly settingsChangedSubject = new BehaviorSubject<Settings>(this.defaultSettings);
+
+  constructor() {
+    // check if settings.json exists
+    window.files.checkAppFileExists('settings.json')
+      .then((exists) => {
+        if (!exists) {
+          // write settings.json file
+          window.files.writeAppFile('settings.json', JSON.stringify(this.defaultSettings, undefined, 2), 'utf8')
+            .then((written) => {
+              if(written) console.log('settings.json created!');
+              else console.error('Error creating settings.json!');
+            })
+            .catch((error) => {
+              console.error('Error creating settings.json!', error);
+            });
+        }
+
+        // Read settings.json file
+        window.files.readAppFile('settings.json', 'utf8')
+        .then((data) => {
+          console.log('settings.json read!');
+          this.settings = JSON.parse(data);
+          this.settingsChangedSubject.next(this.settings);
+        })
+        .catch((error) => {
+          console.error('Error reading settings.json!', error);
+          this.settings = this.defaultSettings;
+          this.settingsChangedSubject.next(this.settings);
+        });
+      })
+      .catch((error) => {
+        console.error('Error checking settings.json!', error);
+        this.settings = this.defaultSettings;
+        this.settingsChangedSubject.next(this.settings);
+      });
+
+    this.settingsChangedSubject.subscribe((settings) => console.log('Settings changed!', settings));
+  }
+
+  public getSettings(): Settings {
+    return this.settings || this.defaultSettings;
+  }
+
+  public setSettingsValue(key: keyof Settings, value: Settings[keyof Settings]): void {
+    if (this.settings && key in this.settings) {
+      // @ts-ignore
+      this.settings[key] = value;
+    }
+
+    this.settingsChangedSubject.next(this.settings);
+  }
+
+  public saveSettings(): void {
+    window.files.writeAppFile('settings.json', JSON.stringify(this.settings), 'utf8')
+      .then(() => console.log('settings.json saved!'))
+      .catch((error) => console.error('Error saving settings.json!', error));
+  }
+
+  public getSettingsChangedObservable() {
+    return this.settingsChangedSubject.asObservable();
+  }
+
+}
+
+type Settings = {
+  version: string,
+  languageCode: string,
+  timezoneCode: string,
+  weatherCondition: string,
+  forecastLength: {
+    value: number,
+    unit: 'hours' | 'days',
+  },
+  updateCheck: boolean,
+  defaultLocationId: Location['id'],
+}

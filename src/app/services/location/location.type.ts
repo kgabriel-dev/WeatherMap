@@ -13,3 +13,18 @@ export type Location = {
     resolution: number;
   }
 }
+
+export type LocationAddingData = {
+  name: string;
+  coordinates: {
+    latitude: number;
+    longitude: number;
+  };
+  region: {
+    size: {
+      length: number,
+      unit: 'km' | 'mi';
+    },
+    resolution: number;
+  }
+}

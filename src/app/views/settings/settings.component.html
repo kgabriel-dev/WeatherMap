@@ -1,0 +1,101 @@
+<p-tabView class="w-full h-full" styleClass="h-full" [scrollable]="true">
+  <p-tabPanel header="General">
+    <p>Language:</p>
+    <p-dropdown
+      [options]="languages"
+      styleClass="w-full"
+      optionValue="key"
+      optionLabel="label"
+      [style]="{'z-index': '3'}"
+      [(ngModel)]="selectedLanguageKey" >
+
+      <ng-template pTemplate="selectedItem">
+        <div class="flex align-items-center gap-2" @if(selectedLanguage)>
+          <span [class]="'fi fi-' + getLanguageFromKey(selectedLanguageKey).flag"></span>
+          <span>{{getLanguageFromKey(selectedLanguageKey).label}}</span>
+        </div>
+      </ng-template>
+
+      <ng-template let-language pTemplate="item">
+        <div class="flex align-items-center gap-2">
+          <span [class]="'fi fi-' + language.flag"></span>
+          <span>{{language.label}}</span>
+        </div>
+      </ng-template>
+    </p-dropdown>
+
+    <p-divider />
+
+    <p>Timezone:</p>
+    <p-dropdown
+      [options]="timezones"
+      optionValue="tzCode"
+      optionLabel="label"
+      [group]="true"
+      styleClass="w-full"
+      [filter]="true"
+      filterBy="label"
+      [style]="{'z-index': '2'}"
+      [(ngModel)]="selectedTimezoneCode" >
+
+      <ng-template let-group pTemplate="group">
+        <div class="flex align-items center color-primary">
+          <span>---- {{group.label}} ----</span>
+        </div>
+      </ng-template>
+
+    </p-dropdown>
+
+    <p-divider />
+
+    <p>Default weather condition:</p>
+    <p-dropdown
+      [options]="dataSources"
+      optionValue="value"
+      [group]="true"
+      styleClass="w-full"
+      [style]="{'z-index': '1'}"
+      [(ngModel)]="selectedDataSource" >
+
+      <ng-template let-group pTemplate="group">
+        <div class="flex align-items center">
+          <img [src]="dataSourceIcons[group.value] || ''" class="mr-2" style="width: 20px" />
+          <span>{{group.label}}</span>
+        </div>
+      </ng-template>
+
+    </p-dropdown>
+
+    <p-divider />
+
+    <p>Default length of forecast:</p>
+    <div class="flex flex-row">
+      <p-inputNumber [(ngModel)]="forecastLength.value" styleClass="w-full" [inputStyle]="{'width': '100%', 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'text-align': 'right'}" />
+      <p-dropdown [(ngModel)]="forecastLength.unit" [options]="['hours', 'days']" [style]="{'border-radius': '0 var(--border-radius) var(--border-radius) 0', 'width': '7rem'}"></p-dropdown>
+    </div>
+
+    <p-divider />
+
+    <p>Update check & notification</p>
+    <div class="flex flex-row gap-1">
+      <p-checkbox [(ngModel)]="updateCheck" [binary]="true" inputId="update_notification"></p-checkbox>
+      <label for="update_notification">Check for updates at startup and notify me when an update is available.</label>
+    </div>
+
+    <p-divider />
+
+    <div class="flex flex-row gap-2">
+      <p-button label="Save" icon="pi pi-save" />
+      <p-button label="Discard" icon="pi pi-times" />
+    </div>
+  </p-tabPanel>
+
+  <p-tabPanel header="Locations">
+    <div class="flex flex-row h-full">
+      <p-listbox
+      [options]="locationsService.getLocations()"
+      optionLabel="name"
+      listStyleClass="h-full" />
+    </div>
+  </p-tabPanel>
+</p-tabView>
