@@ -91,11 +91,78 @@
   </p-tabPanel>
 
   <p-tabPanel header="Locations">
-    <div class="flex flex-row h-full">
-      <p-listbox
-      [options]="locationsService.getLocations()"
-      optionLabel="name"
-      listStyleClass="h-full" />
+    <div class="flex flex-row h-full gap-2">
+      <div class="flex flex-column gap-2">
+        <p-listbox
+          [options]="locationsService.getLocations()"
+          optionLabel="name"
+          listStyleClass="h-full" />
+
+        <div class="flex flex-grow-1"></div>
+
+        <p-button label="Add" icon="pi pi-plus" styleClass="w-full" />
+      </div>
+
+      <p-divider layout="vertical" />
+
+      <div class="flex flex-column flex-grow-1 w-full">
+        <p class="mt-0">Location name:</p>
+        <input type="text" pInputText>
+
+        <p>Timezone:</p>
+        <p-dropdown
+          [options]="timezones"
+          optionValue="tzCode"
+          optionLabel="label"
+          [group]="true"
+          styleClass="w-full"
+          [filter]="true"
+          filterBy="label"
+          [style]="{'z-index': 3}" >
+
+          <ng-template let-group pTemplate="group">
+            <div class="flex align-items center color-primary">
+              <span>---- {{group.label}} ----</span>
+            </div>
+          </ng-template>
+
+        </p-dropdown>
+
+        <div class="flex flex-row w-full gap-2">
+          <div class="flex flex-column w-full">
+            <p>Latitude:</p>
+            <p-inputNumber styleClass="w-full" [inputStyle]="{'width': '100%', 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'text-align': 'right'}" />
+          </div>
+          <div class="flex flex-column w-full">
+            <p>Longitude:</p>
+            <p-inputNumber styleClass="w-full" [inputStyle]="{'width': '100%', 'border-radius': '0 var(--border-radius) var(--border-radius) 0', 'text-align': 'right'}" />
+          </div>
+        </div>
+
+        <div class="flex flex-row flex-grow-1 gap-2">
+          <div class="flex flex-column w-full">
+            <p>Region size:</p>
+            <div class="flex flex-row">
+              <p-inputNumber inputId="size" [inputStyle]="{'text-align': 'right' , 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'width': '100%'}" styleClass="w-full" class="w-full" />
+              <p-dropdown
+                [options]="['km', 'mi']"
+                [style]="{'width': '7rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0', 'z-index': 2}" />
+            </div>
+          </div>
+          <div class="flex flex-column w-full">
+            <p>Resolution (results in n &#x2715; n steps):</p>
+            <p-inputNumber mode="decimal" [inputStyle]="{'width': '100%'}" styleClass="w-full" />
+          </div>
+        </div>
+
+        <p-divider />
+
+        <div class="flex flex-row gap-2 w-full justify-content-center">
+          <p-button label="Save" icon="pi pi-save" />
+          <p-button label="Discard" icon="pi pi-times" />
+          <p-button label="Delete" icon="pi pi-trash" />
+        </div>
+      </div>
     </div>
   </p-tabPanel>
 </p-tabView>

@@ -11,6 +11,7 @@ import timezones, { TimeZone } from 'timezones-list';
 import { SettingsService } from '../../services/settings/settings.service';
 import { LocationService } from '../../services/location/location.service';
 import { ListboxModule } from 'primeng/listbox';
+import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
   selector: 'app-settings',
@@ -23,7 +24,8 @@ import { ListboxModule } from 'primeng/listbox';
     CheckboxModule,
     DividerModule,
     ButtonModule,
-    ListboxModule
+    ListboxModule,
+    InputTextModule
   ],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
