@@ -11,10 +11,12 @@ import sys
 import shutil
 from settings import Settings, SettingsGUI
 from language import LanguageManager
+import tempfile
 
 from helpers import is_update_available, open_update_notification, get_file_path_in_bundle
 
-data_directory = 'WeatherMap_Data'
+data_directory = tempfile.TemporaryDirectory()
+data_directory_name = data_directory.name
 settings = Settings()
 settings_gui = None
 lm = None
@@ -58,16 +60,16 @@ def finish_thread():
     set_progress(progress_in_percent + remaining_progress/3)
 
     set_log_text(lm.get_string("log.deleting_images"))
-    for image_name in os.listdir(data_directory):
+    for image_name in os.listdir(data_directory_name):
         if image_name.startswith('image_'):
-            os.remove(os.path.join(data_directory, image_name))
+            os.remove(os.path.join(data_directory_name, image_name))
 
     set_progress(progress_in_percent + remaining_progress/3)
     scale_cloud_images()
     
     set_progress(100)
     set_log_text(lm.get_string("log.finished_all_steps"))
-    number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('image_')])
+    number_of_images = len([name for name in os.listdir(data_directory_name + '/originals') if name.startswith('image_')])
 
     thread_blocks = False
 
@@ -159,17 +161,17 @@ def change_settings(new_settings_values):
 def scale_cloud_images():
     global last_resize_time, number_of_images, thread_blocks
 
-    number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('image_')])
+    number_of_images = len([name for name in os.listdir(data_directory_name + '/originals') if name.startswith('image_')])
 
     scaled_images = 0
 
-    for file_name in os.listdir(data_directory + '/originals'):
+    for file_name in os.listdir(data_directory_name + '/originals'):
         if file_name.startswith('image_'):
             set_log_text(lm.get_string("log.scale_image_at_index", replace_dict={'index': str(scaled_images + 1), 'total': str(number_of_images)}))
 
-            image = PIL.Image.open(os.path.join(data_directory + '/originals', file_name))
+            image = PIL.Image.open(os.path.join(data_directory_name + '/originals', file_name))
             image = image.resize((int(image.width * screen_factor), int(image.height * screen_factor)), PIL.Image.LANCZOS)
-            image.save(os.path.join(data_directory, file_name))
+            image.save(os.path.join(data_directory_name, file_name))
 
             scaled_images += 1
     
@@ -198,7 +200,7 @@ def run_gui():
     global thread, global_log_text, number_of_images, screen_factor, auto_start_data_retreival, last_resize_time, settings_gui, settings, settings_changed, thread_blocks
     global main_window
 
-    number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('image_')])
+    number_of_images = len([name for name in os.listdir(data_directory_name + '/originals') if name.startswith('image_')])
 
     # create the window
     window = sg.Window(lm.get_string("main_window.title"), create_layout(), finalize=True, resizable=True, icon=get_file_path_in_bundle('./app.ico'))
@@ -304,7 +306,7 @@ def run_gui():
         elif values['animation_checkbox'] is False and thread_blocks is False:
             # update the image index and the image
             image_index = int(values['index_slider'])
-            window['forecast_image'].update(filename=f'{data_directory}/image_{image_index}.png')
+            window['forecast_image'].update(filename=f'{data_directory_name}/image_{image_index}.png')
 
         # a timeout event occured
         if event == sg.TIMEOUT_KEY:
@@ -319,10 +321,10 @@ def run_gui():
 
             # check if the animation checkbox is checked and the thread is not blocked
             # and if so, update the image index and the image
-            number_of_images = len([name for name in os.listdir(data_directory + '/originals') if name.startswith('image_')])
+            number_of_images = len([name for name in os.listdir(data_directory_name + '/originals') if name.startswith('image_')])
 
             if values['animation_checkbox'] is True and thread_blocks is False and number_of_images > 0:
-                window['forecast_image'].update(filename=f'{data_directory}/image_{image_index}.png')
+                window['forecast_image'].update(filename=f'{data_directory_name}/image_{image_index}.png')
                 window['index_slider'].update(value=image_index)
 
                 image_index = (image_index + 1) % number_of_images
@@ -351,12 +353,12 @@ def run_gui():
                 thread.join()
 
                 # delete all images
-                for image_name in os.listdir(data_directory):
+                for image_name in os.listdir(data_directory_name):
                     if image_name.startswith('image_'):
-                        os.remove(os.path.join(data_directory, image_name))
-                for image_name in os.listdir(data_directory + '/originals'):
+                        os.remove(os.path.join(data_directory_name, image_name))
+                for image_name in os.listdir(data_directory_name + '/originals'):
                     if image_name.startswith('image_'):
-                        os.remove(os.path.join(data_directory + '/originals', image_name))
+                        os.remove(os.path.join(data_directory_name + '/originals', image_name))
 
                 # reset the progress bar
                 set_progress(100)
@@ -388,19 +390,19 @@ def run_gui():
                 # get the key of the current forecast category by using the last element of the dot-key in the language manager
                 forecast_category = lm.get_keys_by_value(values['forecast_category'], start_dotkey=f"weather_image.bar_label.{data_source.name}")[0].split('.')[-1]
 
-                thread = Thread(target=retreive_and_handle_data, args=(data_source, forecast_category, data_directory, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution, lm, settings.get_settings()['timezone'], settings.get_settings()['interpolation'], set_progress))
+                thread = Thread(target=retreive_and_handle_data, args=(data_source, forecast_category, data_directory_name, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution, lm, settings.get_settings()['timezone'], settings.get_settings()['interpolation'], set_progress))
                 thread_blocks = True
 
                 window['forecast_image'].update(filename=None)
                 window['index_slider'].update(range=(0,1), value=0)
 
                 # delete all images
-                for image_name in os.listdir(data_directory):
+                for image_name in os.listdir(data_directory_name):
                     if image_name.startswith('image_'):
-                        os.remove(os.path.join(data_directory, image_name))
-                for image_name in os.listdir(data_directory + '/originals'):
+                        os.remove(os.path.join(data_directory_name, image_name))
+                for image_name in os.listdir(data_directory_name + '/originals'):
                     if image_name.startswith('image_'):
-                        os.remove(os.path.join(data_directory + '/originals', image_name))
+                        os.remove(os.path.join(data_directory_name + '/originals', image_name))
 
                 # start the thread
                 thread.start()
@@ -418,18 +420,19 @@ def run_gui():
     main_window = None
 
     # remove old images
-    shutil.rmtree(data_directory)
+    shutil.rmtree(data_directory_name)
+    data_directory.cleanup()
 
     sys.exit(0)
 
 
 if __name__ == '__main__':
     # remove old images (if there are any, e.g. when the program crashed)
-    if os.path.exists(data_directory):
-        shutil.rmtree(data_directory)
+    if os.path.exists(data_directory_name):
+        shutil.rmtree(data_directory_name)
 
     # prepare for starting the program
-    os.makedirs(data_directory + '/originals', exist_ok=True)
+    os.makedirs(data_directory_name + '/originals', exist_ok=True)
 
     # read the settings from the settings file, otherwise it uses the default settings
     settings.load_settings_from_file()

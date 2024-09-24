@@ -7,7 +7,7 @@ import sys
 
 
 # CONSTANTS
-CURRENT_VERSION = Version('1.2.1')
+CURRENT_VERSION = Version('1.2.2')
 
 
 def is_update_available() -> bool:
