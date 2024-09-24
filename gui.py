@@ -79,6 +79,21 @@ def create_layout():
     global screen_factor, settings
 
     values = settings.get_settings()
+    region = locations_handler.get_location_by_id(selected_region_id)
+
+    if region is None:
+        region = {
+            'name': 'New York City',
+            'coordinates': {
+                'latitude': 40.73061,
+                'longitude': -73.93524
+            },
+            'region': {
+                'size': 100,
+                'unit': 'km'
+            },
+            'steps': 5
+        }
 
     options = [
         sg.Push(),
@@ -92,12 +107,12 @@ def create_layout():
         sg.VSeparator(),
         sg.Push(),
         sg.Text(lm.get_string("main_window.latitude", suffix=':'), key='latitude_text'),
-        sg.Input(key='latitude', size=(7,1), default_text=str(values['latitude'])),
+        sg.Input(key='latitude', size=(7,1), default_text=str(region['coordinates']['latitude'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
         sg.Text(lm.get_string("main_window.longitude", suffix=':'), key='longitude_text'),
-        sg.Input(key='longitude', size=(7,1), default_text=str(values['longitude'])),
+        sg.Input(key='longitude', size=(7,1), default_text=str(region['coordinates']['longitude'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
@@ -107,12 +122,12 @@ def create_layout():
         sg.VSeparator(),
         sg.Push(),
         sg.Text(lm.get_string("main_window.size", suffix=':'), key='size_text'),
-        sg.Input(key='size', size=(6,1), default_text=str(values['size'])),
+        sg.Input(key='size', size=(6,1), default_text=str(region['region']['size'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),
         sg.Text(lm.get_string("main_window.resolution", suffix=':'), key='resolution_text'),
-        sg.Input(key='resolution', size=(4,1), default_text=str(values['resolution'])),
+        sg.Input(key='resolution', size=(4,1), default_text=str(region['steps'])),
         sg.Push(),
         sg.VSeparator(),
         sg.Push(),

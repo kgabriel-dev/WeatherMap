@@ -6,7 +6,7 @@ import os
 from data_retreivers import OpenMeteo, BrightSky
 import gc # garbage collector
 from helpers import is_update_available, open_update_notification, open_no_update_available_notification, get_file_path_in_bundle
-from locations import Locations
+from locations import Locations, LocationGUI
 
 
 class Settings:
@@ -14,14 +14,9 @@ class Settings:
     def __init__(self):
         self.settings = {
             "forecast_length": 12,
-            "latitude": 40.73,
-            "longitude": -73.94,
             "source": "OpenMeteo",
-            "size": 100.0,
-            "resolution": 5,
             "language": "en-US",
             "load_data_on_start": False,
-            "timezone": "America/New_York",
             "interpolation": False,
             "data_category": "cloud_cover",
             "color_maximum": "#0000ff",
@@ -32,20 +27,22 @@ class Settings:
 
         self.locations_handler = Locations()
     
+
     def get_settings(self):
         return self.settings
     
+
     def change_setting_entry(self, key, value):
         if key in self.settings:
             self.settings[key] = value
         else:
             print(f"Key '{key}' not found in settings.")
     
+
     def change_settings(self, settings):
         for key, value in settings.items():
             self.change_setting_entry(key, value)
-        
-        
+
 
     def load_settings_from_file(self, file_path='settings.json'):
         if not os.path.exists(file_path):
@@ -74,6 +71,8 @@ class SettingsGUI:
         self.settings = settings
         self.change_settings_callback = change_settings_callback
         self.lm = language_manager
+        self.locations_window = LocationGUI(self.main_gui, self.change_settings_callback, self.lm)
+        self.locations_handler = Locations()
 
 
     def open_settings_window(self):
@@ -112,6 +111,8 @@ class SettingsGUI:
                     open_update_notification(self.lm)
                 else:
                     open_no_update_available_notification(self.lm)
+            elif event == 'add_location':
+                self.locations_window.open_locations_window()
             
             # update color preview every 250ms (timeout value)
             if event == sg.TIMEOUT_KEY:
@@ -162,26 +163,20 @@ class SettingsGUI:
             [
                 sg.Column(
                     [
+                        [sg.Text(self.lm.get_string("settings_window.location", suffix=':'))],
+                        [
+                            sg.Combo([location['name'] for location in self.locations_handler.locations], key='location', default_value=self.locations_handler.get_location_by_id(self.settings.get_settings()['selected_region'])['name'], readonly=True, enable_events=True),
+                            sg.Button(self.lm.get_string("settings_window.add_location"), key='add_location')
+                        ],
                         [sg.Text(self.lm.get_string("settings_window.forecast", suffix=':'))],
                         [sg.InputText(self.settings.get_settings()['forecast_length'], key='forecast_length')],
-                        [sg.HSeparator()],
-                        [sg.Text(self.lm.get_string("settings_window.latitude", suffix=':'))],
-                        [sg.InputText(self.settings.get_settings()['latitude'], key='latitude')],
-                        [sg.HSeparator()],
-                        [sg.Text(self.lm.get_string("settings_window.longitude", suffix=':'))],
-                        [sg.InputText(self.settings.get_settings()['longitude'], key='longitude')],
                         [sg.HSeparator()],
                         [sg.Text(self.lm.get_string("settings_window.data_source", suffix=':'))],
                         [sg.Combo(['OpenMeteo', 'BrightSky (DWD)'], key='source', default_value=str(self.settings.get_settings()['source']), size=(15,1), readonly=True, enable_events=True)],
                         [sg.HSeparator()],
                         [sg.Text(self.lm.get_string("settings_window.default_data_category", suffix=':'))],
                         [sg.Combo(self.get_all_forecast_categories(self.settings.get_settings()['source']), key='forecast_category', default_value=self.get_forecast_category(self.settings.get_settings()['source']), readonly=True, size=(30, 1))],
-                        [sg.HSeparator()],
-                        [sg.Text(self.lm.get_string("settings_window.size", suffix=':'))],
-                        [sg.InputText(self.settings.get_settings()['size'], key='size')],
-                        [sg.HSeparator()],
-                        [sg.Text(self.lm.get_string("settings_window.resolution", suffix=':'))],
-                        [sg.InputText(self.settings.get_settings()['resolution'], key='resolution')]
+                        [sg.HSeparator()]
                     ],
                     vertical_alignment='top',
                     element_justification='left'
@@ -202,9 +197,6 @@ class SettingsGUI:
                         ],
                         [sg.HSeparator()],
                         [sg.Checkbox(self.lm.get_string("settings_window.load_data_at_start"), default=self.settings.get_settings()['load_data_on_start'], key='load_data_on_start')],
-                        [sg.HSeparator()],
-                        [sg.Text(self.lm.get_string("settings_window.timezone", suffix=':'))],
-                        [sg.Combo(pytz.common_timezones, key='timezone', default_value=str(self.settings.get_settings()['timezone']), readonly=True)],
                         [sg.HSeparator()],
                         [sg.Checkbox(self.lm.get_string("settings_window.interpolation"), default=self.settings.get_settings()['interpolation'], key='interpolation')],
                         [sg.Text(self.lm.get_string("settings_window.interpolation_info"), size=(35, 4))],
@@ -269,15 +261,10 @@ class SettingsGUI:
 
         settings = {
             'forecast_length': int(values['forecast_length']),
-            'latitude': float(values['latitude']),
-            'longitude': float(values['longitude']),
             'source': values['source'],
             'data_category': f"{forecast_category_keys[-2]}.{forecast_category_keys[-1]}",  # e.g. 'OpenMeteo.cloud_cover'
-            'size': float(values['size']),
-            'resolution': int(values['resolution']),
             'language': LanguageManager.get_language_code_by_name(values['language']),
             'load_data_on_start': values['load_data_on_start'],
-            'timezone': values['timezone'],
             'interpolation': values['interpolation'],
             'color_maximum': values['maximum_color'],
             'color_minimum': values['minimum_color'],
