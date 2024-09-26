@@ -13,5 +13,5 @@
     "color_maximum": "#0000ff",
     "color_minimum": "#ffffff",
     "update_notification": true,
-    "animation_autoplay": false
+    "animation_autoplay": true
 }
