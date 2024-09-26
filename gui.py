@@ -310,6 +310,7 @@ def run_gui():
         elif values['animation_checkbox'] is False and thread_blocks is False and number_of_images > 0:
             # update the image index and the image
             image_index = int(values['index_slider'])
+            window['index_slider'].update(range=(0, max(number_of_images - 1, 1)))
             window['forecast_image'].update(filename=f'{data_directory_name}/image_{image_index}.png')
 
         # a timeout event occured
