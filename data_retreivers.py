@@ -14,35 +14,43 @@ class BrightSky:
         self.categories = {
             'cloud_cover': {
                 'min': 0,
-                'max': 100
+                'max': 100,
+                'key': 'cloud_cover'
             },
             'dew_point': {
                 'min': None,
-                'max': None
+                'max': None,
+                'key': 'dew_point'
             },
             'precipitation_probability': {
                 'min': 0,
-                'max': 100
+                'max': 100,
+                'key': 'precipitation_probability'
             },
-            'pressure_msl': {
+            'pressure': {
                 'min': None,
-                'max': None
+                'max': None,
+                'key': 'pressure_msl'
             },
             'relative_humidity': {
                 'min': 0,
-                'max': 100
+                'max': 100,
+                'key': 'relative_humidity'
             },
             'temperature': {
                 'min': None,
-                'max': None
+                'max': None,
+                'key': 'temperature'
             },
             'visibility': {
                 'min': None,
-                'max': None
+                'max': None,
+                'key': 'visibility'
             },
             'wind_speed': {
                 'min': None,
-                'max': None
+                'max': None,
+                'key': 'wind_speed'
             }
         }
 
@@ -51,6 +59,7 @@ class BrightSky:
         # reset starting time to given hour
         start_date = datetime.fromisoformat(start_date_iso)
         start_date = start_date.replace(minute=0, second=0, microsecond=0)
+        category_key = self.categories[category]['key']
 
         url = self.api_url.format(date=start_date.isoformat(), last_date=last_date_iso, lat=lat, lon=lon, timezone=timezone)
         request = requests.get(url)
@@ -75,12 +84,13 @@ class BrightSky:
 
         forecast = []
 
+
         for entry in json['weather']:
             try:
                 forecast.append({
                     'error': False,
                     'timestamp': entry['timestamp'],
-                    'value': entry[category]
+                    'value': entry[category_key]
                 })
 
             except KeyError:
@@ -103,51 +113,63 @@ class OpenMeteo:
         self.categories = {
             'cloud_cover': {
                 'min': 0,
-                'max': 100
+                'max': 100,
+                'key': 'cloud_cover'
             },
-            'temperature_2m': {
+            'temperature': {
                 'min': None,
-                'max': None
+                'max': None,
+                'key': 'temperature_2m'
             },
-            'relative_humidity_2m': {
+            'relative_humidity': {
                 'min': 0,
-                'max': 100
+                'max': 100,
+                'key': 'relative_humidity_2m'
             },
             'cloud_cover_low': {
                 'min': 0,
-                'max': 100
+                'max': 100,
+                'key': 'cloud_cover_low'
             },
             'cloud_cover_mid': {
                 'min': 0,
-                'max': 100
+                'max': 100,
+                'key': 'cloud_cover_mid'
             },
             'cloud_cover_high': {
                 'min': 0,
-                'max': 100
+                'max': 100,
+                'key': 'cloud_cover_high'
             },
-            'dew_point_2m': {
+            'dew_point': {
                 'min': None,
-                'max': None
+                'max': None,
+                'key': 'dew_point_2m'
             },
-            'pressure_msl': {
+            'pressure': {
                 'min': None,
-                'max': None
+                'max': None,
+                'key': 'pressure_msl'
             },
             'precipitation': {
                 'min': 0,
-                'max': None
+                'max': None,
+                'key': 'precipitation'
             },
             'precipitation_probability': {
                 'min': 0,
-                'max': 100
+                'max': 100,
+                'key': 'precipitation_probability'
             },
             'visibility': {
                 'min': None,
-                'max': None
+                'max': None,
+                'key': 'visibility'
             },
             'uv_index': {
                 'min': 0,
-                'max': 11
+                'max': 11,
+                'key': 'uv_index'
             }
         }
 
@@ -156,8 +178,9 @@ class OpenMeteo:
         last_date = datetime.fromisoformat(last_date_iso)
 
         hours = math.ceil((last_date - start_date).total_seconds() / 3600) + 1
+        category_key = self.categories[category]['key']
 
-        url = self.api_url.format(lat=lat, lon=lon, hours=hours, timezone=timezone, category=category)
+        url = self.api_url.format(lat=lat, lon=lon, hours=hours, timezone=timezone, category=category_key)
         request = requests.get(url)
 
         if(request.status_code != 200):
@@ -176,7 +199,6 @@ class OpenMeteo:
         json = request.json()
 
         forecast = []
-
         hours = json['hourly']['time']
 
         for i in range(len(hours)):
@@ -186,7 +208,7 @@ class OpenMeteo:
                 forecast.append({
                     'error': False,
                     'timestamp': time.isoformat(),
-                    'value': json['hourly'][category][i]
+                    'value': json['hourly'][category_key][i]
                 })
             
             except KeyError:

@@ -12,6 +12,7 @@ import shutil
 from settings import Settings, SettingsGUI
 from language import LanguageManager
 import tempfile
+import time
 
 from helpers import is_update_available, open_update_notification, get_file_path_in_bundle
 
@@ -240,6 +241,8 @@ def run_gui():
     if update_available_notification is True:
         open_update_notification(lm)
 
+    last_values = None
+
     # main event loop of the GUI
     while True:
         event, values = window.read(timeout=500)
@@ -343,7 +346,37 @@ def run_gui():
                 category_names = [lm.get_string(f"weather_image.bar_label.{data_retreiver.name}.{key}") for key in data_retreiver.categories.keys()]
                 category_source_and_key = lm.get_string(f"weather_image.bar_label.{data_retreiver.name}.{settings.get_settings()['data_category']}")
                 category_name = lm.get_string(f"weather_image.bar_label.{category_source_and_key}")
-                window['forecast_category'].update(values=category_names, value=category_name if category_name in category_names else category_names[0])
+
+                # check if the old category is still available in the new data source
+                old_category_name = last_values['forecast_category']
+                old_category_keys = lm.get_keys_by_value(old_category_name, start_dotkey=f"weather_image.bar_label.{data_retreiver.name}")
+
+                if len(old_category_keys) > 0:  # if the old category is still available in the new data source
+                    old_category_key = old_category_keys[0].split('.')[-1]
+
+                    new_source_keys = data_retreiver.categories.keys()
+
+                    if old_category_key in new_source_keys:
+                        category_name = lm.get_string(f"weather_image.bar_label.{data_retreiver.name}.{old_category_key}")
+
+                    # update the forecast category
+                    window['forecast_category'].update(values=category_names, value=category_name if category_name in category_names else category_names[0])
+
+                else:   # the new category is not available in the new data source
+                    # update the forecast category
+                    window['forecast_category'].update(values=category_names, value=category_names[0])
+
+                    # let the combo blink 3 times                    
+                    combo = window['forecast_category']
+
+                    for _ in range(3):
+                        combo.update(background_color='yellow')
+                        window.refresh()
+                        time.sleep(0.3)
+                        
+                        combo.update(background_color='white')
+                        window.refresh()
+                        time.sleep(0.3)
 
         # check if the user wants to calculate the data
         if (event == 'calculate_button' or auto_start_data_retreival is True):
@@ -389,7 +422,6 @@ def run_gui():
 
                 # get the key of the current forecast category by using the last element of the dot-key in the language manager
                 forecast_category = lm.get_keys_by_value(values['forecast_category'], start_dotkey=f"weather_image.bar_label.{data_source.name}")[0].split('.')[-1]
-
                 thread = Thread(target=retreive_and_handle_data, args=(data_source, forecast_category, data_directory_name, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution, lm, settings.get_settings()['timezone'], settings.get_settings()['interpolation'], set_progress))
                 thread_blocks = True
 
@@ -410,6 +442,8 @@ def run_gui():
         # check if the user wants to open the settings window
         if event == 'settings_button' and SettingsGUI is not None:
             settings_gui.open_settings_window()
+
+        last_values = values
             
 
     # wait for the thread to finish
