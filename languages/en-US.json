@@ -46,7 +46,8 @@
         "color_maximum": "Max. value color",
         "choose_color": "Choose color",
         "update_notification": "Notify about updates",
-        "update_check": "Check for updates"
+        "update_check": "Check for updates",
+        "animation_autoplay": "Autoplay animation"
     },
     "weather_image": {
         "label_latitude": "Latitude",

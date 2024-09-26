@@ -126,7 +126,7 @@ def create_layout():
 
     animation = [
         sg.vbottom([
-            sg.Checkbox(lm.get_string("main_window.animation"), key='animation_checkbox', default=True, text_color='black'),
+            sg.Checkbox(lm.get_string("main_window.animation"), key='animation_checkbox', default=values['animation_autoplay'], text_color='black'),
             sg.Slider(range=(0, max(number_of_images - 1, 1)), orientation='horizontal', key='index_slider')
         ])
     ]
@@ -194,7 +194,7 @@ def update_texts_of_elements(window, lm):
     window['resolution_text'].update(lm.get_string("main_window.resolution", suffix=':'))
     window['calculate_button'].update(lm.get_string("main_window.calc_and_show"))
     window['settings_button'].update(lm.get_string("main_window.settings"))
-    window['animation_checkbox'].update(lm.get_string("main_window.animation"))
+    window['animation_checkbox'].update(text=lm.get_string("main_window.animation"))
 
 
 def run_gui():
@@ -260,6 +260,7 @@ def run_gui():
             window['source'].update(value=settings_values['source'])
             window['size'].update(value=settings_values['size'])
             window['resolution'].update(value=settings_values['resolution'])
+            window['animation_checkbox'].update(value=settings_values['animation_autoplay'])
 
             # update the entries of the forecast category
             data_retreiver = None
@@ -306,7 +307,7 @@ def run_gui():
             # update the image index and the image
             window['index_slider'].update(range=(0, max(number_of_images - 1, 1)))
         # check if the animation checkbox is unchecked and the thread is not blocked
-        elif values['animation_checkbox'] is False and thread_blocks is False:
+        elif values['animation_checkbox'] is False and thread_blocks is False and number_of_images > 0:
             # update the image index and the image
             image_index = int(values['index_slider'])
             window['forecast_image'].update(filename=f'{data_directory_name}/image_{image_index}.png')

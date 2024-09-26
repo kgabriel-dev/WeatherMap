@@ -25,7 +25,8 @@ class Settings:
             "data_category": "cloud_cover",
             "color_maximum": "#0000ff",
             "color_minimum": "#ffffff",
-            "update_notification": True
+            "update_notification": True,
+            "animation_autoplay": True
         }
     
     def get_settings(self):
@@ -177,7 +178,9 @@ class SettingsGUI:
                         [sg.InputText(self.settings.get_settings()['size'], key='size')],
                         [sg.HSeparator()],
                         [sg.Text(self.lm.get_string("settings_window.resolution", suffix=':'))],
-                        [sg.InputText(self.settings.get_settings()['resolution'], key='resolution')]
+                        [sg.InputText(self.settings.get_settings()['resolution'], key='resolution')],
+                        [sg.HSeparator()],
+                        [sg.Checkbox(self.lm.get_string("settings_window.animation_autoplay"), default=self.settings.get_settings()['animation_autoplay'], key='animation_autoplay')]
                     ],
                     vertical_alignment='top',
                     element_justification='left'
@@ -268,7 +271,8 @@ class SettingsGUI:
             'interpolation': values['interpolation'],
             'color_maximum': values['maximum_color'],
             'color_minimum': values['minimum_color'],
-            'update_notification': values['update_notification']
+            'update_notification': values['update_notification'],
+            'animation_autoplay': values['animation_autoplay']
         }
 
         self.settings.change_settings(settings)
