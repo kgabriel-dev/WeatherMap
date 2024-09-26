@@ -423,7 +423,7 @@ def run_gui():
 
                 # get the key of the current forecast category by using the last element of the dot-key in the language manager
                 forecast_category = lm.get_keys_by_value(values['forecast_category'], start_dotkey=f"weather_image.bar_label.{data_source.name}")[0].split('.')[-1]
-                thread = Thread(target=retreive_and_handle_data, args=(data_source, forecast_category, data_directory_name, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_lat, size_lon), resolution, lm, settings.get_settings()['timezone'], settings.get_settings()['interpolation'], set_progress))
+                thread = Thread(target=retreive_and_handle_data, args=(data_source, forecast_category, data_directory_name, set_log_text, finish_thread, start_date, last_date, latitude, longitude, (size_km, size_lat, size_lon), resolution, lm, settings.get_settings()['timezone'], settings.get_settings()['interpolation'], set_progress))
                 thread_blocks = True
 
                 window['forecast_image'].update(filename=None)

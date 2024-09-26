@@ -36,7 +36,7 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
 
     weather_data = {}
     searched_locations = 0
-    lat_size, lon_size = size
+    km_size, lat_size, lon_size = size
     lat_resolution = lat_size / number_of_size_steps
     lon_resolution = lon_size / number_of_size_steps
 
@@ -230,13 +230,22 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
 
         image_date = datetime.fromisoformat(entry)
 
-        ax.set_title(lm.get_string('weather_image.label_time', replace_dict={
+        title_time = lm.get_string('weather_image.label_time', replace_dict={
             'day': image_date.day,
             'month': image_date.month,
             'year': image_date.year,
             'hour': str(image_date.hour).rjust(2, '0'),
             'minute': str(image_date.minute).ljust(2, '0')
-        }))
+        })
+        title_data = lm.get_string(f"weather_image.label_data", replace_dict={
+            'data_category': lm.get_string(f"weather_image.bar_label.{data_retreiver.name}.{data_category}"),
+            'data_source': data_retreiver.name    
+        })
+        title_region = lm.get_string('weather_image.label_region', replace_dict={
+            'region_size': int(km_size) if int(km_size) == km_size else km_size,    # remove decimal point if not needed
+            'resolution': number_of_size_steps
+        })
+        ax.set_title(title_time + '\n' + title_data + '\n' + title_region)
 
         if figure_index == 0:
             ax.set_ylim(min(y) - lat_resolution, max(y) + lat_resolution)
@@ -245,7 +254,6 @@ def retreive_and_handle_data(data_retreiver, data_category, data_dir, log_text, 
                 im,
                 ax=ax,
                 orientation='vertical',
-                label=lm.get_string(f"weather_image.bar_label.{data_retreiver.name}.{data_category}"),
                 fraction=0.047*(df.shape[0]/df.shape[1])
             )
 
