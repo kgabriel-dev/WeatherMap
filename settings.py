@@ -5,7 +5,7 @@ import pytz
 import os
 from data_retreivers import OpenMeteo, BrightSky
 import gc # garbage collector
-from helpers import is_update_available, open_update_notification, open_no_update_available_notification, get_file_path_in_bundle
+from helpers import is_update_available, open_update_notification, open_no_update_available_notification, get_file_path_in_bundle, get_settings_path
 
 
 class Settings:
@@ -29,22 +29,24 @@ class Settings:
             "animation_autoplay": True
         }
     
+
     def get_settings(self):
         return self.settings
     
+
     def change_setting_entry(self, key, value):
         if key in self.settings:
             self.settings[key] = value
         else:
             print(f"Key '{key}' not found in settings.")
     
+
     def change_settings(self, settings):
         for key, value in settings.items():
             self.change_setting_entry(key, value)
         
         
-
-    def load_settings_from_file(self, file_path='settings.json'):
+    def load_settings_from_file(self, file_path=get_settings_path()):
         if not os.path.exists(file_path):
             self.save_settings_to_file(file_path)
 
@@ -59,7 +61,10 @@ class Settings:
             self.change_settings(settings)
 
     
-    def save_settings_to_file(self, file_path='settings.json'):
+    def save_settings_to_file(self, file_path=get_settings_path()):
+        if not os.path.exists(file_path):
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
         with open(file_path, 'w') as file:
             json.dump(self.settings, file, indent=4)
 
@@ -276,7 +281,7 @@ class SettingsGUI:
         }
 
         self.settings.change_settings(settings)
-        self.settings.save_settings_to_file('settings.json')
+        self.settings.save_settings_to_file()
         
         self.change_settings_callback(settings)
         self.lm.set_language(settings['language'])

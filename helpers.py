@@ -4,6 +4,7 @@ import PySimpleGUI as sg
 import webbrowser
 import os
 import sys
+import platform
 
 
 # CONSTANTS
@@ -94,3 +95,44 @@ def open_no_update_available_notification(lm) -> None:
 def get_file_path_in_bundle(file_name: str) -> str:
     bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
     return os.path.join(bundle_dir, file_name)
+
+
+def get_executable_path():
+    """Returns the directory where the executable or script is located."""
+    if getattr(sys, 'frozen', False):  # If running as a frozen/compiled app (like PyInstaller)
+        return os.path.dirname(sys.executable)
+    else:  # If running as a script
+        return os.path.dirname(os.path.abspath(__file__))
+
+
+def is_installed_version():
+    """Determine if the program is likely running from an installed location."""
+    exe_dir = get_executable_path()
+
+    # Check if the executable is in a system-wide directory
+    system = platform.system()
+
+    if system == 'Windows':
+        return 'Program Files' in exe_dir
+    elif system == 'Darwin':  # macOS
+        return exe_dir.startswith('/Applications') or '/usr/local' in exe_dir
+    else:  # Assume Linux/Unix
+        return '/usr' in exe_dir or '/opt' in exe_dir
+
+
+def get_settings_path():
+    """Determine the correct settings path based on whether it's a standalone or installed version."""
+    exe_dir = get_executable_path()
+
+    if not is_installed_version():
+        # Standalone mode: settings file is next to the executable
+        return os.path.join(exe_dir, 'settings.json')
+    else:
+        # Installed mode: use platform-specific settings location
+        system = platform.system()
+        if system == 'Windows':
+            return os.path.join(os.getenv('LOCALAPPDATA'), 'WeatherMap', 'settings.json')
+        elif system == 'Darwin':  # macOS
+            return os.path.expanduser('~/Library/Application Support/WeatherMap/settings.json')
+        else:  # Assume Linux or other Unix-like system
+            return os.path.expanduser('~/.config/WeatherMap/settings.json')
