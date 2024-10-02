@@ -11,7 +11,8 @@ export type Location = {
       unit: 'km' | 'mi';
     };
     resolution: number;
-  }
+  },
+  timezoneCode: string;
 }
 
 export type LocationAddingData = {
@@ -26,5 +27,6 @@ export type LocationAddingData = {
       unit: 'km' | 'mi';
     },
     resolution: number;
-  }
+  },
+  timezoneCode: string;
 }

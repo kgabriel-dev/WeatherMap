@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SelectItemGroup } from 'primeng/api';
+import { Message, SelectItemGroup } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DividerModule } from 'primeng/divider';
@@ -12,6 +12,9 @@ import { SettingsService } from '../../services/settings/settings.service';
 import { LocationService } from '../../services/location/location.service';
 import { ListboxModule } from 'primeng/listbox';
 import { InputTextModule } from 'primeng/inputtext';
+import { Location, LocationAddingData } from '../../services/location/location.type';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { MessagesModule } from 'primeng/messages';
 
 @Component({
   selector: 'app-settings',
@@ -25,7 +28,9 @@ import { InputTextModule } from 'primeng/inputtext';
     DividerModule,
     ButtonModule,
     ListboxModule,
-    InputTextModule
+    InputTextModule,
+    ProgressSpinnerModule,
+    MessagesModule
   ],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
@@ -101,17 +106,69 @@ export class SettingsComponent {
     unit: 'days'
   }
   updateCheck: boolean = true;
+  workingLocation?: Location;
+  locationLoadingMessages: Message[] = [];
+  locationsAlreadyLoaded: boolean = false;
+  locationsList: Location[] = [];
 
   constructor(
     public settingsService: SettingsService,
     public locationsService: LocationService
   ) {
+
     // load and set the initial settings
     settingsService.getSettingsChangedObservable().subscribe((settings) => {
       this.selectedTimezoneCode = settings.timezoneCode || this.timezones[0].items[0].tzCode;
       this.selectedDataSource = settings.weatherCondition;
       this.selectedLanguageKey = settings.languageCode || this.languages[0].key;
+      this.forecastLength = settings.forecastLength || this.forecastLength;
     });
+
+    // display a message while loading the locations file
+    this.locationLoadingMessages = [{
+      severity: 'info',
+      summary: 'Loading locations...',
+      detail: 'Please wait a moment.'
+    }];
+
+    // load the locations file
+    locationsService.locationFileRead().subscribe((fileRead: boolean) => {
+      if (!fileRead) return;
+
+      this.locationsList = this.locationsService.getLocations();
+      this.setWorkingLocation(this.settingsService.getSettings().defaultLocationId);
+      this.locationLoadingMessages = [];
+      this.locationsAlreadyLoaded = true;
+    });
+
+    // wait 3 seconds and then warn that loading locations is taking longer
+    setTimeout(() => {
+      if(this.locationsAlreadyLoaded) return;
+
+      this.locationLoadingMessages = [{
+        severity: 'warn',
+        summary: 'Loading locations...',
+        detail: 'This is taking longer than expected. Please wait a moment.'
+      }]
+    }, 3000);
+  }
+
+  saveSettings() {
+    this.settingsService.setSettingsValue('timezoneCode', this.selectedTimezoneCode);
+    this.settingsService.setSettingsValue('weatherCondition', this.selectedDataSource);
+    this.settingsService.setSettingsValue('languageCode', this.selectedLanguageKey);
+    this.settingsService.setSettingsValue('forecastLength', {
+      value: this.forecastLength.value,
+      unit: this.forecastLength.unit
+    });
+    this.settingsService.setSettingsValue('updateCheck', this.updateCheck);
+
+    this.settingsService.saveSettings();
+    this.closeWindow();
+  }
+
+  closeWindow() {
+    window.close();
   }
 
   private buildTimezoneList(): TimezoneList {
@@ -144,6 +201,57 @@ export class SettingsComponent {
     return this.timezones
       .flatMap(group => group.items)
       .find(timezone => timezone.tzCode === code) || this.timezones[0].items[0];
+  }
+
+  setWorkingLocation(locationId: number) {
+    // if no locations are found, add an initial location and set it
+    if(this.locationsList.length === 0) {
+      console.log('No locations found. Adding initial location.');
+      this.addInitialLocation();
+      return; // new location will automatically be set
+    }
+
+    // if the locationId is not valid or there is no location with this id, set the first location
+    if(!locationId || !this.locationsList.find(location => location.id === locationId))
+      locationId = this.locationsList[0].id;
+
+    // make a copy of the location to avoid changing the original
+    this.workingLocation = JSON.parse(
+      JSON.stringify(
+        this.locationsList.find(location => location.id === locationId) || this.locationsList[0]
+      )
+    );
+  }
+
+  saveWorkingLocation() {
+    if (!this.workingLocation) return;
+
+    this.locationsService.updateLocation(this.workingLocation);
+    this.locationsList = this.locationsService.getLocations();
+  }
+
+  deleteWorkingLocation() {
+    if (!this.workingLocation) return;
+
+    this.locationsService.removeLocation(this.workingLocation.id);
+    this.locationsList = this.locationsService.getLocations();
+
+    this.workingLocation = this.locationsList[0] || undefined;
+  }
+
+  addInitialLocation() {
+    const randomLocations: LocationAddingData[] = [
+      { name: 'Rostock', coordinates: { latitude: 54.10352, longitude: 12.10480 }, region: { size: { length: 100, unit: 'km' }, resolution: 6 }, timezoneCode: 'Europe/Berlin' },
+      { name: 'New York City', coordinates: { latitude: 40.73164, longitude: -74.00166 }, region: { size: { length: 130, unit: 'mi' }, resolution: 7}, timezoneCode: 'America/New_York' },
+      { name: 'Madrid', coordinates: { latitude: 40.43684, longitude: -3.65193 }, region: { size: { length: 80, unit: 'km' }, resolution: 4 }, timezoneCode: 'Europe/Madrid' },
+      { name: 'Sydney', coordinates: { latitude: -33.86708, longitude: 151.24548 }, region: { size: { length: 150, unit: 'km' }, resolution: 10 }, timezoneCode: 'Australia/Sydney' },
+      { name: 'Tokyo', coordinates: { latitude: 35.68267, longitude: 139.77254 }, region: { size: { length: 100, unit: 'km' }, resolution: 6 }, timezoneCode: 'Asia/Tokyo' }
+    ]
+
+    const index = Math.floor(Math.random() * randomLocations.length);
+    this.locationsService.addLocation(randomLocations[index]);
+    this.locationsList = this.locationsService.getLocations();
+    this.setWorkingLocation(this.locationsList[this.locationsList.length - 1].id);
   }
 
 }

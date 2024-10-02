@@ -1,13 +1,20 @@
 import { Injectable } from '@angular/core';
 import { Location, LocationAddingData } from './location.type';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LocationService {
   private locations: Location[] = [];
+  private fileRead = false; // flag to check if file has been read
+  private fileReadSubject = new BehaviorSubject<boolean>(false);
 
   constructor() {
+    this.readLocationsFile();
+  }
+
+  private readLocationsFile() {
     // check if locations.json exists
     window.files.checkAppFileExists('locations.json')
       .then((exists) => {
@@ -27,10 +34,16 @@ export class LocationService {
         window.files.readAppFile('locations.json', 'utf8')
         .then((data) => {
           this.locations = JSON.parse(data);
+
+          this.fileRead = true;
+          this.fileReadSubject.next(true);
         })
         .catch((error) => {
           console.error('Error reading locations.json!', error);
           this.locations = [];
+
+          this.fileRead = true;
+          this.fileReadSubject.next(true);
         });
       })
       .catch((error) => {
@@ -42,9 +55,18 @@ export class LocationService {
     return this.locations;
   }
 
+  public updateLocation(locationData: Location) {
+    const location = this.locations.find(location => location.id === locationData.id);
+
+    if(!location) return;
+
+    Object.assign(location, locationData);
+    this.saveLocations();
+  }
+
   public addLocation(locationData: LocationAddingData) {
     this.locations.push({
-      id: this.locations.length + 1,
+      id: Math.max(...this.locations.map(location => location.id)) + 1,
       ...locationData
     });
 
@@ -57,8 +79,12 @@ export class LocationService {
   }
 
   public saveLocations() {
-    window.files.writeAppFile('locations.json', JSON.stringify(this.locations), 'utf8')
+    window.files.writeAppFile('locations.json', JSON.stringify(this.locations, undefined, 2), 'utf8')
       .then(() => console.log('locations.json saved!'))
       .catch((error) => console.error('Error saving locations.json!', error));
+  }
+
+  public locationFileRead(): Observable<boolean> {
+    return this.fileReadSubject.asObservable();
   }
 }

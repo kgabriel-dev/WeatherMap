@@ -7,3 +7,8 @@
 p {
   margin-bottom: 5px;
 }
+
+:host, .container {
+  height: 100vh;
+  background-color: var(--background-color);
+}

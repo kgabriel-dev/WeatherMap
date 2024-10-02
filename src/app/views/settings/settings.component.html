@@ -1,6 +1,6 @@
-<p-tabView class="w-full h-full" styleClass="h-full" [scrollable]="true">
+<p-tabView class="w-full h-full" [classList]="'flex flex-grow-1'" styleClass="flex flex-column flex-grow-1" [scrollable]="true">
   <p-tabPanel header="General">
-    <p>Language:</p>
+    <p class="mt-0">Language:</p>
     <p-dropdown
       [options]="languages"
       styleClass="w-full"
@@ -85,84 +85,121 @@
     <p-divider />
 
     <div class="flex flex-row gap-2">
-      <p-button label="Save" icon="pi pi-save" />
-      <p-button label="Discard" icon="pi pi-times" />
+      <p-button label="Save" icon="pi pi-save" (onClick)="saveSettings()" />
+      <p-button label="Discard" icon="pi pi-times" (onClick)="closeWindow()" />
     </div>
+
+    <div class="flex-grow-1"></div>
   </p-tabPanel>
 
   <p-tabPanel header="Locations">
-    <div class="flex flex-row h-full gap-2">
-      <div class="flex flex-column gap-2">
-        <p-listbox
-          [options]="locationsService.getLocations()"
-          optionLabel="name"
-          listStyleClass="h-full" />
+    @if(locationsAlreadyLoaded) {
+      @if(workingLocation) {
+        <div class="flex flex-row h-full gap-2">
+          <div class="flex flex-column gap-2">
+            <p-listbox
+              [options]="locationsList"
+              optionLabel="name"
+              optionValue="id"
+              [listStyle]="{'min-height': 'fit-content', 'width': '10rem'}"
+              styleClass="flex flex-grow-1"
+              (onChange)="setWorkingLocation($event.value)"
+              [(ngModel)]="workingLocation.id" />
 
-        <div class="flex flex-grow-1"></div>
+            <div class="flex-grow-1"></div>
 
-        <p-button label="Add" icon="pi pi-plus" styleClass="w-full" />
-      </div>
+            <p-button label="Add Location" icon="pi pi-plus" styleClass="w-full" (onClick)="addInitialLocation()" />
+          </div>
 
-      <p-divider layout="vertical" />
+          <p-divider layout="vertical" />
 
-      <div class="flex flex-column flex-grow-1 w-full">
-        <p class="mt-0">Location name:</p>
-        <input type="text" pInputText>
+          <div class="flex flex-column flex-grow-1 w-full">
+            <p class="mt-0">Location name:</p>
+            <input type="text" pInputText [(ngModel)]="workingLocation.name">
 
-        <p>Timezone:</p>
-        <p-dropdown
-          [options]="timezones"
-          optionValue="tzCode"
-          optionLabel="label"
-          [group]="true"
-          styleClass="w-full"
-          [filter]="true"
-          filterBy="label"
-          [style]="{'z-index': 3}" >
+            <p>Timezone:</p>
+            <p-dropdown
+              [options]="timezones"
+              optionValue="tzCode"
+              optionLabel="label"
+              [group]="true"
+              styleClass="w-full"
+              [filter]="true"
+              filterBy="label"
+              [style]="{'z-index': 3}"
+              [(ngModel)]="workingLocation.timezoneCode" >
 
-          <ng-template let-group pTemplate="group">
-            <div class="flex align-items center color-primary">
-              <span>---- {{group.label}} ----</span>
+              <ng-template let-group pTemplate="group">
+                <div class="flex align-items center color-primary">
+                  <span>---- {{group.label}} ----</span>
+                </div>
+              </ng-template>
+
+            </p-dropdown>
+
+            <div class="flex flex-row w-full gap-2">
+              <div class="flex flex-column w-full">
+                <p>Latitude:</p>
+                <p-inputNumber [(ngModel)]="workingLocation.coordinates.latitude" maxFractionDigits="5" styleClass="w-full" [inputStyle]="{'width': '100%', 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'text-align': 'right'}" />
+              </div>
+              <div class="flex flex-column w-full">
+                <p>Longitude:</p>
+                <p-inputNumber [(ngModel)]="workingLocation.coordinates.longitude" maxFractionDigits="5" styleClass="w-full" [inputStyle]="{'width': '100%', 'border-radius': '0 var(--border-radius) var(--border-radius) 0', 'text-align': 'right'}" />
+              </div>
             </div>
-          </ng-template>
 
-        </p-dropdown>
+            <div class="flex flex-row flex-grow-1 gap-2">
+              <div class="flex flex-column w-full">
+                <p>Region size:</p>
+                <div class="flex flex-row">
+                  <p-inputNumber
+                    [(ngModel)]="workingLocation.region.size.length"
+                    inputId="size"
+                    [inputStyle]="{'text-align': 'right' , 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'width': '100%'}"
+                    styleClass="w-full"
+                    class="w-full" />
+                  <p-dropdown
+                    [(ngModel)]="workingLocation.region.size.unit"
+                    [options]="['km', 'mi']"
+                    [style]="{'width': '7rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0', 'z-index': 2}" />
+                </div>
+              </div>
+              <div class="flex flex-column w-full">
+                <p>Resolution (results in n &#x2715; n steps):</p>
+                <p-inputNumber
+                  [(ngModel)]="workingLocation.region.resolution"
+                  mode="decimal"
+                  [inputStyle]="{'width': '100%'}"
+                  styleClass="w-full" />
+              </div>
+            </div>
 
-        <div class="flex flex-row w-full gap-2">
-          <div class="flex flex-column w-full">
-            <p>Latitude:</p>
-            <p-inputNumber styleClass="w-full" [inputStyle]="{'width': '100%', 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'text-align': 'right'}" />
-          </div>
-          <div class="flex flex-column w-full">
-            <p>Longitude:</p>
-            <p-inputNumber styleClass="w-full" [inputStyle]="{'width': '100%', 'border-radius': '0 var(--border-radius) var(--border-radius) 0', 'text-align': 'right'}" />
-          </div>
-        </div>
+            <p-divider />
 
-        <div class="flex flex-row flex-grow-1 gap-2">
-          <div class="flex flex-column w-full">
-            <p>Region size:</p>
-            <div class="flex flex-row">
-              <p-inputNumber inputId="size" [inputStyle]="{'text-align': 'right' , 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'width': '100%'}" styleClass="w-full" class="w-full" />
-              <p-dropdown
-                [options]="['km', 'mi']"
-                [style]="{'width': '7rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0', 'z-index': 2}" />
+            <div class="flex flex-row gap-2 w-full justify-content-center">
+              <p-button label="Save" icon="pi pi-save" (onClick)="saveWorkingLocation()" />
+              <p-button label="Discard" icon="pi pi-times" (onClick)="closeWindow()" />
+              <p-button label="Delete" icon="pi pi-trash" (onClick)="deleteWorkingLocation()" />
             </div>
           </div>
-          <div class="flex flex-column w-full">
-            <p>Resolution (results in n &#x2715; n steps):</p>
-            <p-inputNumber mode="decimal" [inputStyle]="{'width': '100%'}" styleClass="w-full" />
-          </div>
         </div>
-
-        <p-divider />
-
-        <div class="flex flex-row gap-2 w-full justify-content-center">
-          <p-button label="Save" icon="pi pi-save" />
-          <p-button label="Discard" icon="pi pi-times" />
-          <p-button label="Delete" icon="pi pi-trash" />
+      }
+      @else {
+        <div class="w-full h-full flex flex-column justify-content-center align-items-center">
+          <p>No locations found. Add a location to get started.</p>
+          <p-button label="Add location" icon="pi pi-plus" (onClick)="addInitialLocation()" />
         </div>
+      }
+    }
+    @else {
+      <div class="w-full h-full flex flex-column justify-content-center align-items-center">
+        <p-progressSpinner />
+
+        <p-messages
+          [(value)]="locationLoadingMessages"
+          [enableService]="false"
+          [closable]="false" />
       </div>
-    </div>
+    }
   </p-tabPanel>
 </p-tabView>
