@@ -129,6 +129,9 @@ const createWindow = () => {
 
     modalWindow.on('closed', () => {
       modalWindow = null;
+
+      // send a message to the main window to update the settings
+      mainWindow.webContents.send('settings-modal-closed');
     });
   }
 }

@@ -8,7 +8,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class LocationService {
   private locations: Location[] = [];
   private fileRead = false; // flag to check if file has been read
-  private fileReadSubject = new BehaviorSubject<boolean>(false);
+  private isFileRead$ = new BehaviorSubject<boolean>(false);
 
   constructor() {
     this.readLocationsFile();
@@ -36,14 +36,14 @@ export class LocationService {
           this.locations = JSON.parse(data);
 
           this.fileRead = true;
-          this.fileReadSubject.next(true);
+          this.isFileRead$.next(true);
         })
         .catch((error) => {
           console.error('Error reading locations.json!', error);
           this.locations = [];
 
           this.fileRead = true;
-          this.fileReadSubject.next(true);
+          this.isFileRead$.next(true);
         });
       })
       .catch((error) => {
@@ -84,7 +84,7 @@ export class LocationService {
       .catch((error) => console.error('Error saving locations.json!', error));
   }
 
-  public locationFileRead(): Observable<boolean> {
-    return this.fileReadSubject.asObservable();
+  public isServiceReady(): Observable<boolean> {
+    return this.isFileRead$.asObservable();
   }
 }

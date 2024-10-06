@@ -17,10 +17,12 @@ export class SettingsService {
       unit: 'hours'
     },
     updateCheck: true,
-    defaultLocationId: 1
+    defaultLocationIndex: 0
   }
   private settings: Settings = this.defaultSettings;
+
   private readonly settingsChangedSubject = new BehaviorSubject<Settings>(this.defaultSettings);
+  private notifySettingsRead$ = new BehaviorSubject<boolean>(false);
 
   constructor() {
     // check if settings.json exists
@@ -44,17 +46,20 @@ export class SettingsService {
           console.log('settings.json read!');
           this.settings = JSON.parse(data);
           this.settingsChangedSubject.next(this.settings);
+          this.notifySettingsRead$.next(true);
         })
         .catch((error) => {
           console.error('Error reading settings.json!', error);
           this.settings = this.defaultSettings;
           this.settingsChangedSubject.next(this.settings);
+          this.notifySettingsRead$.next(true);
         });
       })
       .catch((error) => {
         console.error('Error checking settings.json!', error);
         this.settings = this.defaultSettings;
         this.settingsChangedSubject.next(this.settings);
+        this.notifySettingsRead$.next(true);
       });
 
     this.settingsChangedSubject.subscribe((settings) => console.log('Settings changed!', settings));
@@ -74,13 +79,17 @@ export class SettingsService {
   }
 
   public saveSettings(): void {
-    window.files.writeAppFile('settings.json', JSON.stringify(this.settings), 'utf8')
+    window.files.writeAppFile('settings.json', JSON.stringify(this.settings, undefined, 2), 'utf8')
       .then(() => console.log('settings.json saved!'))
       .catch((error) => console.error('Error saving settings.json!', error));
   }
 
   public getSettingsChangedObservable() {
     return this.settingsChangedSubject.asObservable();
+  }
+
+  public isServiceReady() {
+    return this.notifySettingsRead$.asObservable();
   }
 
 }
@@ -95,5 +104,5 @@ type Settings = {
     unit: 'hours' | 'days',
   },
   updateCheck: boolean,
-  defaultLocationId: Location['id'],
+  defaultLocationIndex: number,
 }

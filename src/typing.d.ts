@@ -16,6 +16,9 @@ interface Window {
     readAppFile: (filePath: string, encoding: string) => Promise<string>,
     checkAppFileExists: (filePath: string) => Promise<boolean>,
     writeAppFile: (filePath: string, data: string, encoding: string) => Promise<boolean>,
+  },
+  app: {
+    onSettingsModalClosed: (callback) => void
   }
 }
 

@@ -12,3 +12,7 @@ contextBridge.exposeInMainWorld('files', {
   checkAppFileExists: (filePath) => ipcRenderer.invoke('check-app-file-exists', filePath),
   writeAppFile: (filePath, data, encoding) => ipcRenderer.invoke('write-app-file', filePath, data, encoding)
 });
+
+contextBridge.exposeInMainWorld('app', {
+  onSettingsModalClosed: (callback) => ipcRenderer.on('settings-modal-closed', callback)
+});

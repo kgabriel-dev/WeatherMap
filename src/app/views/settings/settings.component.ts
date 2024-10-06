@@ -132,11 +132,11 @@ export class SettingsComponent {
     }];
 
     // load the locations file
-    locationsService.locationFileRead().subscribe((fileRead: boolean) => {
+    locationsService.isServiceReady().subscribe((fileRead: boolean) => {
       if (!fileRead) return;
 
       this.locationsList = this.locationsService.getLocations();
-      this.setWorkingLocation(this.settingsService.getSettings().defaultLocationId);
+      this.setWorkingLocation(this.settingsService.getSettings().defaultLocationIndex);
       this.locationLoadingMessages = [];
       this.locationsAlreadyLoaded = true;
     });
@@ -203,7 +203,7 @@ export class SettingsComponent {
       .find(timezone => timezone.tzCode === code) || this.timezones[0].items[0];
   }
 
-  setWorkingLocation(locationId: number) {
+  setWorkingLocation(locationIndex: number) {
     // if no locations are found, add an initial location and set it
     if(this.locationsList.length === 0) {
       console.log('No locations found. Adding initial location.');
@@ -211,9 +211,12 @@ export class SettingsComponent {
       return; // new location will automatically be set
     }
 
-    // if the locationId is not valid or there is no location with this id, set the first location
-    if(!locationId || !this.locationsList.find(location => location.id === locationId))
+    let locationId: number;
+    // if there is no location at the given index, set the first location
+    if(!locationIndex || this.locationsList.length < locationIndex)
       locationId = this.locationsList[0].id;
+    else
+      locationId = this.locationsList[locationIndex].id;
 
     // make a copy of the location to avoid changing the original
     this.workingLocation = JSON.parse(

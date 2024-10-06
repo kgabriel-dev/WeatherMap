@@ -23,34 +23,72 @@
   <div class="flex flex-column flex-grow-0 gap-3 h-full" style="width: 20%; min-width: 180px; max-width: 350px;">
     <div class="flex flex-column flex-grow-1 gap-3 pr-4 overflow-y-auto">
       <label for="location">Location:</label>
-    <p-dropdown
-      [options]="locationsService.getLocations()"
-      [(ngModel)]="selectedLocation"
-      optionLabel="name"
-      optionValue="id"
-      placeholder="Select a location"
-      [style]="{'width': '100%'}" />
+      <p-dropdown
+        #locationDropdown
+        [options]="getLocationsList()"
+        [(ngModel)]="selectedLocation"
+        (onChange)="applyLocation()"
+        optionLabel="name"
+        placeholder="Select a location"
+        [style]="{'width': '100%'}"
+      />
 
       <label for="latitude">Latitude:</label>
-      <p-inputNumber inputId="latitude" [(ngModel)]="latitude" mode="decimal" [minFractionDigits]="0" [maxFractionDigits]="6" [inputStyle]="{'width': '100%'}" styleClass="w-full" />
+      <p-inputNumber
+        (onInput)="onLocationDataChange()"
+        inputId="latitude"
+        [(ngModel)]="latitude"
+        mode="decimal"
+        [minFractionDigits]="0"
+        [maxFractionDigits]="6"
+        [inputStyle]="{'width': '100%'}"
+        styleClass="w-full"
+      />
 
       <label for="longitude">Latitude:</label>
-      <p-inputNumber inputId="longitude" [(ngModel)]="longitude" mode="decimal" [minFractionDigits]="0" [maxFractionDigits]="6" [inputStyle]="{'width': '100%'}" styleClass="w-full" />
+      <p-inputNumber
+        (onInput)="onLocationDataChange()"
+        inputId="longitude"
+        [(ngModel)]="longitude"
+        mode="decimal"
+        [minFractionDigits]="0"
+        [maxFractionDigits]="6"
+        [inputStyle]="{'width': '100%'}"
+        styleClass="w-full"
+      />
 
       <label for="size">Size:</label>
       <div class="flex flex-row">
-        <p-inputNumber inputId="size" [inputStyle]="{'text-align': 'right' , 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'width': '100%'}" styleClass="w-full" class="w-full" />
+        <p-inputNumber
+          [(ngModel)]="regionSize.length"
+          inputId="size"
+          [inputStyle]="{'text-align': 'right' , 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'width': '100%'}"
+          styleClass="w-full" class="w-full"
+        />
         <p-dropdown
+          [(ngModel)]="regionSize.unit"
           [options]="['km', 'mi']"
-          [style]="{'width': '7rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0'}" />
+          [style]="{'width': '7rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0'}"
+        />
       </div>
 
       <label for="resolution">Resolution (n &#x2715; n steps):</label>
-      <p-inputNumber inputId="resolution" [(ngModel)]="resolution" mode="decimal" [inputStyle]="{'width': '100%'}" styleClass="w-full" />
+      <p-inputNumber
+        inputId="resolution"
+        [(ngModel)]="resolution"
+        mode="decimal"
+        [inputStyle]="{'width': '100%'}"
+        styleClass="w-full"
+      />
 
       <label for="forecast">Forecast length:</label>
       <div class="flex flex-row">
-        <p-inputNumber inputId="forecast" [inputStyle]="{'text-align': 'right' , 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'width': '100%'}" styleClass="w-full" class="w-full" />
+        <p-inputNumber
+          inputId="forecast"
+          [inputStyle]="{'text-align': 'right' , 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'width': '100%'}"
+          styleClass="w-full"
+          class="w-full"
+        />
         <p-dropdown
           [options]="['hours', 'days']"
           [style]="{'width': '7rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0'}" />
