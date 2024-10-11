@@ -16,3 +16,7 @@ contextBridge.exposeInMainWorld('files', {
 contextBridge.exposeInMainWorld('app', {
   onSettingsModalClosed: (callback) => ipcRenderer.on('settings-modal-closed', callback)
 });
+
+contextBridge.exposeInMainWorld('weather', {
+  generateWeatherImagesForRegion: (region, dataGatherer, weatherCondition, forecastLength) => ipcRenderer.invoke('generate-weather-images-for-region', region, dataGatherer, weatherCondition, forecastLength)
+});

@@ -1,4 +1,4 @@
-import { Region } from "../../app/services/location/location.type";
+import { Location, Region } from "../../app/services/location/location.type";
 
 export interface DataGatherer {
   getName: () => string;
@@ -7,12 +7,10 @@ export interface DataGatherer {
 }
 
 export type WeatherData = {
-  coordinates: {
-    latitude: number,
-    longitude: number
-  },
+  coordinates: Location,
   weatherCondition: WeatherCondition,
-  weatherValue: number
+  weatherValue: number,
+  date: Date
 }
 
 export type WeatherCondition = {

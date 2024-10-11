@@ -58,6 +58,7 @@ class OpenMeteoDataGatherer implements DataGatherer {
                     coordinates: { latitude: lat, longitude: lon },
                     weatherCondition: condition,
                     weatherValue: value,
+                    date: date
                   });
                 }
 

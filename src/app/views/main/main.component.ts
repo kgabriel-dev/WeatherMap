@@ -130,4 +130,10 @@ export class MainComponent implements OnInit {
       this.customLocation
     ];
   }
+
+  startWeatherImageGeneration(): void {
+    const region = this.selectedLocation || this.customLocation;
+
+    // window.weather.generateWeatherImagesForRegion(region, )
+  }
 }

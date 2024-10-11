@@ -15,10 +15,13 @@ interface Window {
     readFile: (filePath: string, encoding: string) => Promise<string>
     readAppFile: (filePath: string, encoding: string) => Promise<string>,
     checkAppFileExists: (filePath: string) => Promise<boolean>,
-    writeAppFile: (filePath: string, data: string, encoding: string) => Promise<boolean>,
+    writeAppFile: (filePath: string, data: string, encoding: string) => Promise<boolean>
   },
   app: {
     onSettingsModalClosed: (callback) => void
+  },
+  weather: {
+    generateWeatherImagesForRegion: (region: Region, dataGatherer: DataGatherer, weatherCondition: WeatherCondition, forecast_length: number) => Promise<{ date: Date, filename: string }[]>
   }
 }
 
