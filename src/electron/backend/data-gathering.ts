@@ -1,10 +1,10 @@
 import { resolve } from "path";
 import { Location, Region } from "../../app/services/location/location.type";
-import { DataGatherer, WeatherCondition, WeatherData } from "./weather-data.type";
+import { DataGatherer, WeatherCondition, WeatherData } from "../../app/views/main/weather-data.type";
 
 import * as https from 'https';
 
-class OpenMeteoDataGatherer implements DataGatherer {
+export class OpenMeteoDataGatherer implements DataGatherer {
   readonly API_URL = "https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly={category}&forecast_hours={hours}&timezone={timezone}";
   readonly REQUEST_DELAY = 300; // time in ms to wait between two requests
 

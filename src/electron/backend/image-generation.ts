@@ -1,11 +1,14 @@
 import { Location, Region } from "../../app/services/location/location.type";
-import { DataGatherer, WeatherCondition } from "./weather-data.type";
+import { DataGathererId, WeatherCondition } from "../../app/views/main/weather-data.type";
 import { createCanvas } from "canvas";
+import { OpenMeteoDataGatherer } from "./data-gathering";
 
 const { app } = require('electron');
 const fs = require('fs');
 
-function generateWeatherImageForLocation(region: Region, dataGatherer: DataGatherer, weatherCondition: WeatherCondition, forecast_length: number): Promise<{ date: Date, filename: string }[]> {
+export function generateWeatherImageForLocation(region: Region, dataGathererId: DataGathererId, weatherCondition: WeatherCondition, forecast_length: number): Promise<{ date: Date, filename: string }[]> {
+  const dataGatherer = getDataGatherer(dataGathererId);
+
   return new Promise((resolve, reject) => {
     // gather the data for the location
     dataGatherer.gatherData(region, weatherCondition, forecast_length)
@@ -90,3 +93,19 @@ function _mapValueToColor(value: number, min: number, max: number): number[] {
   // fade from white to blue using the color value
   return [255, 255, colorValue, 200];
 }
+
+function getDataGatherer(dataGathererId: DataGathererId) {
+  switch(dataGathererId) {
+    case DataGathererId.OpenMeteo:
+      return new OpenMeteoDataGatherer();
+    case DataGathererId.BrightSky:
+      // TODO: return new BrightSkyDataGatherer();
+      throw new Error('BrightSky data gatherer is not implemented yet');
+    default:
+      throw new Error('Unknown data gatherer id');
+  }
+}
+
+module.exports = {
+  generateWeatherImageForLocation
+};

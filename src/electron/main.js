@@ -2,7 +2,7 @@ const { app, BrowserWindow, ipcMain, Menu } = require('electron')
 const path = require('node:path')
 const url = require('node:url')
 const fs = require('node:fs')
-const { hash } = require('node:crypto')
+const { generateWeatherImageForLocation } = require('./backend/image-generation.ts')
 
 const createWindow = () => {
   // Create the browser window.
@@ -170,6 +170,10 @@ ipcMain.handle('write-app-file', (event, filePath, data, encoding) => {
     console.error('Error writing file:', err);
     return false;
   }
+});
+
+ipcMain.handle('generate-weather-images-for-region', (event, region, dataGatherer, weatherCondition, forecastLength) => {
+  return generateWeatherImageForLocation(region, dataGatherer, weatherCondition, forecastLength);
 });
 
 // Helper functions
