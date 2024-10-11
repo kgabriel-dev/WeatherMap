@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Location, LocationAddingData } from './location.type';
+import { Region, RegionAddingData } from './location.type';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LocationService {
-  private locations: Location[] = [];
+  private locations: Region[] = [];
   private fileRead = false; // flag to check if file has been read
   private isFileRead$ = new BehaviorSubject<boolean>(false);
 
@@ -51,11 +51,11 @@ export class LocationService {
       })
   }
 
-  public getLocations(): Location[] {
+  public getLocations(): Region[] {
     return this.locations;
   }
 
-  public updateLocation(locationData: Location) {
+  public updateLocation(locationData: Region) {
     const location = this.locations.find(location => location.id === locationData.id);
 
     if(!location) return;
@@ -64,7 +64,7 @@ export class LocationService {
     this.saveLocations();
   }
 
-  public addLocation(locationData: LocationAddingData) {
+  public addLocation(locationData: RegionAddingData) {
     this.locations.push({
       id: Math.max(...this.locations.map(location => location.id)) + 1,
       ...locationData

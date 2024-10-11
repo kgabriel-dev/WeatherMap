@@ -1,4 +1,4 @@
-export type Location = {
+export type Region = {
   name: string;
   id: number;
   coordinates: {
@@ -15,7 +15,12 @@ export type Location = {
   timezoneCode: string;
 }
 
-export type LocationAddingData = {
+export type Location = {
+  latitude: number;
+  longitude: number;
+}
+
+export type RegionAddingData = {
   name: string;
   coordinates: {
     latitude: number;

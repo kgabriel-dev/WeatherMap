@@ -12,7 +12,7 @@ import { SettingsService } from '../../services/settings/settings.service';
 import { LocationService } from '../../services/location/location.service';
 import { ListboxModule } from 'primeng/listbox';
 import { InputTextModule } from 'primeng/inputtext';
-import { Location, LocationAddingData } from '../../services/location/location.type';
+import { Region, RegionAddingData } from '../../services/location/location.type';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessagesModule } from 'primeng/messages';
 
@@ -106,10 +106,10 @@ export class SettingsComponent {
     unit: 'days'
   }
   updateCheck: boolean = true;
-  workingLocation?: Location;
+  workingLocation?: Region;
   locationLoadingMessages: Message[] = [];
   locationsAlreadyLoaded: boolean = false;
-  locationsList: Location[] = [];
+  locationsList: Region[] = [];
 
   constructor(
     public settingsService: SettingsService,
@@ -243,7 +243,7 @@ export class SettingsComponent {
   }
 
   addInitialLocation() {
-    const randomLocations: LocationAddingData[] = [
+    const randomLocations: RegionAddingData[] = [
       { name: 'Rostock', coordinates: { latitude: 54.10352, longitude: 12.10480 }, region: { size: { length: 100, unit: 'km' }, resolution: 6 }, timezoneCode: 'Europe/Berlin' },
       { name: 'New York City', coordinates: { latitude: 40.73164, longitude: -74.00166 }, region: { size: { length: 130, unit: 'mi' }, resolution: 7}, timezoneCode: 'America/New_York' },
       { name: 'Madrid', coordinates: { latitude: 40.43684, longitude: -3.65193 }, region: { size: { length: 80, unit: 'km' }, resolution: 4 }, timezoneCode: 'Europe/Madrid' },

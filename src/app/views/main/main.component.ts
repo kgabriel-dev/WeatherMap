@@ -7,7 +7,7 @@ import { Dropdown, DropdownModule } from 'primeng/dropdown';
 import { FormsModule } from '@angular/forms';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SettingsService } from '../../services/settings/settings.service';
-import { Location } from '../../services/location/location.type';
+import { Region } from '../../services/location/location.type';
 import { combineLatestWith, map } from 'rxjs';
 
 @Component({
@@ -23,16 +23,16 @@ export class MainComponent implements OnInit {
   currentWeatherImageSrc = '';
   currentWeatherImageIndex = 0;
   numberOfWeatherImages = 7;
-  selectedLocation?: Location;
+  selectedLocation?: Region;
   latitude = 51.5074;
   longitude = 0.1278;
   resolution = 5;
-  regionSize: Location['region']['size'] = {
+  regionSize: Region['region']['size'] = {
     length: 100,
     unit: 'km'
   }
 
-  readonly customLocation: Location = {
+  readonly customLocation: Region = {
     id: -1,
     coordinates: {
       latitude: this.latitude,
@@ -105,7 +105,7 @@ export class MainComponent implements OnInit {
 
   pauseWeatherImageAnimation(): void {}
 
-  applyLocation(location?: Location): void {
+  applyLocation(location?: Region): void {
     location = location || this.selectedLocation || this.customLocation;
 
     if(!location)
@@ -124,7 +124,7 @@ export class MainComponent implements OnInit {
     this.selectedLocation = this.customLocation;
   }
 
-  getLocationsList(): Location[] {
+  getLocationsList(): Region[] {
     return [
       ...this.locationsService.getLocations(),
       this.customLocation
