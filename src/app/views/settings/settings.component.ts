@@ -12,7 +12,6 @@ import { SettingsService } from '../../services/settings/settings.service';
 import { LocationService } from '../../services/location/location.service';
 import { ListboxModule } from 'primeng/listbox';
 import { InputTextModule } from 'primeng/inputtext';
-import { Region, RegionAddingData } from '../../services/location/location.type';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessagesModule } from 'primeng/messages';
 

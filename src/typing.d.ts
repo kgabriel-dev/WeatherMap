@@ -21,7 +21,7 @@ interface Window {
     onSettingsModalClosed: (callback) => void
   },
   weather: {
-    generateWeatherImagesForRegion: (region: Region, dataGatherer: DataGatherer, weatherCondition: WeatherCondition, forecast_length: number) => Promise<{ date: Date, filename: string }[]>
+    generateWeatherImagesForRegion: (region: Region, dataGatherer: DataGathererName, weatherConditionId: string, forecast_length: number) => Promise<{ date: Date, filename: string }[]>
   }
 }
 

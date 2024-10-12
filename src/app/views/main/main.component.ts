@@ -7,9 +7,7 @@ import { Dropdown, DropdownModule } from 'primeng/dropdown';
 import { FormsModule } from '@angular/forms';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SettingsService } from '../../services/settings/settings.service';
-import { Region } from '../../services/location/location.type';
 import { combineLatestWith, map } from 'rxjs';
-import { DataGathererId, WeatherConditions } from './weather-data.type';
 
 @Component({
   selector: 'app-main',
@@ -134,11 +132,11 @@ export class MainComponent implements OnInit {
 
   startWeatherImageGeneration(): void {
     const region = this.selectedLocation || this.customLocation;
-    const dataGathererId = DataGathererId.OpenMeteo;
-    const weatherCondition = WeatherConditions[dataGathererId][0];
+    const dataGathererName: DataGathererName = "OpenMeteo";
+    const weatherConditionId = "temperature_c";
     const forecast_length = 12;
 
-    window.weather.generateWeatherImagesForRegion(region, dataGathererId, weatherCondition, forecast_length)
+    window.weather.generateWeatherImagesForRegion(region, dataGathererName, weatherConditionId, forecast_length)
       .then((images) => {
         console.log('Images generated:', images);
       })

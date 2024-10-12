@@ -1,4 +1,4 @@
-export type Region = {
+declare type Region = {
   name: string;
   id: number;
   coordinates: {
@@ -15,12 +15,12 @@ export type Region = {
   timezoneCode: string;
 }
 
-export type Location = {
+declare type SimpleLocation = {
   latitude: number;
   longitude: number;
 }
 
-export type RegionAddingData = {
+declare type RegionAddingData = {
   name: string;
   coordinates: {
     latitude: number;

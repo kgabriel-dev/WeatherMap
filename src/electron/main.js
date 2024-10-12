@@ -1,8 +1,10 @@
+require('ts-node').register();
+
 const { app, BrowserWindow, ipcMain, Menu } = require('electron')
 const path = require('node:path')
 const url = require('node:url')
 const fs = require('node:fs')
-const { generateWeatherImageForLocation } = require('./backend/image-generation.ts')
+const { generateWeatherImageForLocation } = require('./backend/image-generation')
 
 const createWindow = () => {
   // Create the browser window.

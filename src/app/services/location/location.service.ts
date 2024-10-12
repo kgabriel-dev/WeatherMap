@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Region, RegionAddingData } from './location.type';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({

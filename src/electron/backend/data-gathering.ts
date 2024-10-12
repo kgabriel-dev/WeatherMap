@@ -1,7 +1,3 @@
-import { resolve } from "path";
-import { Location, Region } from "../../app/services/location/location.type";
-import { DataGatherer, WeatherCondition, WeatherData } from "../../app/views/main/weather-data.type";
-
 import * as https from 'https';
 
 export class OpenMeteoDataGatherer implements DataGatherer {
@@ -9,72 +5,124 @@ export class OpenMeteoDataGatherer implements DataGatherer {
   readonly REQUEST_DELAY = 300; // time in ms to wait between two requests
 
   gatherData(region: Region, condition: WeatherCondition, forecast_hours: number): Promise<WeatherData[]> {
-    if(!this.listAvailableWeatherConditions().includes(condition))
-      throw new Error('Condition not available');
+    console.log(this.listAvailableWeatherConditions());
+    console.log(condition);
+
+    if(!this.listAvailableWeatherConditions().find((availableCondition) => availableCondition.id === condition.id))
+      throw new Error('The selected Weather Condition not available');
 
     return new Promise((resolve, reject) => {
       const regionSizeInKm = convertToKm(region.region.size.length, region.region.size.unit);
       const stepSize = regionSizeInKm / region.region.resolution;
+      const latStepSize = stepSize / 110.574; // 1° latitude is 110.574 km
+      const lonStepSize = stepSize / (111.320 * Math.cos(region.coordinates.latitude * Math.PI / 180)); // 1° longitude is 111.320 km at the equator
       const locationOffset = -Math.floor(region.region.resolution/2) + (region.region.resolution % 2 === 0 ? 0.5 : 1);
+
+      const requests: { lat: number, lon: number, api: string, hours: number, tz: string }[] = [];
+      const weatherData: WeatherData[] = [];
 
       for(let latIndex = 0; latIndex < region.region.resolution; latIndex++) {
         for(let lonIndex = 0; lonIndex < region.region.resolution; lonIndex++) {
-          const lat = region.coordinates.latitude + locationOffset + latIndex * stepSize;
-          const lon = region.coordinates.longitude + locationOffset + lonIndex * stepSize;
+          const lat = region.coordinates.latitude + locationOffset + latIndex * latStepSize;
+          const lon = region.coordinates.longitude + locationOffset + lonIndex * lonStepSize;
 
-          // request data for the current location
-          const url = this.API_URL
-            .replace('{lat}', lat.toString())
-            .replace('{lon}', lon.toString())
-            .replace('{category}', condition.api)
-            .replace('{hours}', forecast_hours.toString())
-            .replace('{timezone}', region.timezoneCode);
+          requests.push({ lat, lon, api: condition.api, hours: forecast_hours, tz: region.timezoneCode });
 
-            const request = https.request(url, (response) => {
-              response.setEncoding('utf8');
-
-              let data = '';
-
-              response.on('data', (chunk) => {
-                data += chunk;
-              });
-
-              response.on('end', () => {
-                if(response.statusCode !== 200) {
-                  console.error(`Request failed with status code ${response.statusCode}`);
-                  reject(`REQUEST FAILED - Request failed with status code ${response.statusCode}`)
-                }
-
-                const json = JSON.parse(data);
-                const time_values = json['hourly']['time'];
-
-                const weatherData: WeatherData[] = [];
-
-                for(let i = 0; i < time_values.length; i++) {
-                  const date = new Date(time_values[i]);
-                  const value = json['hourly'][condition.api][i];
-
-                  weatherData.push({
-                    coordinates: { latitude: lat, longitude: lon },
-                    weatherCondition: condition,
-                    weatherValue: value,
-                    date: date
-                  });
-                }
-
-                resolve(weatherData);
-              });
-            });
-
-            request.on('error', (error) => {
-              console.error(error);
-              reject(error);
-            });
-
-            request.end();
-          }
+//           const request = https.request(url, (response) => {
+//             response.setEncoding('utf8');
+//
+//             let data = '';
+//
+//             response.on('data', (chunk) => {
+//               data += chunk;
+//             });
+//
+//             response.on('end', () => {
+//               if(response.statusCode !== 200) {
+//                 console.error(`Request failed with status code ${response.statusCode}`);
+//                 reject(`REQUEST FAILED - Request failed with status code ${response.statusCode}`)
+//               }
+//
+//               const json = JSON.parse(data);
+//               const time_values = json['hourly']['time'];
+//
+//               for(let i = 0; i < time_values.length; i++) {
+//                 const date = new Date(time_values[i]);
+//                 const value = json['hourly'][condition.api][i];
+//
+//                 weatherData.push({
+//                   coordinates: { latitude: lat, longitude: lon },
+//                   weatherCondition: condition,
+//                   weatherValue: value,
+//                   date: date
+//                 });
+//               }
+//             });
+//           });
+//
+//           request.on('error', (error) => {
+//             reject(error);
+//           });
+//
+//           request.end();
+//
+//           await new Promise((resolve) => setTimeout(resolve, this.REQUEST_DELAY));
         }
-      });
+      }
+
+      this.requestApiUrls(requests)
+        .then((data) => {
+          resolve(data);
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  }
+
+  private async requestApiUrls(dataList: { lat: number, lon: number, api: string, hours: number, tz: string }[]): Promise<WeatherData[]> {
+    const weatherData: WeatherData[] = [];
+
+    for(const data of dataList) {
+      const url = this.API_URL
+        .replace('{lat}', data.lat.toString())
+        .replace('{lon}', data.lon.toString())
+        .replace('{category}', data.api)
+        .replace('{hours}', data.hours.toString())
+        .replace('{timezone}', data.tz);
+
+      try {
+        const response = await fetch(url);
+
+        if(!response.ok) {
+          console.error(`Request failed with status code ${response.status}`);
+          throw new Error(`REQUEST FAILED - Request failed with status code ${response.status}`);
+        }
+
+        const json = await response.json();
+        const time_values = json['hourly']['time'];
+
+        for(let i = 0; i < time_values.length; i++) {
+          const date = new Date(time_values[i]);
+          const value = json['hourly'][data.api][i];
+
+          weatherData.push({
+            coordinates: { latitude: data.lat, longitude: data.lon },
+            weatherCondition: this.listAvailableWeatherConditions().find((condition) => condition.api === data.api)!,
+            weatherValue: value,
+            date: date
+          });
+        }
+
+        console.log(`Request for ${data.lat}, ${data.lon} successful`);
+        await delay(this.REQUEST_DELAY);
+      }
+      catch(error) {
+        console.error(error);
+      }
+    }
+
+    return weatherData;
   }
 
   getName(): string {
@@ -101,4 +149,8 @@ export class OpenMeteoDataGatherer implements DataGatherer {
 
 function convertToKm(number: number, unit: Region['region']['size']['unit']): number {
   return unit === 'km' ? number : number * 1.60934;
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
