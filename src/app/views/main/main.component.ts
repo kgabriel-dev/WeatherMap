@@ -8,11 +8,12 @@ import { FormsModule } from '@angular/forms';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SettingsService } from '../../services/settings/settings.service';
 import { combineLatestWith, map } from 'rxjs';
+import { MapComponent } from '../../components/map/map.component';
 
 @Component({
   selector: 'app-main',
   standalone: true,
-  imports: [FormsModule, ProgressBarModule, ButtonModule, ImageModule, DropdownModule, InputNumberModule],
+  imports: [FormsModule, ProgressBarModule, ButtonModule, ImageModule, DropdownModule, InputNumberModule, MapComponent],
   templateUrl: './main.component.html',
   styleUrl: './main.component.scss'
 })
