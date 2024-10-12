@@ -5,9 +5,6 @@ export class OpenMeteoDataGatherer implements DataGatherer {
   readonly REQUEST_DELAY = 300; // time in ms to wait between two requests
 
   gatherData(region: Region, condition: WeatherCondition, forecast_hours: number): Promise<WeatherData[]> {
-    console.log(this.listAvailableWeatherConditions());
-    console.log(condition);
-
     if(!this.listAvailableWeatherConditions().find((availableCondition) => availableCondition.id === condition.id))
       throw new Error('The selected Weather Condition not available');
 
@@ -19,7 +16,6 @@ export class OpenMeteoDataGatherer implements DataGatherer {
       const locationOffset = -Math.floor(region.region.resolution/2) + (region.region.resolution % 2 === 0 ? 0.5 : 1);
 
       const requests: { lat: number, lon: number, api: string, hours: number, tz: string }[] = [];
-      const weatherData: WeatherData[] = [];
 
       for(let latIndex = 0; latIndex < region.region.resolution; latIndex++) {
         for(let lonIndex = 0; lonIndex < region.region.resolution; lonIndex++) {
@@ -27,46 +23,6 @@ export class OpenMeteoDataGatherer implements DataGatherer {
           const lon = region.coordinates.longitude + locationOffset + lonIndex * lonStepSize;
 
           requests.push({ lat, lon, api: condition.api, hours: forecast_hours, tz: region.timezoneCode });
-
-//           const request = https.request(url, (response) => {
-//             response.setEncoding('utf8');
-//
-//             let data = '';
-//
-//             response.on('data', (chunk) => {
-//               data += chunk;
-//             });
-//
-//             response.on('end', () => {
-//               if(response.statusCode !== 200) {
-//                 console.error(`Request failed with status code ${response.statusCode}`);
-//                 reject(`REQUEST FAILED - Request failed with status code ${response.statusCode}`)
-//               }
-//
-//               const json = JSON.parse(data);
-//               const time_values = json['hourly']['time'];
-//
-//               for(let i = 0; i < time_values.length; i++) {
-//                 const date = new Date(time_values[i]);
-//                 const value = json['hourly'][condition.api][i];
-//
-//                 weatherData.push({
-//                   coordinates: { latitude: lat, longitude: lon },
-//                   weatherCondition: condition,
-//                   weatherValue: value,
-//                   date: date
-//                 });
-//               }
-//             });
-//           });
-//
-//           request.on('error', (error) => {
-//             reject(error);
-//           });
-//
-//           request.end();
-//
-//           await new Promise((resolve) => setTimeout(resolve, this.REQUEST_DELAY));
         }
       }
 
@@ -110,7 +66,7 @@ export class OpenMeteoDataGatherer implements DataGatherer {
             coordinates: { latitude: data.lat, longitude: data.lon },
             weatherCondition: this.listAvailableWeatherConditions().find((condition) => condition.api === data.api)!,
             weatherValue: value,
-            date: date
+            date: date.toISOString()
           });
         }
 

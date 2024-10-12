@@ -8,7 +8,7 @@ declare type WeatherData = {
   coordinates: SimpleLocation,
   weatherCondition: WeatherCondition,
   weatherValue: number,
-  date: Date
+  date: string
 }
 
 declare type WeatherCondition = {

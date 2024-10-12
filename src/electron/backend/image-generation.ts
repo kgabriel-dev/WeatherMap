@@ -1,10 +1,10 @@
 import { createCanvas } from "@napi-rs/canvas";
 import { OpenMeteoDataGatherer } from "./data-gathering";
+import * as fs from 'fs';
 
 const { app } = require('electron');
-const fs = require('fs');
 
-export function generateWeatherImageForLocation(region: Region, dataGathererName: DataGathererName, weatherConditionId: string, forecast_length: number): Promise<{ date: Date, filename: string }[]> {
+export function generateWeatherImageForLocation(region: Region, dataGathererName: DataGathererName, weatherConditionId: string, forecast_length: number): Promise<{ date: string, filename: string }[]> {
   const dataGatherer = getDataGatherer(dataGathererName);
 
   return new Promise((resolve, reject) => {
@@ -13,14 +13,28 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
     if(!weatherCondition)
       reject('Unknown weather condition id');
 
+    // check if the WeatherMap dir in the temp dir exists, if not create it
+    // and if it exists, delete all files in it
+    const dir = `${app.getPath('temp')}/WeatherMap`;
+    if(!fs.existsSync(dir))
+      fs.mkdirSync(dir);
+    else
+      fs.readdirSync(dir).forEach((file) => fs.unlinkSync(`${dir}/${file}`));
+
     // gather the data for the location
     dataGatherer.gatherData(region, weatherCondition!, forecast_length)
       .then((weatherData) => {
+
         // convert the data from weather over space in a time range to weather over time at a location
         const weatherDataOverTime: { [timeIndex: number]: { weatherCondition: WeatherCondition, weatherValue: number, location: SimpleLocation }[] } = {};
-        const timeList: Date[] = weatherData.map((data) => data.date);
 
-        const imagesToReturn: { date: Date, filename: string }[] = [];
+        const timeList: string[] = [];
+        weatherData.forEach((data) => {
+          if(!timeList.find((date) => date === data.date))
+            timeList.push(data.date);
+        });
+
+        const imagesToReturn: { date: string, filename: string }[] = [];
 
         weatherData.forEach((data) => {
           const timeIndex = timeList.indexOf(data.date);
@@ -36,16 +50,16 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
         });
 
         // gather all coordinates
-        const allCoordinates: SimpleLocation[] = [];
-        weatherData.forEach((data) => {
-          if(!allCoordinates.find((coordinate) => coordinate.latitude === data.coordinates.latitude && coordinate.longitude === data.coordinates.longitude))
-            allCoordinates.push(data.coordinates);
-        });
+        const allCoordinates = weatherData.map((data) => data.coordinates).filter((value, index, self) => self.indexOf(value) === index);
 
-        // sort the coordinates to a 2x2 grid
+        // sort the coordinates to a res x res grid
         const gridCoordinates: SimpleLocation[][] = [];
-        const latitudes = allCoordinates.map((coordinate) => coordinate.latitude).sort();
-        const longitudes = allCoordinates.map((coordinate) => coordinate.longitude).sort();
+        const latitudes = allCoordinates
+                            .map((coordinate) => coordinate.latitude)
+                            .filter((value, index, self) => self.indexOf(value) === index);
+        const longitudes = allCoordinates
+                            .map((coordinate) => coordinate.longitude)
+                            .filter((value, index, self) => self.indexOf(value) === index);
 
         for(let latIndex = 0; latIndex < latitudes.length; latIndex++) {
           for(let lonIndex = 0; lonIndex < longitudes.length; lonIndex++) {
@@ -60,13 +74,12 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
           }
         }
 
-        console.log(gridCoordinates);
-
         // sort the grid
         gridCoordinates.forEach((row) => row.sort((a, b) => a.longitude - b.longitude));
         gridCoordinates.sort((a, b) => a[0].latitude - b[0].latitude);
 
-        console.log(gridCoordinates);
+        const maxWeatherValue = Math.max(...weatherData.map((data) => data.weatherValue));
+        const minWeatherValue = Math.min(...weatherData.map((data) => data.weatherValue));
 
         // create the raster images
         for(let timeIndex = 0; timeIndex < timeList.length; timeIndex++) {
@@ -77,44 +90,31 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
             reject('Failed to create context');
           }
 
-          canvas.width = region.region.resolution;
-          canvas.height = region.region.resolution;
+          canvas.width = region.region.resolution * 64;
+          canvas.height = region.region.resolution * 64;
 
-          for(const row of gridCoordinates) {
-            for(const coordinate of row) {
-              const weatherData = weatherDataOverTime[timeIndex].find((data) => data.location.latitude === coordinate.latitude && data.location.longitude === coordinate.longitude);
+          for(const [rowIndex, row] of gridCoordinates.entries()) {
+            for(const [columnIndex, coordinate] of row.entries()) {
+              const weatherData = weatherDataOverTime[timeIndex]?.find((data) => data.location.latitude === coordinate.latitude && data.location.longitude === coordinate.longitude) || null;
 
-              const latIndex = gridCoordinates.indexOf(row);
-              const lonIndex = row.indexOf(coordinate);
+              const color = weatherData ? _mapValueToColor(weatherData.weatherValue, minWeatherValue, maxWeatherValue) : [255, 0, 0, 200];
 
-              if(weatherData) {
-                const color = _mapValueToColor(weatherData.weatherValue, weatherCondition!.min, weatherCondition!.max);
-
-                context.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3]})`;
-                context.fillRect(latIndex, lonIndex, 1, 1);
-              } else {
-                console.error('No data found for location', coordinate.latitude, coordinate.longitude, 'at time', timeList[timeIndex]);
-
-                const color = [255, 0, 0, 200];
-
-                context.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3]})`;
-                context.fillRect(latIndex, lonIndex, 1, 1);
-              }
-
-              // save the image to a file in the temp directory
-              const buffer = canvas.toBuffer('image/png');
-              const filename = `${app.getPath('temp')}/weather_image_${timeIndex}.png`;
-
-              try {
-                fs.writeFileSync(filename, buffer);
-                imagesToReturn.push({date: timeList[timeIndex], filename: filename});
-              } catch (error) {
-                console.error('Failed to write file', error);
-              }
+              context.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 255)`;
+              context.fillRect(rowIndex * 64, columnIndex * 64, 64, 64); // draw squares that are 64x64 pixels
             }
           }
-        }
 
+          // save the image to a file in the temp directory
+          const buffer = canvas.toBuffer('image/png');
+          const filename = `${app.getPath('temp')}/WeatherMap/weather_image_${timeIndex}.png`;
+
+          try {
+            fs.writeFileSync(filename, buffer);
+            imagesToReturn.push({date: timeList[timeIndex], filename: filename});
+          } catch (error) {
+            console.error('Failed to write file', error);
+          }
+        }
         resolve(imagesToReturn);
       })
       .catch((error) => {
@@ -124,10 +124,11 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
 }
 
 function _mapValueToColor(value: number, min: number, max: number): number[] {
-  const colorValue = 0 + (255 - 0) / (max - min) * (value - min);
+  // map the value from the range of the weather condition to the range of the color
+  const colorValue = 0 + ((255 - 0) / (max - min)) * (value - min);
 
   // fade from white to blue using the color value
-  return [255, 255, colorValue, 200];
+  return [255 - colorValue, 255 - colorValue, 255];
 }
 
 function getDataGatherer(dataGathererName: DataGathererName): DataGatherer {
