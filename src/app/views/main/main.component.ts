@@ -9,6 +9,8 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { SettingsService } from '../../services/settings/settings.service';
 import { combineLatestWith, map } from 'rxjs';
 import { MapComponent } from '../../components/map/map.component';
+import { SessionService } from '../../services/session/session.service';
+import { MainData } from '../../services/session/session.type';
 
 @Component({
   selector: 'app-main',
@@ -20,28 +22,26 @@ import { MapComponent } from '../../components/map/map.component';
 export class MainComponent implements OnInit {
   readonly filePath = 'D:\\Programmieren\\Electron\\WeatherMap\\image_0.png';
 
-  currentWeatherImageSrc = '';
-  currentWeatherImageIndex = 0;
-  numberOfWeatherImages = 7;
-  selectedLocation?: Region;
-  latitude = 51.5074;
-  longitude = 0.1278;
-  resolution = 5;
-  regionSize: Region['region']['size'] = {
-    length: 100,
-    unit: 'km'
+  latestMainSessionData: MainData;
+  selectedRegion: Region | undefined;
+  usedLocation: SimpleLocation = {
+    latitude: 0,
+    longitude: 0
   }
 
   readonly customLocation: Region = {
     id: -1,
     coordinates: {
-      latitude: this.latitude,
-      longitude: this.longitude
+      latitude: 0,
+      longitude: 0
     },
     name: 'Custom Location',
     region: {
-      resolution: this.resolution,
-      size: this.regionSize
+      resolution: 0,
+      size: {
+        length: 0,
+        unit: 'km'
+      }
     },
     timezoneCode: 'UTC'
   }
@@ -50,19 +50,41 @@ export class MainComponent implements OnInit {
 
   constructor(
     public locationsService: LocationService,
-    public settingsService: SettingsService
+    public settingsService: SettingsService,
+    public sessionService: SessionService
   ) {
+    this.latestMainSessionData = this.sessionService.getLatestSessionData().mainData;
+    this.sessionService.getSessionDataObservable().subscribe((sessionData) => {
+      this.latestMainSessionData = sessionData.mainData;
+    });
+
+    this.customLocation.coordinates = this.latestMainSessionData.usedLocation;
+    this.customLocation.region = {
+      resolution: this.latestMainSessionData.regionResolution,
+      size: this.latestMainSessionData.regionSize
+    }
+
     window.app.onSettingsModalClosed(() => {
       const settings = this.settingsService.getSettings();
-      this.selectedLocation = this.locationsService.getLocations()[settings.defaultLocationIndex];
+      let selectedLocation = this.locationsService.getLocations()[settings.defaultLocationIndex];
 
-      if(!this.selectedLocation)
-        this.selectedLocation = this.customLocation;
+      if(!selectedLocation)
+        selectedLocation = this.customLocation;
 
-      this.applyLocation(this.selectedLocation);
+      this.applyLocation(selectedLocation);
 
       if(this.locationDropdown)
         this.locationDropdown.focus(); // this triggers the update of the label to the selected location
+
+      const sessionData = this.sessionService.getLatestSessionData();
+      this.sessionService.updateSessionData({
+        mainData: {
+          ...sessionData.mainData,
+          selectedRegion: selectedLocation,
+          regionResolution: selectedLocation.region.resolution,
+          regionSize: selectedLocation.region.size
+        }
+      });
     });
 
     // set the default location to the one saved in the settings
@@ -72,56 +94,70 @@ export class MainComponent implements OnInit {
       map(([isLocationReady, isSettingsReady]) => isLocationReady && isSettingsReady)
     );
     // --> subscribe to the observable
-    combinedReadiness$.subscribe((isRead: boolean) => {
-      if(!isRead) return; // wait until both files are read
+    combinedReadiness$.subscribe((isReady: boolean) => {
+      if(!isReady) return; // wait until both files are read
 
       const settings = this.settingsService.getSettings();
-      this.selectedLocation = this.locationsService.getLocations()[settings.defaultLocationIndex];
+      let selectedLocation = this.locationsService.getLocations()[settings.defaultLocationIndex];
 
-      if(!this.selectedLocation)
-        this.selectedLocation = this.customLocation;
+      if(!selectedLocation)
+        selectedLocation = this.customLocation;
 
       this.applyLocation();
+
+      const sessionData = this.sessionService.getLatestSessionData();
+      this.sessionService.updateSessionData({
+        mainData: {
+          ...sessionData.mainData,
+          selectedRegion: selectedLocation,
+          regionResolution: selectedLocation.region.resolution,
+          regionSize: selectedLocation.region.size
+        }
+      });
     })
   }
 
-  ngOnInit(): void {
-    window.files.readFile(this.filePath, 'base64')
-      .then((data) => {
-        const extension = this.filePath.split('.').pop();
-        this.currentWeatherImageSrc = 'data:image/' + extension + ';base64,' + data;
-      })
-  }
+  ngOnInit(): void { }
 
   changeWeatherImageIndex(amount: number): void {
-    this.currentWeatherImageIndex += amount;
+    const sessionData = this.sessionService.getLatestSessionData();
 
-    if(this.currentWeatherImageIndex >= this.numberOfWeatherImages)
-      this.currentWeatherImageIndex = this.numberOfWeatherImages - this.currentWeatherImageIndex
+    let currentWeatherImageIndex = sessionData.mainData.currentWeatherImageIndex + amount;
 
-    else if(this.currentWeatherImageIndex < 0)
-      this.currentWeatherImageIndex = this.numberOfWeatherImages + this.currentWeatherImageIndex
+    if(currentWeatherImageIndex >= sessionData.mainData.numberOfWeatherImages)
+      currentWeatherImageIndex = sessionData.mainData.numberOfWeatherImages - currentWeatherImageIndex
+
+    else if(currentWeatherImageIndex < 0)
+      currentWeatherImageIndex = sessionData.mainData.numberOfWeatherImages + currentWeatherImageIndex
+
+    if(currentWeatherImageIndex < 0 || currentWeatherImageIndex >= sessionData.mainData.numberOfWeatherImages)
+      currentWeatherImageIndex = 0;
+
+    this.sessionService.updateSessionData({
+      mainData: {
+        ...sessionData.mainData,
+        currentWeatherImageIndex
+      }
+    });
   }
 
   pauseWeatherImageAnimation(): void {}
 
   applyLocation(location?: Region): void {
-    location = location || this.selectedLocation || this.customLocation;
+    const sessionData = this.sessionService.getLatestSessionData();
+    location = location || sessionData.mainData.selectedRegion || this.customLocation;
 
     if(!location)
       return;
 
-    this.latitude = location.coordinates.latitude;
-    this.longitude = location.coordinates.longitude;
-    this.resolution = location.region.resolution;
-    this.regionSize = location.region.size;
-
-    if(location == this.customLocation)
-      this.selectedLocation = location;
-  }
-
-  onLocationDataChange(): void {
-    this.selectedLocation = this.customLocation;
+    this.sessionService.updateSessionData({
+      mainData: {
+        ...sessionData.mainData,
+        selectedRegion: location,
+        regionResolution: location.region.resolution,
+        regionSize: location.region.size
+      }
+    });
   }
 
   getLocationsList(): Region[] {
@@ -132,7 +168,9 @@ export class MainComponent implements OnInit {
   }
 
   startWeatherImageGeneration(): void {
-    const region = this.selectedLocation || this.customLocation;
+    const sessionData = this.sessionService.getLatestSessionData();
+
+    const region = sessionData.mainData.selectedRegion || this.customLocation;
     const dataGathererName: DataGathererName = "OpenMeteo";
     const weatherConditionId = "temperature_c";
     const forecast_length = 12;
@@ -144,5 +182,24 @@ export class MainComponent implements OnInit {
       .catch((error) => {
         console.error('Error generating images:', error);
       });
+  }
+
+  updateSessionData(): void {
+    this.sessionService.updateSessionData({
+      mainData: {
+        currentWeatherImageIndex: this.latestMainSessionData.currentWeatherImageIndex,
+        numberOfWeatherImages: this.latestMainSessionData.numberOfWeatherImages,
+        selectedRegion: this.selectedRegion,
+        usedLocation: this.usedLocation,
+        regionResolution: this.latestMainSessionData.regionResolution,
+        regionSize: this.latestMainSessionData.regionSize,
+        forecastLength: this.latestMainSessionData.forecastLength,
+        weatherDataSource: this.latestMainSessionData.weatherDataSource
+      }
+    })
+  }
+
+  getDataSourcesList(): string[] {
+    return ['OpenMeteo', 'BrightSky'];
   }
 }
