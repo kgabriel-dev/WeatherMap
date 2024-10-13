@@ -89,9 +89,10 @@
           [inputStyle]="{'text-align': 'right' , 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'width': '100%'}"
           styleClass="w-full"
           class="w-full"
-          [(ngModel)]="latestMainSessionData.forecastLength"
+          [(ngModel)]="latestMainSessionData.forecastLength.value"
         />
         <p-dropdown
+          [(ngModel)]="latestMainSessionData.forecastLength.unit"
           [options]="['hours', 'days']"
           [style]="{'width': '7rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0'}" />
       </div>

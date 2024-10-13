@@ -20,7 +20,10 @@ export class SessionService {
         length: 100,
         unit: 'km'
       },
-      forecastLength: 0,
+      forecastLength: {
+        value: 12,
+        unit: 'hours'
+      },
       weatherDataSource: 'OpenMeteo'
     }
   });

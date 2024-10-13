@@ -93,7 +93,7 @@ export class SettingsService {
 
 }
 
-type Settings = {
+export type Settings = {
   version: string,
   languageCode: string,
   timezoneCode: string,

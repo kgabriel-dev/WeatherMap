@@ -1,3 +1,5 @@
+import { Settings } from "../settings/settings.service";
+
 export type SessionData = {
   mainData: MainData;
 }
@@ -9,6 +11,6 @@ export type MainData = {
   usedLocation: SimpleLocation;
   regionResolution: number;
   regionSize: Region['region']['size'];
-  forecastLength: number;
+  forecastLength: Settings['forecastLength'];
   weatherDataSource: DataGathererName;
 }

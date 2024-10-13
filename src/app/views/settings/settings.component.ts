@@ -242,7 +242,7 @@ export class SettingsComponent {
   }
 
   addInitialLocation() {
-    const randomLocations: RegionAddingData[] = [
+    const listOfLocations: RegionAddingData[] = [
       { name: 'Rostock', coordinates: { latitude: 54.10352, longitude: 12.10480 }, region: { size: { length: 100, unit: 'km' }, resolution: 6 }, timezoneCode: 'Europe/Berlin' },
       { name: 'New York City', coordinates: { latitude: 40.73164, longitude: -74.00166 }, region: { size: { length: 130, unit: 'mi' }, resolution: 7}, timezoneCode: 'America/New_York' },
       { name: 'Madrid', coordinates: { latitude: 40.43684, longitude: -3.65193 }, region: { size: { length: 80, unit: 'km' }, resolution: 4 }, timezoneCode: 'Europe/Madrid' },
@@ -250,8 +250,8 @@ export class SettingsComponent {
       { name: 'Tokyo', coordinates: { latitude: 35.68267, longitude: 139.77254 }, region: { size: { length: 100, unit: 'km' }, resolution: 6 }, timezoneCode: 'Asia/Tokyo' }
     ]
 
-    const index = Math.floor(Math.random() * randomLocations.length);
-    this.locationsService.addLocation(randomLocations[index]);
+    const index = Math.floor(Math.random() * listOfLocations.length);
+    this.locationsService.addLocation(listOfLocations[index]);
     this.locationsList = this.locationsService.getLocations();
     this.setWorkingLocation(this.locationsList[this.locationsList.length - 1].id);
   }

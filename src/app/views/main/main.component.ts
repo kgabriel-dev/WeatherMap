@@ -56,6 +56,8 @@ export class MainComponent implements OnInit {
     this.latestMainSessionData = this.sessionService.getLatestSessionData().mainData;
     this.sessionService.getSessionDataObservable().subscribe((sessionData) => {
       this.latestMainSessionData = sessionData.mainData;
+      this.selectedRegion = sessionData.mainData.selectedRegion;
+      this.usedLocation = sessionData.mainData.usedLocation;
     });
 
     this.customLocation.coordinates = this.latestMainSessionData.usedLocation;
@@ -111,7 +113,8 @@ export class MainComponent implements OnInit {
           ...sessionData.mainData,
           selectedRegion: selectedLocation,
           regionResolution: selectedLocation.region.resolution,
-          regionSize: selectedLocation.region.size
+          regionSize: selectedLocation.region.size,
+          forecastLength: settings.forecastLength
         }
       });
     })

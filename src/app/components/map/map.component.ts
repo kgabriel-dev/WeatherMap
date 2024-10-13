@@ -3,6 +3,7 @@ import * as L from 'leaflet';
 import { LocationService } from '../../services/location/location.service';
 import { SettingsService } from '../../services/settings/settings.service';
 import { BehaviorSubject, combineLatestWith, map } from 'rxjs';
+import { SessionService } from '../../services/session/session.service';
 
 @Component({
   selector: 'app-map',
@@ -18,20 +19,23 @@ export class MapComponent implements AfterViewInit {
   readonly markerIcon = L.icon({
     iconUrl: 'assets/maps-pin-black-icon.png',
     iconSize: [ 25, 25 ],
-    iconAnchor: [ 13, 25 ]
+    iconAnchor: [ 13, 25 ],
+    popupAnchor: [ 0, -25 ]
   })
 
   readonly markerIconSelected = L.icon({
     iconUrl: 'assets/maps-pin-red-icon.png',
     iconSize: [ 25, 25 ],
-    iconAnchor: [ 13, 25 ]
+    iconAnchor: [ 13, 25 ],
+    popupAnchor: [ 0, -25 ]
   })
 
   markers: L.Marker[] = [];
 
   constructor(
     private locationsService: LocationService,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    private sessionService: SessionService
   ) {
     const combinedReadiness$ = this.locationsService.isServiceReady().pipe(
       combineLatestWith(this.settingsService.isServiceReady(), this.isMapReady$),
@@ -52,9 +56,20 @@ export class MapComponent implements AfterViewInit {
           L.marker([ location.coordinates.latitude, location.coordinates.longitude ], { icon })
             .addTo(this.map)
             .bindPopup(location.name)
+            .on('click', () => this.onMarkerClick(i))
         )
       }
     })
+
+    this.sessionService.getSessionDataObservable().subscribe((sessionData) => {
+      this.markers.forEach((marker, index) => {
+        const sessionLocationIndex = this.locationsService.getLocations().findIndex((location) => location.name === sessionData.mainData.selectedRegion?.name);
+        const locationIndex = sessionLocationIndex === -1 ? this.settingsService.getSettings().defaultLocationIndex : sessionLocationIndex;
+        const icon = index === locationIndex ? this.markerIconSelected : this.markerIcon;
+
+        marker.setIcon(icon);
+      });
+    });
   }
 
   ngAfterViewInit() {
@@ -77,5 +92,20 @@ export class MapComponent implements AfterViewInit {
 
     this.isMapReady$.next(true);
   }
+
+  private onMarkerClick(index: number) {
+    const locations = this.locationsService.getLocations();
+    const selectedLocation = locations[index];
+
+    this.sessionService.updateSessionData({
+      mainData: {
+        ...this.sessionService.getLatestSessionData().mainData,
+        selectedRegion: selectedLocation,
+        usedLocation: selectedLocation.coordinates,
+        regionResolution: selectedLocation.region.resolution,
+        regionSize: selectedLocation.region.size
+      }
+    })
+  };
 
 }
