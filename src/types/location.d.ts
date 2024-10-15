@@ -1,10 +1,7 @@
 declare type Region = {
   name: string;
   id: number;
-  coordinates: {
-    latitude: number;
-    longitude: number;
-  };
+  coordinates: SimpleLocation;
   region: {
     size: {
       length: number;

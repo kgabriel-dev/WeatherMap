@@ -10,7 +10,7 @@ export class SessionService {
     mainData: {
       currentWeatherImageIndex: 0,
       numberOfWeatherImages: 0,
-      selectedRegion: undefined,
+      selectedRegionIndex: -1,
       usedLocation: {
         latitude: 54.10352,
         longitude: 12.1048

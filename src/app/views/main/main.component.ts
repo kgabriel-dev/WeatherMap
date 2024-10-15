@@ -11,11 +11,12 @@ import { combineLatestWith, map } from 'rxjs';
 import { MapComponent } from '../../components/map/map.component';
 import { SessionService } from '../../services/session/session.service';
 import { MainData } from '../../services/session/session.type';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-main',
   standalone: true,
-  imports: [FormsModule, ProgressBarModule, ButtonModule, ImageModule, DropdownModule, InputNumberModule, MapComponent],
+  imports: [FormsModule, ProgressBarModule, ButtonModule, ImageModule, DropdownModule, InputNumberModule, MapComponent, TooltipModule],
   templateUrl: './main.component.html',
   styleUrl: './main.component.scss'
 })
@@ -23,8 +24,8 @@ export class MainComponent implements OnInit {
   readonly filePath = 'D:\\Programmieren\\Electron\\WeatherMap\\image_0.png';
 
   latestMainSessionData: MainData;
-  selectedRegion: Region | undefined;
-  usedLocation: SimpleLocation = {
+  selectedRegionIndex: number = -1;
+  usedCoordinates: SimpleLocation = {
     latitude: 0,
     longitude: 0
   }
@@ -46,7 +47,10 @@ export class MainComponent implements OnInit {
     timezoneCode: 'UTC'
   }
 
+  regionInDropdown = this.customLocation;
+
   @ViewChild('locationDropdown') locationDropdown?: Dropdown;
+  @ViewChild('mapComponent') mapComponent?: MapComponent
 
   constructor(
     public locationsService: LocationService,
@@ -56,8 +60,29 @@ export class MainComponent implements OnInit {
     this.latestMainSessionData = this.sessionService.getLatestSessionData().mainData;
     this.sessionService.getSessionDataObservable().subscribe((sessionData) => {
       this.latestMainSessionData = sessionData.mainData;
-      this.selectedRegion = sessionData.mainData.selectedRegion;
-      this.usedLocation = sessionData.mainData.usedLocation;
+      this.selectedRegionIndex = sessionData.mainData.selectedRegionIndex;
+      this.usedCoordinates = sessionData.mainData.usedLocation;
+
+      if(this.selectedRegionIndex !== -1) {
+        const selectedRegion = this.locationsService.getLocations()[this.selectedRegionIndex];
+        this.regionInDropdown = selectedRegion ? selectedRegion : this.customLocation;
+      }
+
+      // check if the used coordinates are in the list of locations and update the selected region index
+      // try to find a region that matches the used coordinates
+      const selectedRegion = this.locationsService.getLocations().find((location) => this.compareCoordinates(location.coordinates, sessionData.mainData.usedLocation)) || undefined;
+      // if the region is found and the index is different from the current one, update the index
+      if(selectedRegion !== undefined && this.selectedRegionIndex != this.locationsService.getLocations().indexOf(selectedRegion)) {
+        this.selectedRegionIndex = this.locationsService.getLocations().indexOf(selectedRegion);
+        this.regionInDropdown = this.locationsService.getLocations()[this.selectedRegionIndex];
+
+        this.sessionService.updateSessionData({
+          mainData: {
+            ...sessionData.mainData,
+            selectedRegionIndex: this.selectedRegionIndex
+          }
+        });
+      }
     });
 
     this.customLocation.coordinates = this.latestMainSessionData.usedLocation;
@@ -82,7 +107,7 @@ export class MainComponent implements OnInit {
       this.sessionService.updateSessionData({
         mainData: {
           ...sessionData.mainData,
-          selectedRegion: selectedLocation,
+          selectedRegionIndex: this.selectedRegionIndex,
           regionResolution: selectedLocation.region.resolution,
           regionSize: selectedLocation.region.size
         }
@@ -100,20 +125,18 @@ export class MainComponent implements OnInit {
       if(!isReady) return; // wait until both files are read
 
       const settings = this.settingsService.getSettings();
-      let selectedLocation = this.locationsService.getLocations()[settings.defaultLocationIndex];
+      let selectedRegionIndex = this.locationsService.getLocations()[settings.defaultLocationIndex] ? settings.defaultLocationIndex : -1;
+      let selectedRegion = this.locationsService.getLocations()[selectedRegionIndex];
 
-      if(!selectedLocation)
-        selectedLocation = this.customLocation;
-
-      this.applyLocation();
+      this.applyLocation(selectedRegion);
 
       const sessionData = this.sessionService.getLatestSessionData();
       this.sessionService.updateSessionData({
         mainData: {
           ...sessionData.mainData,
-          selectedRegion: selectedLocation,
-          regionResolution: selectedLocation.region.resolution,
-          regionSize: selectedLocation.region.size,
+          selectedRegionIndex: selectedRegionIndex,
+          regionResolution: selectedRegion ? selectedRegion.region.resolution : sessionData.mainData.regionResolution,
+          regionSize: selectedRegion ? selectedRegion.region.size : sessionData.mainData.regionSize,
           forecastLength: settings.forecastLength
         }
       });
@@ -148,15 +171,27 @@ export class MainComponent implements OnInit {
 
   applyLocation(location?: Region): void {
     const sessionData = this.sessionService.getLatestSessionData();
-    location = location || sessionData.mainData.selectedRegion || this.customLocation;
 
-    if(!location)
-      return;
+    if(!location) {
+      const locationFromIndex = this.locationsService.getLocations()[this.selectedRegionIndex];
+
+      location = locationFromIndex !== undefined ? locationFromIndex : {
+        ...this.customLocation,
+        coordinates: sessionData.mainData.usedLocation,
+        region: {
+          resolution: sessionData.mainData.regionResolution,
+          size: sessionData.mainData.regionSize
+        }
+      };
+    }
+
+    this.selectedRegionIndex = this.locationsService.getLocations().indexOf(location);
 
     this.sessionService.updateSessionData({
       mainData: {
         ...sessionData.mainData,
-        selectedRegion: location,
+        selectedRegionIndex: this.selectedRegionIndex,
+        usedLocation: JSON.parse(JSON.stringify(location.coordinates)),
         regionResolution: location.region.resolution,
         regionSize: location.region.size
       }
@@ -173,7 +208,7 @@ export class MainComponent implements OnInit {
   startWeatherImageGeneration(): void {
     const sessionData = this.sessionService.getLatestSessionData();
 
-    const region = sessionData.mainData.selectedRegion || this.customLocation;
+    const region = this.locationsService.getLocations()[sessionData.mainData.selectedRegionIndex] || this.customLocation;
     const dataGathererName: DataGathererName = "OpenMeteo";
     const weatherConditionId = "temperature_c";
     const forecast_length = 12;
@@ -188,12 +223,21 @@ export class MainComponent implements OnInit {
   }
 
   updateSessionData(): void {
+    const selectedRegion = this.locationsService.getLocations().find((location) => this.compareCoordinates(location.coordinates, this.usedCoordinates)) || undefined;
+    this.selectedRegionIndex = selectedRegion ? this.locationsService.getLocations().indexOf(selectedRegion) : -1;
+    console.log('Selected region index:', this.selectedRegionIndex, 'Used coordinates:', this.usedCoordinates);
+
+    if(this.selectedRegionIndex == -1)
+      this.regionInDropdown = this.customLocation;
+    else
+      this.regionInDropdown = this.locationsService.getLocations()[this.selectedRegionIndex];
+
     this.sessionService.updateSessionData({
       mainData: {
         currentWeatherImageIndex: this.latestMainSessionData.currentWeatherImageIndex,
         numberOfWeatherImages: this.latestMainSessionData.numberOfWeatherImages,
-        selectedRegion: this.selectedRegion,
-        usedLocation: this.usedLocation,
+        selectedRegionIndex: this.selectedRegionIndex,
+        usedLocation: this.usedCoordinates,
         regionResolution: this.latestMainSessionData.regionResolution,
         regionSize: this.latestMainSessionData.regionSize,
         forecastLength: this.latestMainSessionData.forecastLength,
@@ -204,5 +248,14 @@ export class MainComponent implements OnInit {
 
   getDataSourcesList(): string[] {
     return ['OpenMeteo', 'BrightSky'];
+  }
+
+  mapPanToLocation(): void {
+    if(this.mapComponent)
+      this.mapComponent.panToSelectedLocation(true);
+  }
+
+  private compareCoordinates(a: SimpleLocation, b: SimpleLocation): boolean {
+    return a.latitude == b.latitude && a.longitude == b.longitude;
   }
 }

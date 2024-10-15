@@ -59,21 +59,32 @@ export class MapComponent implements AfterViewInit {
             .on('click', () => this.onMarkerClick(i))
         )
       }
+
+      this.panToSelectedLocation();
     })
 
     this.sessionService.getSessionDataObservable().subscribe((sessionData) => {
       this.markers.forEach((marker, index) => {
-        const sessionLocationIndex = this.locationsService.getLocations().findIndex((location) => location.name === sessionData.mainData.selectedRegion?.name);
-        const locationIndex = sessionLocationIndex === -1 ? this.settingsService.getSettings().defaultLocationIndex : sessionLocationIndex;
+        const locationIndex = sessionData.mainData.selectedRegionIndex === -1 ? this.settingsService.getSettings().defaultLocationIndex : sessionData.mainData.selectedRegionIndex;
         const icon = index === locationIndex ? this.markerIconSelected : this.markerIcon;
 
         marker.setIcon(icon);
       });
+
+      this.panToSelectedLocation();
     });
   }
 
   ngAfterViewInit() {
     this.initMap();
+  }
+
+  public panToSelectedLocation(animate: boolean = true) {
+    const sessionData = this.sessionService.getLatestSessionData();
+
+    let coordinates = sessionData.mainData.selectedRegionIndex === -1 ? sessionData.mainData.usedLocation : this.locationsService.getLocations()[sessionData.mainData.selectedRegionIndex].coordinates;
+
+    this.map?.setView([ coordinates.latitude, coordinates.longitude ], 10, { animate, duration: 1 });
   }
 
   private initMap() {
@@ -100,7 +111,7 @@ export class MapComponent implements AfterViewInit {
     this.sessionService.updateSessionData({
       mainData: {
         ...this.sessionService.getLatestSessionData().mainData,
-        selectedRegion: selectedLocation,
+        selectedRegionIndex: selectedLocation ? index : -1,
         usedLocation: selectedLocation.coordinates,
         regionResolution: selectedLocation.region.resolution,
         regionSize: selectedLocation.region.size

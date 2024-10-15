@@ -7,7 +7,7 @@ export type SessionData = {
 export type MainData = {
   currentWeatherImageIndex: number;
   numberOfWeatherImages: number;
-  selectedRegion: Region | undefined;
+  selectedRegionIndex: number;
   usedLocation: SimpleLocation;
   regionResolution: number;
   regionSize: Region['region']['size'];

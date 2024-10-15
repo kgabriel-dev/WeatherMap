@@ -1,12 +1,11 @@
 <div class="flex flex-row gap-4 p-4" style="width: 100%; height: 100%">
   <div class="flex flex-column flex-grow-1 gap-2 pr-4 border-right-2 border-primary-500 h-full">
-    <!-- <img style="object-fit: contain; max-height: 87vh;" #weatherImage [src]="currentWeatherImageSrc" /> -->
-     <app-map style="width: 100%; height: 100%"></app-map>
+     <app-map #mapComponent style="width: 100%; height: 100%"></app-map>
 
     <!-- spacing -->
     <div class="flex-grow-1"></div>
 
-    <div class="flex flex-row align-items-center gap-4 pl-4" style="height: 30px;">
+    <div class="flex flex-row align-items-center gap-4" style="height: 30px;">
       <p-progressBar [value]="((latestMainSessionData.currentWeatherImageIndex + 1) / latestMainSessionData.numberOfWeatherImages) * 100" class="w-full">
         <ng-template pTemplate="content">
           <span>{{latestMainSessionData.currentWeatherImageIndex + 1}} / {{latestMainSessionData.numberOfWeatherImages}}</span>
@@ -24,39 +23,56 @@
   <div class="flex flex-column flex-grow-0 gap-3 h-full" style="width: 20%; min-width: 180px; max-width: 350px;">
     <div class="flex flex-column flex-grow-1 gap-3 pr-4 overflow-y-auto">
       <label for="location">Location:</label>
-      <p-dropdown
-        #locationDropdown
-        [options]="getLocationsList()"
-        [(ngModel)]="selectedRegion"
-        (onChange)="applyLocation()"
-        optionLabel="name"
-        placeholder="Select a location"
-        [style]="{'width': '100%'}"
-      />
+      <div class="w-full flex gap-1">
+          <div class="flex-grow-1">
+            <p-dropdown
+              #locationDropdown
+              [options]="getLocationsList()"
+              [(ngModel)]="regionInDropdown"
+              (onChange)="applyLocation(regionInDropdown)"
+              optionLabel="name"
+              placeholder="Select a location"
+              styleClass="w-full"
+            />
+          </div>
 
-      <label for="latitude">Latitude:</label>
-      <p-inputNumber
-        (onInput)="updateSessionData()"
-        inputId="latitude"
-        [(ngModel)]="usedLocation.latitude"
-        mode="decimal"
-        [minFractionDigits]="0"
-        [maxFractionDigits]="6"
-        [inputStyle]="{'width': '100%'}"
-        styleClass="w-full"
-      />
+          <p-button
+            (onClick)="mapPanToLocation()"
+            icon="pi pi-map-marker"
+            [style]="{'color': 'var(--primary-color)'}"
+            styleClass="surface-100 hover:bg-primary border-transparent"
+            pTooltip="Click to center the map on the selected location."
+          />
+        </div>
 
-      <label for="longitude">Latitude:</label>
-      <p-inputNumber
-        (onInput)="updateSessionData()"
-        inputId="longitude"
-        [(ngModel)]="usedLocation.longitude"
-        mode="decimal"
-        [minFractionDigits]="0"
-        [maxFractionDigits]="6"
-        [inputStyle]="{'width': '100%'}"
-        styleClass="w-full"
-      />
+      <div class="flex flex-col text-center">
+        <div>
+          <label for="latitude">Latitude:</label>
+          <p-inputNumber
+            inputId="latitude"
+            [(ngModel)]="usedCoordinates.latitude"
+            (onInput)="updateSessionData()"
+            mode="decimal"
+            [minFractionDigits]="0"
+            [maxFractionDigits]="6"
+            [inputStyle]="{'width': '100%', 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)'}"
+            styleClass="w-full"
+          />
+        </div>
+        <div>
+          <label for="longitude">Longitude:</label>
+          <p-inputNumber
+            inputId="longitude"
+            [(ngModel)]="usedCoordinates.longitude"
+            (onInput)="updateSessionData()"
+            mode="decimal"
+            [minFractionDigits]="0"
+            [maxFractionDigits]="6"
+            [inputStyle]="{'width': '100%', 'border-radius': '0 var(--border-radius) var(--border-radius) 0'}"
+            styleClass="w-full border-left-none"
+          />
+        </div>
+      </div>
 
       <label for="size">Size:</label>
       <div class="flex flex-row">
