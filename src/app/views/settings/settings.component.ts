@@ -7,13 +7,13 @@ import { DividerModule } from 'primeng/divider';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { TabViewModule } from 'primeng/tabview';
-import timezones, { TimeZone } from 'timezones-list';
 import { SettingsService } from '../../services/settings/settings.service';
 import { LocationService } from '../../services/location/location.service';
 import { ListboxModule } from 'primeng/listbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessagesModule } from 'primeng/messages';
+import { getTimeZones, TimeZone } from '@vvo/tzdb';
 
 @Component({
   selector: 'app-settings',
@@ -36,8 +36,8 @@ import { MessagesModule } from 'primeng/messages';
 })
 export class SettingsComponent {
   // variables for the selected timezone
-  readonly timezones = this.buildTimezoneList();
-  selectedTimezoneCode: string = this.timezones[0].items[0].tzCode;
+  readonly timezoneList = this.buildTimezoneList();
+  selectedTimezoneCode: string = this.timezoneList[0].items[0].abbreviation;
 
   // variables for the selected data source
   readonly dataSources: SelectItemGroup[] = [
@@ -117,10 +117,12 @@ export class SettingsComponent {
 
     // load and set the initial settings
     settingsService.getSettingsChangedObservable().subscribe((settings) => {
-      this.selectedTimezoneCode = settings.timezoneCode || this.timezones[0].items[0].tzCode;
+      this.selectedTimezoneCode = settings.timezoneCode || this.timezoneList[0].items[0].abbreviation;
       this.selectedDataSource = settings.weatherCondition;
       this.selectedLanguageKey = settings.languageCode || this.languages[0].key;
       this.forecastLength = settings.forecastLength || this.forecastLength;
+
+      console.log(this.selectedTimezoneCode);
     });
 
     // display a message while loading the locations file
@@ -172,8 +174,8 @@ export class SettingsComponent {
 
   private buildTimezoneList(): TimezoneList {
     const timezoneGroups: { label: string, timezones: TimeZone[] }[] = [];
-    timezones.forEach(timezone => {
-      const continent = timezone.label.split('/')[0];
+    getTimeZones().forEach(timezone => {
+      const continent = timezone.continentName
 
       let continentGroup = timezoneGroups.find(group => group.label === continent);
 
@@ -197,9 +199,9 @@ export class SettingsComponent {
   }
 
   getTimeZoneByCode(code: string): TimeZone {
-    return this.timezones
+    return this.timezoneList
       .flatMap(group => group.items)
-      .find(timezone => timezone.tzCode === code) || this.timezones[0].items[0];
+      .find(timezone => timezone.abbreviation === code) || this.timezoneList[0].items[0];
   }
 
   setWorkingLocation(locationIndex: number) {

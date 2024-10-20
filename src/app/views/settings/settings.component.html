@@ -28,13 +28,13 @@
 
     <p>Timezone:</p>
     <p-dropdown
-      [options]="timezones"
-      optionValue="tzCode"
-      optionLabel="label"
+      [options]="timezoneList"
+      optionValue="name"
+      optionLabel="name"
       [group]="true"
       styleClass="w-full"
       [filter]="true"
-      filterBy="label"
+      filterBy="name"
       [style]="{'z-index': '2'}"
       [(ngModel)]="selectedTimezoneCode" >
 
@@ -119,7 +119,7 @@
 
             <p>Timezone:</p>
             <p-dropdown
-              [options]="timezones"
+              [options]="timezoneList"
               optionValue="tzCode"
               optionLabel="label"
               [group]="true"
