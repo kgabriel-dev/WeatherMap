@@ -20,9 +20,7 @@ import { TooltipModule } from 'primeng/tooltip';
   templateUrl: './main.component.html',
   styleUrl: './main.component.scss'
 })
-export class MainComponent implements OnInit {
-  readonly filePath = 'D:\\Programmieren\\Electron\\WeatherMap\\image_0.png';
-
+export class MainComponent {
   latestMainSessionData: MainData;
   selectedRegionIndex: number = -1;
   usedCoordinates: SimpleLocation = {
@@ -48,6 +46,7 @@ export class MainComponent implements OnInit {
   }
 
   regionInDropdown = this.customLocation;
+  weatherImages: { date: Date, filename: string }[] = [];
 
   @ViewChild('locationDropdown') locationDropdown?: Dropdown;
   @ViewChild('mapComponent') mapComponent?: MapComponent
@@ -143,8 +142,6 @@ export class MainComponent implements OnInit {
     })
   }
 
-  ngOnInit(): void { }
-
   changeWeatherImageIndex(amount: number): void {
     const sessionData = this.sessionService.getLatestSessionData();
 
@@ -165,6 +162,24 @@ export class MainComponent implements OnInit {
         currentWeatherImageIndex
       }
     });
+
+    this.updateWeatherImageOnMap();
+  }
+
+  setWeatherImageIndex(value: number): void {
+    const sessionData = this.sessionService.getLatestSessionData();
+
+    if(value < 0 || value >= sessionData.mainData.numberOfWeatherImages)
+      value = 0;
+
+    this.sessionService.updateSessionData({
+      mainData: {
+        ...sessionData.mainData,
+        currentWeatherImageIndex: value
+      }
+    });
+
+    this.updateWeatherImageOnMap();
   }
 
   pauseWeatherImageAnimation(): void {}
@@ -208,7 +223,16 @@ export class MainComponent implements OnInit {
   startWeatherImageGeneration(): void {
     const sessionData = this.sessionService.getLatestSessionData();
 
-    const region = this.locationsService.getLocations()[sessionData.mainData.selectedRegionIndex] || this.customLocation;
+    const region: Region = {
+      id: -1,
+      coordinates: sessionData.mainData.usedLocation,
+      name: '',
+      region: {
+        resolution: sessionData.mainData.regionResolution,
+        size: sessionData.mainData.regionSize
+      },
+      timezoneCode: this.settingsService.getSettings().timezoneCode
+    }
     const dataGathererName: DataGathererName = "OpenMeteo";
     const weatherConditionId = "temperature_c";
     const forecast_length = 12;
@@ -216,6 +240,17 @@ export class MainComponent implements OnInit {
     window.weather.generateWeatherImagesForRegion(region, dataGathererName, weatherConditionId, forecast_length)
       .then((images) => {
         console.log('Images generated:', images);
+
+        this.sessionService.updateSessionData({
+          mainData: {
+            ...sessionData.mainData,
+            numberOfWeatherImages: images.length
+          }
+        });
+
+        this.weatherImages = images;
+        this.setWeatherImageIndex(0);
+        this.updateWeatherImageOnMap();
       })
       .catch((error) => {
         console.error('Error generating images:', error);
@@ -246,13 +281,23 @@ export class MainComponent implements OnInit {
     })
   }
 
+  updateWeatherImageOnMap(): void {
+    let sessionData = this.sessionService.getLatestSessionData();
+
+    if(sessionData.mainData.currentWeatherImageIndex >= sessionData.mainData.numberOfWeatherImages)
+      this.setWeatherImageIndex(0);
+      sessionData = this.sessionService.getLatestSessionData();
+
+    this.mapComponent?.overlayWeatherImage(this.weatherImages[sessionData.mainData.currentWeatherImageIndex].filename);
+  }
+
   getDataSourcesList(): string[] {
     return ['OpenMeteo', 'BrightSky'];
   }
 
   mapPanToLocation(): void {
     if(this.mapComponent)
-      this.mapComponent.panToSelectedLocation(true);
+      this.mapComponent.fitRegionToScreen();
   }
 
   private compareCoordinates(a: SimpleLocation, b: SimpleLocation): boolean {

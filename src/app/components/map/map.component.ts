@@ -31,6 +31,7 @@ export class MapComponent implements AfterViewInit {
   })
 
   markers: L.Marker[] = [];
+  overlayedImage: L.ImageOverlay | undefined;
 
   constructor(
     private locationsService: LocationService,
@@ -60,7 +61,7 @@ export class MapComponent implements AfterViewInit {
         )
       }
 
-      this.panToSelectedLocation();
+      this.fitRegionToScreen();
     })
 
     this.sessionService.getSessionDataObservable().subscribe((sessionData) => {
@@ -71,20 +72,12 @@ export class MapComponent implements AfterViewInit {
         marker.setIcon(icon);
       });
 
-      this.panToSelectedLocation();
+      this.fitRegionToScreen();
     });
   }
 
   ngAfterViewInit() {
     this.initMap();
-  }
-
-  public panToSelectedLocation(animate: boolean = true) {
-    const sessionData = this.sessionService.getLatestSessionData();
-
-    let coordinates = sessionData.mainData.selectedRegionIndex === -1 ? sessionData.mainData.usedLocation : this.locationsService.getLocations()[sessionData.mainData.selectedRegionIndex].coordinates;
-
-    this.map?.setView([ coordinates.latitude, coordinates.longitude ], 10, { animate, duration: 1 });
   }
 
   private initMap() {
@@ -118,5 +111,54 @@ export class MapComponent implements AfterViewInit {
       }
     })
   };
+
+  overlayWeatherImage(filePath: string): void {
+    if(!this.map) return;
+
+    const sessionData = this.sessionService.getLatestSessionData();
+
+    const location = sessionData.mainData.selectedRegionIndex === -1 ? sessionData.mainData.usedLocation : this.locationsService.getLocations()[sessionData.mainData.selectedRegionIndex].coordinates;
+    const regionSizeLat = this.convertRegionSizeToKm(sessionData.mainData.regionSize) / 110.574;
+    const regionSizeLon = this.convertRegionSizeToKm(sessionData.mainData.regionSize) / (111.32 * Math.cos(location.latitude * Math.PI / 180));
+
+    const imageBounds = L.latLngBounds(
+      [ location.latitude - regionSizeLat / 2, location.longitude - regionSizeLon / 2 ],
+      [ location.latitude + regionSizeLat / 2, location.longitude + regionSizeLon / 2 ]
+    )
+
+    if(this.overlayedImage)
+      this.map.removeLayer(this.overlayedImage);
+
+    this.overlayedImage = L.imageOverlay(filePath, imageBounds, { opacity: 0.7 }).addTo(this.map);
+
+    this.fitRegionToScreen();
+  }
+
+  convertRegionSizeToKm(regionSize: { length: number; unit: string }): number {
+    if(regionSize.unit === 'km')
+      return regionSize.length;
+
+    return regionSize.length * 1.60934;
+  }
+
+  fitRegionToScreen(): void {
+    if(!this.map) return;
+
+    const sessionData = this.sessionService.getLatestSessionData();
+
+    const location = sessionData.mainData.selectedRegionIndex === -1 ? sessionData.mainData.usedLocation : this.locationsService.getLocations()[sessionData.mainData.selectedRegionIndex].coordinates;
+    const regionSizeKm = this.convertRegionSizeToKm(sessionData.mainData.regionSize);
+
+    const regionSizeLat = (regionSizeKm + 1) / 110.574;
+    const regionSizeLon = (regionSizeKm + 1) / (111.32 * Math.cos(location.latitude * Math.PI / 180));
+
+    this.map.fitBounds(
+      [
+        [ location.latitude - regionSizeLat / 2, location.longitude - regionSizeLon / 2 ],
+        [ location.latitude + regionSizeLat / 2, location.longitude + regionSizeLon / 2 ]
+      ],
+      { animate: true, duration: 1 }
+    );
+  }
 
 }
