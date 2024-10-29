@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { ImageModule } from 'primeng/image';
-import { ProgressBarModule } from 'primeng/progressbar';
+import { ProgressBar, ProgressBarModule } from 'primeng/progressbar';
 import { LocationService } from '../../services/location/location.service';
 import { Dropdown, DropdownModule } from 'primeng/dropdown';
 import { FormsModule } from '@angular/forms';
@@ -22,6 +22,7 @@ import { TooltipModule } from 'primeng/tooltip';
 })
 export class MainComponent {
   latestMainSessionData: MainData;
+  latestWeatherDataProgress?: WeatherDataResponse;
   selectedRegionIndex: number = -1;
   usedCoordinates: SimpleLocation = {
     latitude: 0,
@@ -54,7 +55,8 @@ export class MainComponent {
   constructor(
     public locationsService: LocationService,
     public settingsService: SettingsService,
-    public sessionService: SessionService
+    public sessionService: SessionService,
+    private  changeDetectorRef: ChangeDetectorRef
   ) {
     this.latestMainSessionData = this.sessionService.getLatestSessionData().mainData;
     this.sessionService.getSessionDataObservable().subscribe((sessionData) => {
@@ -111,6 +113,14 @@ export class MainComponent {
           regionSize: selectedLocation.region.size
         }
       });
+    });
+
+    window.weather.onWeatherGenerationProgress((inProgress: boolean, progressValue: number, progressMessage: string) => {
+      this.latestWeatherDataProgress = {
+        inProgress,
+        progress: progressValue,
+        message: progressMessage
+      };
     });
 
     // set the default location to the one saved in the settings
@@ -221,6 +231,12 @@ export class MainComponent {
   }
 
   startWeatherImageGeneration(): void {
+    this.latestWeatherDataProgress = {
+      inProgress: true,
+      progress: 0,
+      message: 'Starting weather image generation'
+    }
+
     const sessionData = this.sessionService.getLatestSessionData();
 
     const region: Region = {

@@ -1,4 +1,5 @@
-const { contextBridge, ipcRenderer, app } = require('electron');
+const { contextBridge, ipcRenderer } = require('electron');
+const { on } = require('events');
 
 contextBridge.exposeInMainWorld('versions', {
   node: () => process.versions.node,
@@ -18,5 +19,6 @@ contextBridge.exposeInMainWorld('app', {
 });
 
 contextBridge.exposeInMainWorld('weather', {
-  generateWeatherImagesForRegion: (region, dataGatherer, weatherCondition, forecastLength) => ipcRenderer.invoke('generate-weather-images-for-region', region, dataGatherer, weatherCondition, forecastLength)
+  generateWeatherImagesForRegion: (region, dataGatherer, weatherCondition, forecastLength) => ipcRenderer.invoke('generate-weather-images-for-region', region, dataGatherer, weatherCondition, forecastLength),
+  onWeatherGenerationProgress: (callback) => ipcRenderer.on('weather-generation-progress-update', (_event, inProgress, progressValue, progressMessage) => callback(inProgress, progressValue, progressMessage))
 });

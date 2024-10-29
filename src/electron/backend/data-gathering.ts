@@ -1,10 +1,10 @@
-import * as https from 'https';
+import { sendWeatherGenerationProgressUpdate } from './../utils';
 
 export class OpenMeteoDataGatherer implements DataGatherer {
   readonly API_URL = "https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly={category}&forecast_hours={hours}&timezone={timezone}";
   readonly REQUEST_DELAY = 300; // time in ms to wait between two requests
 
-  gatherData(region: Region, condition: WeatherCondition, forecast_hours: number): Promise<WeatherData[]> {
+  gatherData(region: Region, condition: WeatherCondition, forecast_hours: number, progressPerStep: number): Promise<WeatherData[]> {
     if(!this.listAvailableWeatherConditions().find((availableCondition) => availableCondition.id === condition.id))
       throw new Error('The selected Weather Condition not available');
 
@@ -26,7 +26,7 @@ export class OpenMeteoDataGatherer implements DataGatherer {
         }
       }
 
-      this.requestApiUrls(requests)
+      this.requestApiUrls(requests, progressPerStep)
         .then((data) => {
           resolve(data);
         })
@@ -36,8 +36,11 @@ export class OpenMeteoDataGatherer implements DataGatherer {
     });
   }
 
-  private async requestApiUrls(dataList: { lat: number, lon: number, api: string, hours: number, tz: string }[]): Promise<WeatherData[]> {
+  private async requestApiUrls(dataList: { lat: number, lon: number, api: string, hours: number, tz: string }[], progressPerStep: number): Promise<WeatherData[]> {
     const weatherData: WeatherData[] = [];
+
+    // get the current progress
+    let progress = 0;
 
     for(const data of dataList) {
       const url = this.API_URL
@@ -71,6 +74,9 @@ export class OpenMeteoDataGatherer implements DataGatherer {
         }
 
         console.log(`Request for ${data.lat}, ${data.lon} successful`);
+        progress += progressPerStep;
+        sendWeatherGenerationProgressUpdate(true, progress, `Request for location #${dataList.indexOf(data) + 1} successful`);
+
         await delay(this.REQUEST_DELAY);
       }
       catch(error) {

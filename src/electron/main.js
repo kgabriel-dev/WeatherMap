@@ -6,9 +6,11 @@ const url = require('node:url')
 const fs = require('node:fs')
 const { generateWeatherImageForLocation } = require('./backend/image-generation')
 
+let mainWindow;
+
 const createWindow = () => {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1280,
     height: 720,
     show: false,
@@ -109,7 +111,9 @@ const createWindow = () => {
       height: 600,
       show: false,
       webPreferences: {
-        preload: path.join(__dirname, 'preload.js')
+        preload: path.join(__dirname, 'preload.js'),
+        nodeIntegration: true,
+        contextIsolation: false
       }
     });
 
@@ -176,6 +180,10 @@ ipcMain.handle('write-app-file', (event, filePath, data, encoding) => {
 
 ipcMain.handle('generate-weather-images-for-region', (event, region, dataGatherer, weatherCondition, forecastLength) => {
   return generateWeatherImageForLocation(region, dataGatherer, weatherCondition, forecastLength);
+});
+
+ipcMain.on('weather-generation-progress', (inProgress, progressValue, progressMessage) => {
+  mainWindow.webContents.send('weather-generation-progress-update', inProgress, progressValue, progressMessage);
 });
 
 // Helper functions

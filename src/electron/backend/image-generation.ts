@@ -1,8 +1,9 @@
 import { createCanvas } from "@napi-rs/canvas";
 import { OpenMeteoDataGatherer } from "./data-gathering";
-import * as fs from 'fs';
-
-const { app } = require('electron');
+import { app, ipcMain } from 'electron';
+import fs from 'node:fs';
+import { sendWeatherGenerationProgressUpdate } from "../utils";
+import { send } from "node:process";
 
 export function generateWeatherImageForLocation(region: Region, dataGathererName: DataGathererName, weatherConditionId: string, forecast_length: number): Promise<{ date: string, filename: string }[]> {
   const dataGatherer = getDataGatherer(dataGathererName);
@@ -13,6 +14,8 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
     if(!weatherCondition)
       reject('Unknown weather condition id');
 
+    let progress = 0;
+    sendWeatherGenerationProgressUpdate(true, progress, 'Deleting the old weather images');
     // check if the WeatherMap dir in the temp dir exists, if not create it
     // and if it exists, delete all files in it
     const dir = `${app.getPath('temp')}/WeatherMap`;
@@ -21,9 +24,16 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
     else
       fs.readdirSync(dir).forEach((file) => fs.unlinkSync(`${dir}/${file}`));
 
+    // calculate the progress for the data gathering
+    const numberOfLocations = region.region.resolution * region.region.resolution;
+    const numberOfImages = forecast_length;
+    const progressPerStep = 100 / (numberOfLocations + numberOfImages + 1); // how much progress is made per step (location or image); +1 for the final step
+
     // gather the data for the location
-    dataGatherer.gatherData(region, weatherCondition!, forecast_length)
+    dataGatherer.gatherData(region, weatherCondition!, forecast_length, progressPerStep)
       .then((weatherData) => {
+        progress += progressPerStep * numberOfLocations;
+        sendWeatherGenerationProgressUpdate(true, progress, 'Data gathering finished. Converting data now');
 
         // convert the data from weather over space in a time range to weather over time at a location
         const weatherDataOverTime: { [timeIndex: number]: { weatherCondition: WeatherCondition, weatherValue: number, location: SimpleLocation }[] } = {};
@@ -90,6 +100,9 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
             reject('Failed to create context');
           }
 
+          progress += progressPerStep;
+          sendWeatherGenerationProgressUpdate(true, progress, `Creating image #${timeIndex + 1}`);
+
           canvas.width = region.region.resolution * 64;
           canvas.height = region.region.resolution * 64;
 
@@ -115,6 +128,9 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
             console.error('Failed to write file', error);
           }
         }
+
+        progress = 100;
+        sendWeatherGenerationProgressUpdate(false, progress, 'Finished data gathering and image creation!');
         resolve(imagesToReturn);
       })
       .catch((error) => {

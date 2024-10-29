@@ -1,6 +1,6 @@
 declare interface DataGatherer {
   getName: () => string;
-  gatherData: (region: Region, condition: WeatherCondition, forecast_hours: number) => Promise<WeatherData[]>;
+  gatherData: (region: Region, condition: WeatherCondition, forecast_hours: number, progressPerStep: number) => Promise<WeatherData[]>;
   listAvailableWeatherConditions: () => WeatherCondition[];
 }
 
@@ -20,3 +20,9 @@ declare type WeatherCondition = {
 }
 
 declare type DataGathererName = 'OpenMeteo' | 'BrightSky';
+
+declare type WeatherDataResponse = {
+  inProgress: boolean;
+  progress: number;
+  message: string;
+}
