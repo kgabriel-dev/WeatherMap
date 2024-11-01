@@ -24,7 +24,8 @@ export class SessionService {
         value: 12,
         unit: 'hours'
       },
-      weatherDataSource: 'OpenMeteo'
+      weatherDataSource: 'OpenMeteo',
+      weatherCondition: { condition: 'Cloud Coverage', id: 'cloud_cover', api: 'cloud_cover', min: 0, max: 100 }
     }
   });
 

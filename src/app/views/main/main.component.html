@@ -129,12 +129,16 @@
       <p-dropdown
         [options]="getDataSourcesList()"
         [(ngModel)]="latestMainSessionData.weatherDataSource"
+        (onChange)="updateSessionData()"
         [style]="{'width': '100%'}" />
 
       <label for="condition">Condition:</label>
       <p-dropdown
         inputId="condition"
-        [options]="['Cloudiness (%)']"
+        optionLabel="condition"
+        [options]="getWeatherConditionsList()"
+        [(ngModel)]="latestMainSessionData.weatherCondition"
+        (onChange)="updateSessionData()"
         [style]="{'width': '100%'}" />
     </div>
 

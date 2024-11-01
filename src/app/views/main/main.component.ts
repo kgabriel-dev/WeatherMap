@@ -6,7 +6,7 @@ import { LocationService } from '../../services/location/location.service';
 import { Dropdown, DropdownModule } from 'primeng/dropdown';
 import { FormsModule } from '@angular/forms';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { SettingsService } from '../../services/settings/settings.service';
+import { Settings, SettingsService } from '../../services/settings/settings.service';
 import { combineLatestWith, map } from 'rxjs';
 import { MapComponent } from '../../components/map/map.component';
 import { SessionService } from '../../services/session/session.service';
@@ -122,7 +122,7 @@ export class MainComponent {
         message: progressMessage
       };
 
-      changeDetectorRef.detectChanges();
+      this.changeDetectorRef.detectChanges();
     });
 
     // set the default location to the one saved in the settings
@@ -176,6 +176,7 @@ export class MainComponent {
     });
 
     this.updateWeatherImageOnMap();
+    this.changeDetectorRef.detectChanges();
   }
 
   setWeatherImageIndex(value: number): void {
@@ -192,6 +193,7 @@ export class MainComponent {
     });
 
     this.updateWeatherImageOnMap();
+    this.changeDetectorRef.detectChanges();
   }
 
   pauseWeatherImageAnimation(): void {}
@@ -247,9 +249,10 @@ export class MainComponent {
       },
       timezoneCode: this.locationsService.getLocations().find((location) => location.id === sessionData.mainData.selectedRegionIndex)?.timezoneCode || 'UTC'
     }
-    const dataGathererName: DataGathererName = "OpenMeteo";
-    const weatherConditionId = "temperature_c";
-    const forecast_length = 12;
+
+    const dataGathererName = sessionData.mainData.weatherDataSource;
+    const weatherConditionId = sessionData.mainData.weatherCondition.id;
+    const forecast_length = this.convertTimelengthToHours(sessionData.mainData.forecastLength.value, sessionData.mainData.forecastLength.unit);
 
     window.weather.generateWeatherImagesForRegion(region, dataGathererName, weatherConditionId, forecast_length)
       .then((images) => {
@@ -288,7 +291,8 @@ export class MainComponent {
         regionResolution: this.latestMainSessionData.regionResolution,
         regionSize: this.latestMainSessionData.regionSize,
         forecastLength: this.latestMainSessionData.forecastLength,
-        weatherDataSource: this.latestMainSessionData.weatherDataSource
+        weatherDataSource: this.latestMainSessionData.weatherDataSource,
+        weatherCondition: this.latestMainSessionData.weatherCondition
       }
     })
   }
@@ -322,5 +326,35 @@ export class MainComponent {
 
   cancelWeatherImageGeneration(): void {
     window.weather.cancelWeatherImageGeneration();
+  }
+
+  getWeatherConditionsList(): WeatherCondition[] {
+    if(this.latestMainSessionData.weatherDataSource == 'OpenMeteo')
+      return [
+        { condition: 'Temperature (°C)', id: 'temperature_c', api: 'temperature_2m', min: -1, max: -1 },
+        { condition: 'Cloud Coverage', id: 'cloud_cover', api: 'cloud_cover', min: 0, max: 100 },
+        { condition: 'Relative Humidity', id: 'relative_humidity', api: 'relative_humidity_2m', min: 0, max: 100 },
+        { condition: 'Cloud Coverage (low)', id: 'cloud_cover_low', api: 'cloud_cover_low', min: 0, max: 100 },
+        { condition: 'Cloud Coverage (mid)', id: 'cloud_cover_mid', api: 'cloud_cover_mid', min: 0, max: 100 },
+        { condition: 'Cloud Coverage (high)', id: 'cloud_cover_high', api: 'cloud_cover_high', min: 0, max: 100 },
+        { condition: 'Dew Point (°C)', id: 'dew_point_c', api: 'dew_point_2m', min: -1, max: -1 },
+        { condition: 'Air Pressure (msl)', id: 'air_pressure', api: 'pressure_msl', min: -1, max: -1 },
+        { condition: 'Precipitation', id: 'precipitation_value', api: 'precipitation', min: 0, max: -1 },
+        { condition: 'Precipitation Probability', id: 'precipitation_probability', api: 'precipitation_probability', min: 0, max: 100 },
+        { condition: 'Visibility (m)', id: 'visibility', api: 'visibility', min: -1, max: -1 },
+        { condition: 'UV Index', id: 'uv_index', api: 'uv_index', min: 0, max: 11 }
+      ];
+
+    return [];
+  }
+
+  private convertTimelengthToHours(value: Settings['forecastLength']['value'], unit: Settings['forecastLength']['unit']): number {
+    if(unit == 'hours')
+      return value;
+
+    if(unit == 'days')
+      return value * 24;
+
+    return 0;
   }
 }

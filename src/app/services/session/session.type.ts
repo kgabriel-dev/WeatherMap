@@ -13,4 +13,5 @@ export type MainData = {
   regionSize: Region['region']['size'];
   forecastLength: Settings['forecastLength'];
   weatherDataSource: DataGathererName;
+  weatherCondition: WeatherCondition;
 }
