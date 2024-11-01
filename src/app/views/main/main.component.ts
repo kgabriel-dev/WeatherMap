@@ -245,7 +245,7 @@ export class MainComponent {
         resolution: sessionData.mainData.regionResolution,
         size: sessionData.mainData.regionSize
       },
-      timezoneCode: this.settingsService.getSettings().timezoneCode
+      timezoneCode: this.locationsService.getLocations().find((location) => location.id === sessionData.mainData.selectedRegionIndex)?.timezoneCode || 'UTC'
     }
     const dataGathererName: DataGathererName = "OpenMeteo";
     const weatherConditionId = "temperature_c";

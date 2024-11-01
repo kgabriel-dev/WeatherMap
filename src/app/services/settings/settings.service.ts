@@ -9,7 +9,6 @@ export class SettingsService {
   private readonly defaultSettings: Settings = {
     version: '0.1.0',
     languageCode: 'en-US',
-    timezoneCode: 'America/New_York',
     weatherCondition: 'openmeteo.cloudiness',
     forecastLength: {
       value: 12,
@@ -94,7 +93,6 @@ export class SettingsService {
 export type Settings = {
   version: string,
   languageCode: string,
-  timezoneCode: string,
   weatherCondition: string,
   forecastLength: {
     value: number,

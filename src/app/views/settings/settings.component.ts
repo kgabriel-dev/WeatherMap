@@ -37,7 +37,6 @@ import { getTimeZones, TimeZone } from '@vvo/tzdb';
 export class SettingsComponent {
   // variables for the selected timezone
   readonly timezoneList = this.buildTimezoneList();
-  selectedTimezoneCode: string = this.timezoneList[0].items[0].abbreviation;
 
   // variables for the selected data source
   readonly dataSources: SelectItemGroup[] = [
@@ -117,7 +116,6 @@ export class SettingsComponent {
     console.log(this.timezoneList)
     // load and set the initial settings
     settingsService.getSettingsChangedObservable().subscribe((settings) => {
-      this.selectedTimezoneCode = settings.timezoneCode || this.timezoneList[0].items[0].abbreviation;
       this.selectedDataSource = settings.weatherCondition;
       this.selectedLanguageKey = settings.languageCode || this.languages[0].key;
       this.forecastLength = settings.forecastLength || this.forecastLength;
@@ -153,7 +151,6 @@ export class SettingsComponent {
   }
 
   saveSettings() {
-    this.settingsService.setSettingsValue('timezoneCode', this.selectedTimezoneCode);
     this.settingsService.setSettingsValue('weatherCondition', this.selectedDataSource);
     this.settingsService.setSettingsValue('languageCode', this.selectedLanguageKey);
     this.settingsService.setSettingsValue('forecastLength', {

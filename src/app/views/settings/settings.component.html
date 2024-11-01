@@ -26,28 +26,6 @@
 
     <p-divider />
 
-    <p>Timezone:</p>
-    <p-dropdown
-      [options]="timezoneList"
-      optionValue="name"
-      optionLabel="name"
-      [group]="true"
-      styleClass="w-full"
-      [filter]="true"
-      filterBy="name"
-      [style]="{'z-index': '2'}"
-      [(ngModel)]="selectedTimezoneCode" >
-
-      <ng-template let-group pTemplate="group">
-        <div class="flex align-items center color-primary">
-          <span>---- {{group.label}} ----</span>
-        </div>
-      </ng-template>
-
-    </p-dropdown>
-
-    <p-divider />
-
     <p>Default weather condition:</p>
     <p-dropdown
       [options]="dataSources"
