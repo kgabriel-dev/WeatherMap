@@ -31,7 +31,7 @@ export class SettingsService {
           // write settings.json file
           window.files.writeAppFile('settings.json', JSON.stringify(this.defaultSettings, undefined, 2), 'utf8')
             .then((written) => {
-              if(written) console.log('settings.json created!');
+              if(written) console.info('settings.json created!');
               else console.error('Error creating settings.json!');
             })
             .catch((error) => {
@@ -42,7 +42,7 @@ export class SettingsService {
         // Read settings.json file
         window.files.readAppFile('settings.json', 'utf8')
         .then((data) => {
-          console.log('settings.json read!');
+          console.info('settings.json read!');
           this.settings = JSON.parse(data);
           this.settingsChangedSubject.next(this.settings);
           this.notifySettingsRead$.next(true);
@@ -60,8 +60,6 @@ export class SettingsService {
         this.settingsChangedSubject.next(this.settings);
         this.notifySettingsRead$.next(true);
       });
-
-    this.settingsChangedSubject.subscribe((settings) => console.log('Settings changed!', settings));
   }
 
   public getSettings(): Settings {
@@ -79,7 +77,7 @@ export class SettingsService {
 
   public saveSettings(): void {
     window.files.writeAppFile('settings.json', JSON.stringify(this.settings, undefined, 2), 'utf8')
-      .then(() => console.log('settings.json saved!'))
+      .then(() => console.info('settings.json saved!'))
       .catch((error) => console.error('Error saving settings.json!', error));
   }
 

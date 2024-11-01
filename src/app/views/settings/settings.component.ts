@@ -121,8 +121,6 @@ export class SettingsComponent {
       this.selectedDataSource = settings.weatherCondition;
       this.selectedLanguageKey = settings.languageCode || this.languages[0].key;
       this.forecastLength = settings.forecastLength || this.forecastLength;
-
-      console.log(this.selectedTimezoneCode);
     });
 
     // display a message while loading the locations file
@@ -207,7 +205,6 @@ export class SettingsComponent {
   setWorkingLocation(locationIndex: number) {
     // if no locations are found, add an initial location and set it
     if(this.locationsList.length === 0) {
-      console.log('No locations found. Adding initial location.');
       this.addInitialLocation();
       return; // new location will automatically be set
     }

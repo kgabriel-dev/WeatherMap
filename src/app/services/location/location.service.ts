@@ -21,7 +21,7 @@ export class LocationService {
           // write locations.json file
           window.files.writeAppFile('locations.json', '[]', 'utf8')
             .then(() => {
-              console.log('locations.json created!');
+              console.info('locations.json created!');
             })
             .catch((error) => {
               console.error('Error creating locations.json!', error);
@@ -79,7 +79,7 @@ export class LocationService {
 
   public saveLocations() {
     window.files.writeAppFile('locations.json', JSON.stringify(this.locations, undefined, 2), 'utf8')
-      .then(() => console.log('locations.json saved!'))
+      .then(() => console.info('locations.json saved!'))
       .catch((error) => console.error('Error saving locations.json!', error));
   }
 
