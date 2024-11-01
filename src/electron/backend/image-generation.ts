@@ -5,6 +5,10 @@ import fs from 'node:fs';
 import { sendWeatherGenerationProgressUpdate } from "../utils";
 import { send } from "node:process";
 
+let cancelRequested = false;
+
+ipcMain.on('cancel-weather-image-generation', (_event) => cancelRequested = true);
+
 export function generateWeatherImageForLocation(region: Region, dataGathererName: DataGathererName, weatherConditionId: string, forecast_length: number): Promise<{ date: string, filename: string }[]> {
   const dataGatherer = getDataGatherer(dataGathererName);
 
@@ -24,6 +28,12 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
     else
       fs.readdirSync(dir).forEach((file) => fs.unlinkSync(`${dir}/${file}`));
 
+    if(cancelRequested) {
+      sendWeatherGenerationProgressUpdate(false, 100, 'Cancelled by user');
+      reject('Cancelled by user.');
+      cancelRequested = false;
+    }
+
     // calculate the progress for the data gathering
     const numberOfLocations = region.region.resolution * region.region.resolution;
     const numberOfImages = forecast_length;
@@ -32,6 +42,12 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
     // gather the data for the location
     dataGatherer.gatherData(region, weatherCondition!, forecast_length, progressPerStep)
       .then((weatherData) => {
+        if(cancelRequested) {
+          sendWeatherGenerationProgressUpdate(false, 100, 'Cancelled by user');
+          reject('Cancelled by user.');
+          cancelRequested = false;
+        }
+
         progress += progressPerStep * numberOfLocations + progressPerStep;
         sendWeatherGenerationProgressUpdate(true, progress, 'Data gathering finished. Converting data now');
 
@@ -59,8 +75,21 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
           });
         });
 
+        if(cancelRequested) {
+          sendWeatherGenerationProgressUpdate(false, 100, 'Cancelled by user');
+          reject('Cancelled by user.');
+          cancelRequested = false;
+        }
+
         // gather all coordinates
         const allCoordinates = weatherData.map((data) => data.coordinates).filter((value, index, self) => self.indexOf(value) === index);
+
+
+        if(cancelRequested) {
+          sendWeatherGenerationProgressUpdate(false, 100, 'Cancelled by user');
+          reject('Cancelled by user.');
+          cancelRequested = false;
+        }
 
         // sort the coordinates to a res x res grid
         const gridCoordinates: SimpleLocation[][] = [];
@@ -84,6 +113,12 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
           }
         }
 
+        if(cancelRequested) {
+          sendWeatherGenerationProgressUpdate(false, 100, 'Cancelled by user');
+          reject('Cancelled by user.');
+          cancelRequested = false;
+        }
+
         // sort the grid
         gridCoordinates.forEach((row) => row.sort((a, b) => a.longitude - b.longitude));
         gridCoordinates.sort((a, b) => a[0].latitude - b[0].latitude);
@@ -93,11 +128,17 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
 
         // create the raster images
         for(let timeIndex = 0; timeIndex < timeList.length; timeIndex++) {
+          if(cancelRequested) {
+            sendWeatherGenerationProgressUpdate(false, 100, 'Cancelled by user');
+            reject('Cancelled by user.');
+            cancelRequested = false;
+          }
+
           const canvas = createCanvas(region.region.resolution, region.region.resolution);
           const context = canvas.getContext('2d');
 
           if(!context) {
-            reject('Failed to create context');
+            reject('Failed to create image context');
           }
 
           progress += progressPerStep;

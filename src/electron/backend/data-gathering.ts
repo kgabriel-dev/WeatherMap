@@ -1,4 +1,9 @@
 import { sendWeatherGenerationProgressUpdate } from './../utils';
+import { ipcMain } from 'electron';
+
+let cancelRequested = false;
+
+ipcMain.on('cancel-weather-image-generation', (_event) => cancelRequested = true);
 
 export class OpenMeteoDataGatherer implements DataGatherer {
   readonly API_URL = "https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly={category}&forecast_hours={hours}&timezone={timezone}";
@@ -17,6 +22,12 @@ export class OpenMeteoDataGatherer implements DataGatherer {
 
       const requests: { lat: number, lon: number, api: string, hours: number, tz: string }[] = [];
 
+      if(cancelRequested) {
+        sendWeatherGenerationProgressUpdate(false, 100, 'Cancelled by user');
+        reject('Cancelled by user.');
+        cancelRequested = false;
+      }
+
       for(let latIndex = 0; latIndex < region.region.resolution; latIndex++) {
         for(let lonIndex = 0; lonIndex < region.region.resolution; lonIndex++) {
           const lat = region.coordinates.latitude + locationOffset + latIndex * latStepSize;
@@ -26,12 +37,20 @@ export class OpenMeteoDataGatherer implements DataGatherer {
         }
       }
 
+      if(cancelRequested) {
+        sendWeatherGenerationProgressUpdate(false, 100, 'Cancelled by user');
+        reject('Cancelled by user.');
+        cancelRequested = false;
+      }
+
       this.requestApiUrls(requests, progressPerStep)
         .then((data) => {
           resolve(data);
+          cancelRequested = false;
         })
         .catch((error) => {
           reject(error);
+          cancelRequested = false;
         });
     });
   }
@@ -52,6 +71,10 @@ export class OpenMeteoDataGatherer implements DataGatherer {
 
       try {
         const response = await fetch(url);
+
+        if(cancelRequested) {
+          throw new Error('Cancelled by user.');
+        }
 
         if(!response.ok) {
           console.error(`Request failed with status code ${response.status}`);
@@ -76,10 +99,13 @@ export class OpenMeteoDataGatherer implements DataGatherer {
         progress += progressPerStep;
         sendWeatherGenerationProgressUpdate(true, progress, `Request for location #${dataList.indexOf(data) + 1} successful`);
 
+        if(cancelRequested)
+          throw new Error('Cancelled by user.');
+
         await delay(this.REQUEST_DELAY);
       }
       catch(error) {
-        console.error(error);
+        return [];
       }
     }
 

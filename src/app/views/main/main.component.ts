@@ -319,4 +319,8 @@ export class MainComponent {
   openProgressInfoWindow(): void {
     window.app.openProgressInfoWindow();
   }
+
+  cancelWeatherImageGeneration(): void {
+    window.weather.cancelWeatherImageGeneration();
+  }
 }

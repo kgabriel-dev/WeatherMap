@@ -225,7 +225,14 @@ ipcMain.handle('open-progress-info-window', (_event) => {
   progressWindow.on('closed', () => {
     progressWindow = null;
   });
-})
+});
+
+ipcMain.handle('cancel-weather-image-generation', (_event) => {
+  ipcMain.emit('cancel-weather-image-generation');
+});
+ipcMain.on('canceled-weather-image-generation', (_event) => {
+  ipcMain.emit('weather-generation-progress', false, 100, 'Weather image generation cancelled by user.');
+});
 
 // Helper functions
 function readFile(filePath, encoding) {

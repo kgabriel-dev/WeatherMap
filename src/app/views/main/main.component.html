@@ -14,7 +14,7 @@
         </p-progressBar>
 
         <p-button label="Info" (onClick)="openProgressInfoWindow()" styleClass="w-full" />
-        <p-button label="Cancel" styleClass="w-full" />
+        <p-button label="Cancel" styleClass="w-full" (onClick)="cancelWeatherImageGeneration()" />
       }
       @else {
         <p-progressBar [value]="((latestMainSessionData.currentWeatherImageIndex + 1) / latestMainSessionData.numberOfWeatherImages) * 100" class="w-full">

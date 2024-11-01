@@ -25,7 +25,8 @@ interface Window {
     generateWeatherImagesForRegion: (region: Region, dataGatherer: DataGathererName, weatherConditionId: string, forecast_length: number) => Promise<{ date: Date, filename: string }[]>,
     onWeatherGenerationProgress: (callback: CallableFunction) => void,
     sendWeatherGenerationProgress: (inProgress: boolean, progressValue: number, progressMessage: string) => void,
-    getLatestProgressMessages: () => Promise<WeatherDataResponse[]>
+    getLatestProgressMessages: () => Promise<WeatherDataResponse[]>,
+    cancelWeatherImageGeneration: () => void
   }
 }
 
