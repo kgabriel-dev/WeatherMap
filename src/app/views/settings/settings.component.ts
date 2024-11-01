@@ -114,7 +114,7 @@ export class SettingsComponent {
     public settingsService: SettingsService,
     public locationsService: LocationService
   ) {
-
+    console.log(this.timezoneList)
     // load and set the initial settings
     settingsService.getSettingsChangedObservable().subscribe((settings) => {
       this.selectedTimezoneCode = settings.timezoneCode || this.timezoneList[0].items[0].abbreviation;
@@ -202,19 +202,12 @@ export class SettingsComponent {
       .find(timezone => timezone.abbreviation === code) || this.timezoneList[0].items[0];
   }
 
-  setWorkingLocation(locationIndex: number) {
+  setWorkingLocation(locationId: number) {
     // if no locations are found, add an initial location and set it
     if(this.locationsList.length === 0) {
       this.addInitialLocation();
       return; // new location will automatically be set
     }
-
-    let locationId: number;
-    // if there is no location at the given index, set the first location
-    if(!locationIndex || this.locationsList.length < locationIndex)
-      locationId = this.locationsList[0].id;
-    else
-      locationId = this.locationsList[locationIndex].id;
 
     // make a copy of the location to avoid changing the original
     this.workingLocation = JSON.parse(
