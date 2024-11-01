@@ -12,6 +12,9 @@
             <span>{{ this.latestWeatherDataProgress?.message }}</span>
           </ng-template>
         </p-progressBar>
+
+        <p-button label="Info" (onClick)="openProgressInfoWindow()" styleClass="w-full" />
+        <p-button label="Cancel" styleClass="w-full" />
       }
       @else {
         <p-progressBar [value]="((latestMainSessionData.currentWeatherImageIndex + 1) / latestMainSessionData.numberOfWeatherImages) * 100" class="w-full">
@@ -19,13 +22,13 @@
             <span>{{latestMainSessionData.currentWeatherImageIndex + 1}} / {{latestMainSessionData.numberOfWeatherImages}}</span>
           </ng-template>
         </p-progressBar>
-      }
 
-      <div class="flex flex-row flex-shrink-1 gap-1">
-        <p-button icon="pi pi-arrow-left" size="small" (onClick)="changeWeatherImageIndex(-1)" />
-        <p-button icon="pi pi-pause-circle" size="small" (onClick)="pauseWeatherImageAnimation()" />
-        <p-button icon="pi pi-arrow-right" size="small" (onClick)="changeWeatherImageIndex(+1)" />
-      </div>
+        <div class="flex flex-row flex-shrink-1 gap-1">
+          <p-button icon="pi pi-arrow-left" size="small" (onClick)="changeWeatherImageIndex(-1)" />
+          <p-button icon="pi pi-pause-circle" size="small" (onClick)="pauseWeatherImageAnimation()" />
+          <p-button icon="pi pi-arrow-right" size="small" (onClick)="changeWeatherImageIndex(+1)" />
+        </div>
+      }
     </div>
   </div>
 

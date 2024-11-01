@@ -18,11 +18,14 @@ interface Window {
     writeAppFile: (filePath: string, data: string, encoding: string) => Promise<boolean>
   },
   app: {
-    onSettingsModalClosed: (callback) => void
+    onSettingsModalClosed: (callback) => void,
+    openProgressInfoWindow: () => void
   },
   weather: {
     generateWeatherImagesForRegion: (region: Region, dataGatherer: DataGathererName, weatherConditionId: string, forecast_length: number) => Promise<{ date: Date, filename: string }[]>,
-    onWeatherGenerationProgress: (callback: CallableFunction) => void
+    onWeatherGenerationProgress: (callback: CallableFunction) => void,
+    sendWeatherGenerationProgress: (inProgress: boolean, progressValue: number, progressMessage: string) => void,
+    getLatestProgressMessages: () => Promise<WeatherDataResponse[]>
   }
 }
 

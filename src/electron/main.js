@@ -6,7 +6,8 @@ const url = require('node:url')
 const fs = require('node:fs')
 const { generateWeatherImageForLocation } = require('./backend/image-generation')
 
-let mainWindow;
+let mainWindow, progressWindow;
+let latestProgressMessages = [];
 
 const createWindow = () => {
   // Create the browser window.
@@ -130,7 +131,6 @@ const createWindow = () => {
 
     modalWindow.once('ready-to-show', () => {
       modalWindow.show();
-      modalWindow.webContents.openDevTools();
     });
 
     modalWindow.on('closed', () => {
@@ -155,20 +155,20 @@ app.on('window-all-closed', () => {
 })
 
 // IPC handlers
-ipcMain.handle('read-file', (event, filePath, encoding) => {
+ipcMain.handle('read-file', (_event, filePath, encoding) => {
   return readFile(filePath, encoding);
 })
 
-ipcMain.handle('read-app-file', (event, filePath, encoding) => {
+ipcMain.handle('read-app-file', (_event, filePath, encoding) => {
   // use the app's path and the read-file function to read the file
   return readFile(path.join(app.getAppPath(), filePath), encoding);
 });
 
-ipcMain.handle('check-app-file-exists', (event, filePath) => {
+ipcMain.handle('check-app-file-exists', (_event, filePath) => {
   return fs.existsSync(path.join(app.getAppPath(), filePath));
 });
 
-ipcMain.handle('write-app-file', (event, filePath, data, encoding) => {
+ipcMain.handle('write-app-file', (_event, filePath, data, encoding) => {
   try {
     fs.writeFileSync(path.join(app.getAppPath(), filePath), data, { encoding, flag: 'w' });
     return true;
@@ -178,13 +178,54 @@ ipcMain.handle('write-app-file', (event, filePath, data, encoding) => {
   }
 });
 
-ipcMain.handle('generate-weather-images-for-region', (event, region, dataGatherer, weatherCondition, forecastLength) => {
+ipcMain.handle('generate-weather-images-for-region', (_event, region, dataGatherer, weatherCondition, forecastLength) => {
   return generateWeatherImageForLocation(region, dataGatherer, weatherCondition, forecastLength);
 });
 
-ipcMain.on('weather-generation-progress', (inProgress, progressValue, progressMessage) => {
-  mainWindow.webContents.send('weather-generation-progress-update', inProgress, progressValue, progressMessage);
+ipcMain.on('weather-generation-progress', (_event, inProgress, progressValue, progressMessage) => {
+  if(progressValue === 0) {
+    latestProgressMessages = [];
+  }
+  latestProgressMessages.push({ inProgress, progress: progressValue, message: progressMessage });
+
+  if(mainWindow && !mainWindow.isDestroyed())
+    mainWindow.webContents.send('weather-generation-progress-update', inProgress, progressValue, progressMessage);
+
+  if(progressWindow && !progressWindow.isDestroyed())
+    progressWindow.webContents.send('weather-generation-progress-update', inProgress, progressValue, progressMessage);
 });
+
+ipcMain.handle('get-latest-progress-messages', (_event) => {
+  return latestProgressMessages;
+});
+
+ipcMain.handle('open-progress-info-window', (_event) => {
+  progressWindow = new BrowserWindow({
+    parent: mainWindow,
+    width: 800,
+    height: 600,
+    show: false,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js')
+    }
+  });
+
+  progressWindow.loadURL(url.format({
+    pathname: path.join(__dirname, 'weather-map', 'browser', 'index.html'),
+    protocol: 'file:',
+    slashes: true,
+    hash: '#/progress'
+  }));
+
+  progressWindow.once('ready-to-show', () => {
+    progressWindow.show();
+    progressWindow.toggleDevTools();
+  });
+
+  progressWindow.on('closed', () => {
+    progressWindow = null;
+  });
+})
 
 // Helper functions
 function readFile(filePath, encoding) {

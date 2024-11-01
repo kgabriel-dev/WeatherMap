@@ -15,10 +15,13 @@ contextBridge.exposeInMainWorld('files', {
 });
 
 contextBridge.exposeInMainWorld('app', {
-  onSettingsModalClosed: (callback) => ipcRenderer.on('settings-modal-closed', callback)
+  onSettingsModalClosed: (callback) => ipcRenderer.on('settings-modal-closed', callback),
+  openProgressInfoWindow: () => ipcRenderer.invoke('open-progress-info-window'),
 });
 
 contextBridge.exposeInMainWorld('weather', {
   generateWeatherImagesForRegion: (region, dataGatherer, weatherCondition, forecastLength) => ipcRenderer.invoke('generate-weather-images-for-region', region, dataGatherer, weatherCondition, forecastLength),
-  onWeatherGenerationProgress: (callback) => ipcRenderer.on('weather-generation-progress-update', (_event, inProgress, progressValue, progressMessage) => callback(inProgress, progressValue, progressMessage))
+  onWeatherGenerationProgress: (callback) => ipcRenderer.on('weather-generation-progress-update', (_event, inProgress, progressValue, progressMessage) => callback(inProgress, progressValue, progressMessage)),
+  sendWeatherGenerationProgress: (inProgress, progressValue, progressMessage) => ipcRenderer.send('weather-generation-progress', inProgress, progressValue, progressMessage),
+  getLatestProgressMessages: () => ipcRenderer.invoke('get-latest-progress-messages')
 });

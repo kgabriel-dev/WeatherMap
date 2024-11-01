@@ -121,6 +121,8 @@ export class MainComponent {
         progress: progressValue,
         message: progressMessage
       };
+
+      changeDetectorRef.detectChanges();
     });
 
     // set the default location to the one saved in the settings
@@ -231,11 +233,7 @@ export class MainComponent {
   }
 
   startWeatherImageGeneration(): void {
-    this.latestWeatherDataProgress = {
-      inProgress: true,
-      progress: 0,
-      message: 'Starting weather image generation'
-    }
+    window.weather.sendWeatherGenerationProgress(true, 0, 'Starting weather image generation');
 
     const sessionData = this.sessionService.getLatestSessionData();
 
@@ -255,7 +253,6 @@ export class MainComponent {
 
     window.weather.generateWeatherImagesForRegion(region, dataGathererName, weatherConditionId, forecast_length)
       .then((images) => {
-        console.log('Images generated:', images);
 
         this.sessionService.updateSessionData({
           mainData: {
@@ -276,7 +273,6 @@ export class MainComponent {
   updateSessionData(): void {
     const selectedRegion = this.locationsService.getLocations().find((location) => this.compareCoordinates(location.coordinates, this.usedCoordinates)) || undefined;
     this.selectedRegionIndex = selectedRegion ? this.locationsService.getLocations().indexOf(selectedRegion) : -1;
-    console.log('Selected region index:', this.selectedRegionIndex, 'Used coordinates:', this.usedCoordinates);
 
     if(this.selectedRegionIndex == -1)
       this.regionInDropdown = this.customLocation;
@@ -318,5 +314,9 @@ export class MainComponent {
 
   private compareCoordinates(a: SimpleLocation, b: SimpleLocation): boolean {
     return a.latitude == b.latitude && a.longitude == b.longitude;
+  }
+
+  openProgressInfoWindow(): void {
+    window.app.openProgressInfoWindow();
   }
 }

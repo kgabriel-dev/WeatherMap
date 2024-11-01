@@ -73,7 +73,6 @@ export class OpenMeteoDataGatherer implements DataGatherer {
           });
         }
 
-        console.log(`Request for ${data.lat}, ${data.lon} successful`);
         progress += progressPerStep;
         sendWeatherGenerationProgressUpdate(true, progress, `Request for location #${dataList.indexOf(data) + 1} successful`);
 

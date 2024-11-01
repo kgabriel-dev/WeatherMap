@@ -27,12 +27,12 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
     // calculate the progress for the data gathering
     const numberOfLocations = region.region.resolution * region.region.resolution;
     const numberOfImages = forecast_length;
-    const progressPerStep = 100 / (numberOfLocations + numberOfImages + 1); // how much progress is made per step (location or image); +1 for the final step
+    const progressPerStep = 100 / (numberOfLocations + numberOfImages + 2); // how much progress is made per step (location or image); +2 for "finished data gathering"-message and for the final step
 
     // gather the data for the location
     dataGatherer.gatherData(region, weatherCondition!, forecast_length, progressPerStep)
       .then((weatherData) => {
-        progress += progressPerStep * numberOfLocations;
+        progress += progressPerStep * numberOfLocations + progressPerStep;
         sendWeatherGenerationProgressUpdate(true, progress, 'Data gathering finished. Converting data now');
 
         // convert the data from weather over space in a time range to weather over time at a location
