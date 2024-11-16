@@ -5,7 +5,7 @@ const path = require('node:path')
 const url = require('node:url')
 const fs = require('node:fs')
 const { generateWeatherImageForLocation } = require('./backend/image-generation');
-const { OpenMeteoDataGatherer } = require('./backend/data-gathering');
+const { OpenMeteoDataGatherer, BrightSkyDataGatherer } = require('./backend/data-gathering');
 
 let mainWindow, progressWindow;
 let latestProgressMessages = [];
@@ -238,7 +238,7 @@ ipcMain.handle('list-weather-conditions', (_event) => {
   const weatherConditions = {};
 
   weatherConditions['OpenMeteo'] = new OpenMeteoDataGatherer().listAvailableWeatherConditions();
-  weatherConditions['BrightSky'] = []; // TODO: Implement BrightSkyDataGatherer
+  weatherConditions['BrightSky'] = new BrightSkyDataGatherer().listAvailableWeatherConditions();
 
   return weatherConditions;
 });

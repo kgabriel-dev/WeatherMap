@@ -1,3 +1,4 @@
+import { Conditional } from '@angular/compiler';
 import { sendWeatherGenerationProgressUpdate } from './../utils';
 import { ipcMain } from 'electron';
 
@@ -130,6 +131,136 @@ export class OpenMeteoDataGatherer implements DataGatherer {
       { condition: 'Precipitation Probability', id: 'precipitation_probability', api: 'precipitation_probability', min: 0, max: 100 },
       { condition: 'Visibility (m)', id: 'visibility', api: 'visibility', min: -1, max: -1 },
       { condition: 'UV Index', id: 'uv_index', api: 'uv_index', min: 0, max: 11 }
+    ];
+  }
+}
+
+export class BrightSkyDataGatherer implements DataGatherer {
+  readonly API_URL = "https://api.brightsky.dev/weather?date={date}&last_date={last_date}&lat={lat}&lon={lon}&tz={timezone}";
+  readonly REQUEST_DELAY = 300; // time in ms to wait between two requests
+
+  gatherData(region: Region, condition: WeatherCondition, forecast_hours: number, progressPerStep: number): Promise<WeatherData[]> {
+    if(!this.listAvailableWeatherConditions().find((availableCondition) => availableCondition.id === condition.id))
+      throw new Error('The selected Weather Condition not available');
+
+    return new Promise((resolve, reject) => {
+      const regionSizeInKm = convertToKm(region.region.size.length, region.region.size.unit);
+      const stepSize = regionSizeInKm / region.region.resolution;
+      const latStepSize = stepSize / 110.574; // 1° latitude is 110.574 km
+      const lonStepSize = stepSize / (111.320 * Math.cos(region.coordinates.latitude * Math.PI / 180)); // 1° longitude is 111.320 km at the equator
+      const locationOffset = -Math.floor(region.region.resolution/2) + (region.region.resolution % 2 === 0 ? 0.5 : 1);
+      const startDate = new Date(); // current date
+      startDate.setHours(0, 0, 0, 0);
+      const endDate = new Date(startDate);
+      endDate.setHours(startDate.getHours() + forecast_hours);
+
+      const requests: { lat: number, lon: number, api: string, startDate: Date, endDate: Date, tz: string }[] = [];
+
+      if(cancelRequested) {
+        sendWeatherGenerationProgressUpdate(false, 100, 'Cancelled by user');
+        reject('Cancelled by user.');
+        cancelRequested = false;
+      }
+
+      for(let latIndex = 0; latIndex < region.region.resolution; latIndex++) {
+        for(let lonIndex = 0; lonIndex < region.region.resolution; lonIndex++) {
+          const lat = region.coordinates.latitude + locationOffset + latIndex * latStepSize;
+          const lon = region.coordinates.longitude + locationOffset + lonIndex * lonStepSize;
+
+          requests.push({ lat, lon, api: condition.api, startDate, endDate, tz: region.timezoneCode });
+        }
+      }
+
+      if(cancelRequested) {
+        sendWeatherGenerationProgressUpdate(false, 100, 'Cancelled by user');
+        reject('Cancelled by user.');
+        cancelRequested = false;
+      }
+
+      this.requestApiUrls(requests, progressPerStep)
+        .then((data) => {
+          resolve(data);
+          cancelRequested = false;
+        })
+        .catch((error) => {
+          reject(error);
+          cancelRequested = false;
+        });
+    });
+  }
+
+  private async requestApiUrls(dataList: { lat: number, lon: number, api: string, startDate: Date, endDate: Date, tz: string }[], progressPerStep: number): Promise<WeatherData[]> {
+    const weatherData: WeatherData[] = [];
+
+    // get the current progress
+    let progress = 0;
+
+    for(const data of dataList) {
+      const url = this.API_URL
+        .replace('{lat}', data.lat.toString())
+        .replace('{lon}', data.lon.toString())
+        .replace('{category}', data.api)
+        .replace('{date}', data.startDate.toISOString())
+        .replace('{last_date}', data.endDate.toISOString())
+        .replace('{timezone}', data.tz);
+
+      try {
+        const response = await fetch(url);
+
+        if(cancelRequested) {
+          throw new Error('Cancelled by user.');
+        }
+
+        if(!response.ok) {
+          console.error(`Request failed with status code ${response.status}`);
+          throw new Error(`REQUEST FAILED - Request failed with status code ${response.status}`);
+        }
+
+        const json = await response.json();
+        const time_values = json['hourly']['time'];
+
+        for(let i = 0; i < time_values.length; i++) {
+          const date = new Date(time_values[i]);
+          const value = json['hourly'][data.api][i];
+
+          weatherData.push({
+            coordinates: { latitude: data.lat, longitude: data.lon },
+            weatherCondition: this.listAvailableWeatherConditions().find((condition) => condition.api === data.api)!,
+            weatherValue: value,
+            date: date.toISOString()
+          });
+        }
+
+        progress += progressPerStep;
+        sendWeatherGenerationProgressUpdate(true, progress, `Request for location #${dataList.indexOf(data) + 1} successful`);
+
+        if(cancelRequested)
+          throw new Error('Cancelled by user.');
+
+        await delay(this.REQUEST_DELAY);
+      }
+      catch(error) {
+        return [];
+      }
+    }
+
+    return weatherData;
+  }
+
+  getName(): string {
+    return 'BrightSky';
+  }
+
+  listAvailableWeatherConditions(): WeatherCondition[] {
+    return [
+      { condition: 'Cloud Coverage (%)', id: 'cloud_cover', api: 'cloud_cover', min: 0, max: 100 },
+      { condition: 'Dew Point (°C)', id: 'dew_point_c', api: 'dew_point', min: -1, max: -1 },
+      { condition: 'Precipitation Probability (%)', id: 'precipitation_probability', api: 'precipitation_probability', min: 0, max: 100 },
+      { condition: 'Air Pressure', id: 'air_pressure', api: 'pressure_msl', min: -1, max: -1 },
+      { condition: 'Relative Humidity (%)', id: 'relative_humidity', api: 'relative_humidity', min: 0, max: 100 },
+      { condition: 'Temperature (°C)', id: 'temperature_c', api: 'temperature', min: -1, max: -1 },
+      { condition: 'Visibility (m)', id: 'visibility', api: 'visibility', min: -1, max: -1 },
+      { condition: 'Wind speed (km/h)', id: 'wind_speed', api: 'wind_speed', min: 0, max: -1 },
     ];
   }
 }
