@@ -26,7 +26,8 @@ interface Window {
     onWeatherGenerationProgress: (callback: CallableFunction) => void,
     sendWeatherGenerationProgress: (inProgress: boolean, progressValue: number, progressMessage: string) => void,
     getLatestProgressMessages: () => Promise<WeatherDataResponse[]>,
-    cancelWeatherImageGeneration: () => void
+    cancelWeatherImageGeneration: () => void,
+    listWeatherConditions: () => Promise<{[key: string]: WeatherCondition[]}>
   }
 }
 

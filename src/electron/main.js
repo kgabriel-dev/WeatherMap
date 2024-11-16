@@ -4,7 +4,8 @@ const { app, BrowserWindow, ipcMain, Menu } = require('electron')
 const path = require('node:path')
 const url = require('node:url')
 const fs = require('node:fs')
-const { generateWeatherImageForLocation } = require('./backend/image-generation')
+const { generateWeatherImageForLocation } = require('./backend/image-generation');
+const { OpenMeteoDataGatherer } = require('./backend/data-gathering');
 
 let mainWindow, progressWindow;
 let latestProgressMessages = [];
@@ -230,6 +231,16 @@ ipcMain.handle('cancel-weather-image-generation', (_event) => {
 });
 ipcMain.on('canceled-weather-image-generation', (_event) => {
   ipcMain.emit('weather-generation-progress', false, 100, 'Weather image generation cancelled by user.');
+});
+
+
+ipcMain.handle('list-weather-conditions', (_event) => {
+  const weatherConditions = {};
+
+  weatherConditions['OpenMeteo'] = new OpenMeteoDataGatherer().listAvailableWeatherConditions();
+  weatherConditions['BrightSky'] = []; // TODO: Implement BrightSkyDataGatherer
+
+  return weatherConditions;
 });
 
 // Helper functions

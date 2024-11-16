@@ -49,6 +49,8 @@ export class MainComponent {
   regionInDropdown = this.customLocation;
   weatherImages: { date: Date, filename: string }[] = [];
 
+  weatherConditions: WeatherCondition[] = [];
+
   @ViewChild('locationDropdown') locationDropdown?: Dropdown;
   @ViewChild('mapComponent') mapComponent?: MapComponent
 
@@ -84,6 +86,8 @@ export class MainComponent {
           }
         });
       }
+
+      this.updateWeatherConditionsList();
     });
 
     this.customLocation.coordinates = this.latestMainSessionData.usedLocation;
@@ -91,6 +95,8 @@ export class MainComponent {
       resolution: this.latestMainSessionData.regionResolution,
       size: this.latestMainSessionData.regionSize
     }
+
+    this.updateWeatherConditionsList();
 
     window.app.onSettingsModalClosed(() => {
       const settings = this.settingsService.getSettings();
@@ -328,24 +334,20 @@ export class MainComponent {
     window.weather.cancelWeatherImageGeneration();
   }
 
-  getWeatherConditionsList(): WeatherCondition[] {
-    if(this.latestMainSessionData.weatherDataSource == 'OpenMeteo')
-      return [
-        { condition: 'Temperature (°C)', id: 'temperature_c', api: 'temperature_2m', min: -1, max: -1 },
-        { condition: 'Cloud Coverage', id: 'cloud_cover', api: 'cloud_cover', min: 0, max: 100 },
-        { condition: 'Relative Humidity', id: 'relative_humidity', api: 'relative_humidity_2m', min: 0, max: 100 },
-        { condition: 'Cloud Coverage (low)', id: 'cloud_cover_low', api: 'cloud_cover_low', min: 0, max: 100 },
-        { condition: 'Cloud Coverage (mid)', id: 'cloud_cover_mid', api: 'cloud_cover_mid', min: 0, max: 100 },
-        { condition: 'Cloud Coverage (high)', id: 'cloud_cover_high', api: 'cloud_cover_high', min: 0, max: 100 },
-        { condition: 'Dew Point (°C)', id: 'dew_point_c', api: 'dew_point_2m', min: -1, max: -1 },
-        { condition: 'Air Pressure (msl)', id: 'air_pressure', api: 'pressure_msl', min: -1, max: -1 },
-        { condition: 'Precipitation', id: 'precipitation_value', api: 'precipitation', min: 0, max: -1 },
-        { condition: 'Precipitation Probability', id: 'precipitation_probability', api: 'precipitation_probability', min: 0, max: 100 },
-        { condition: 'Visibility (m)', id: 'visibility', api: 'visibility', min: -1, max: -1 },
-        { condition: 'UV Index', id: 'uv_index', api: 'uv_index', min: 0, max: 11 }
-      ];
+  private updateWeatherConditionsList(): void {
+    window.weather.listWeatherConditions()
+      .then((conditions) => {
+        this.weatherConditions = conditions[this.latestMainSessionData.weatherDataSource];
+        this.changeDetectorRef.detectChanges();
 
-    return [];
+        if(!conditions[this.latestMainSessionData.weatherDataSource])
+          console.error('No weather conditions found for the selected data source:', this.latestMainSessionData.weatherDataSource);
+      })
+      .catch((error) => {
+        console.error('Error getting weather conditions:', error);
+        this.weatherConditions = [];
+        this.changeDetectorRef.detectChanges();
+      });
   }
 
   private convertTimelengthToHours(value: Settings['forecastLength']['value'], unit: Settings['forecastLength']['unit']): number {

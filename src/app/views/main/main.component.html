@@ -130,16 +130,16 @@
         [options]="getDataSourcesList()"
         [(ngModel)]="latestMainSessionData.weatherDataSource"
         (onChange)="updateSessionData()"
-        [style]="{'width': '100%'}" />
+        [style]="{'width': '100%', 'z-index': 2}" />
 
       <label for="condition">Condition:</label>
       <p-dropdown
         inputId="condition"
         optionLabel="condition"
-        [options]="getWeatherConditionsList()"
+        [options]="weatherConditions"
         [(ngModel)]="latestMainSessionData.weatherCondition"
         (onChange)="updateSessionData()"
-        [style]="{'width': '100%'}" />
+        [style]="{'width': '100%', 'z-index': 1}" />
     </div>
 
     <div class="flex-grow-1 border-bottom-2 border-primary-500"></div>

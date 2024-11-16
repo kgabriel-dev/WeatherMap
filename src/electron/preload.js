@@ -24,5 +24,6 @@ contextBridge.exposeInMainWorld('weather', {
   onWeatherGenerationProgress: (callback) => ipcRenderer.on('weather-generation-progress-update', (_event, inProgress, progressValue, progressMessage) => callback(inProgress, progressValue, progressMessage)),
   sendWeatherGenerationProgress: (inProgress, progressValue, progressMessage) => ipcRenderer.send('weather-generation-progress', inProgress, progressValue, progressMessage),
   getLatestProgressMessages: () => ipcRenderer.invoke('get-latest-progress-messages'),
-  cancelWeatherImageGeneration: () => ipcRenderer.invoke('cancel-weather-image-generation')
+  cancelWeatherImageGeneration: () => ipcRenderer.invoke('cancel-weather-image-generation'),
+  listWeatherConditions: () => ipcRenderer.invoke('list-weather-conditions')
 });
