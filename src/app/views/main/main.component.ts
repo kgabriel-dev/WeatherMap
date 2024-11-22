@@ -153,15 +153,33 @@ export class MainComponent {
       this.applyLocation(selectedRegion);
 
       const sessionData = this.sessionService.getLatestSessionData();
-      this.sessionService.updateSessionData({
-        mainData: {
-          ...sessionData.mainData,
-          selectedRegionIndex: selectedRegionIndex,
-          regionResolution: selectedRegion ? selectedRegion.region.resolution : sessionData.mainData.regionResolution,
-          regionSize: selectedRegion ? selectedRegion.region.size : sessionData.mainData.regionSize,
-          forecastLength: settings.forecastLength
-        }
-      });
+
+      this.setInitialWeatherCondition()
+        .then((weatherCondition) => {
+          this.sessionService.updateSessionData({
+            mainData: {
+              ...sessionData.mainData,
+              selectedRegionIndex: selectedRegionIndex,
+              regionResolution: selectedRegion ? selectedRegion.region.resolution : sessionData.mainData.regionResolution,
+              regionSize: selectedRegion ? selectedRegion.region.size : sessionData.mainData.regionSize,
+              forecastLength: settings.forecastLength,
+              weatherCondition
+            }
+          });
+        })
+        .catch((error) => {
+          console.error('Error setting initial weather condition:', error);
+
+          this.sessionService.updateSessionData({
+            mainData: {
+              ...sessionData.mainData,
+              selectedRegionIndex: selectedRegionIndex,
+              regionResolution: selectedRegion ? selectedRegion.region.resolution : sessionData.mainData.regionResolution,
+              regionSize: selectedRegion ? selectedRegion.region.size : sessionData.mainData.regionSize,
+              forecastLength: settings.forecastLength
+            }
+          });
+        });
     })
   }
 
@@ -262,7 +280,13 @@ export class MainComponent {
     }
 
     const dataGathererName = sessionData.mainData.weatherDataSource;
-    const weatherConditionId = sessionData.mainData.weatherCondition.id;
+    const weatherConditionId = sessionData.mainData.weatherCondition?.id;
+
+    if(!weatherConditionId) {
+      console.error('No weather condition selected!');
+      return;
+    }
+
     const forecast_length = this.convertTimelengthToHours(sessionData.mainData.forecastLength.value, sessionData.mainData.forecastLength.unit);
 
     window.weather.generateWeatherImagesForRegion(region, dataGathererName, weatherConditionId, forecast_length)
@@ -375,6 +399,43 @@ export class MainComponent {
         this.weatherConditions = [];
         this.changeDetectorRef.detectChanges();
       });
+  }
+
+  private setInitialWeatherCondition(): Promise<WeatherCondition> {
+    return new Promise((resolve, reject) => {
+      window.weather.listWeatherConditions()
+        .then((conditions) => {
+          if(!conditions[this.lastReadMainSessionData.weatherDataSource]) {
+            console.error('No weather conditions found for the selected data source:', this.lastReadMainSessionData.weatherDataSource);
+
+            this.weatherConditions = [];
+            this.changeDetectorRef.detectChanges();
+
+            reject('No weather conditions found for the selected data source');
+            return;
+          }
+
+          this.weatherConditions = conditions[this.lastReadMainSessionData.weatherDataSource];
+
+          if(!this.lastReadMainSessionData.weatherCondition) {
+            this.sessionService.updateSessionData({
+              mainData: {
+                ...this.mainSessionDataForUpdate,
+                weatherCondition: this.weatherConditions[0]
+              }
+            });
+          }
+
+          resolve(this.weatherConditions[0]);
+        })
+        .catch((error) => {
+          console.error('Error getting weather conditions:', error);
+          this.weatherConditions = [];
+          this.changeDetectorRef.detectChanges();
+
+          reject(error);
+        });
+    });
   }
 
   private convertTimelengthToHours(value: Settings['forecastLength']['value'], unit: Settings['forecastLength']['unit']): number {
