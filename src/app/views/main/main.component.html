@@ -63,7 +63,7 @@
           <p-inputNumber
             inputId="latitude"
             [(ngModel)]="usedCoordinates.latitude"
-            (onInput)="updateSessionData()"
+            (onInput)="debouncedUpdateSessionData()"
             mode="decimal"
             [minFractionDigits]="0"
             [maxFractionDigits]="6"
@@ -76,7 +76,7 @@
           <p-inputNumber
             inputId="longitude"
             [(ngModel)]="usedCoordinates.longitude"
-            (onInput)="updateSessionData()"
+            (onInput)="debouncedUpdateSessionData()"
             mode="decimal"
             [minFractionDigits]="0"
             [maxFractionDigits]="6"
@@ -90,12 +90,14 @@
       <div class="flex flex-row">
         <p-inputNumber
           [(ngModel)]="mainSessionDataForUpdate.regionSize.length"
+          (onInput)="debouncedUpdateSessionData()"
           inputId="size"
           [inputStyle]="{'text-align': 'right' , 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'width': '100%'}"
           styleClass="w-full" class="w-full"
         />
         <p-dropdown
           [(ngModel)]="mainSessionDataForUpdate.regionSize.unit"
+          (onChange)="updateSessionData()"
           [options]="['km', 'mi']"
           [style]="{'width': '7rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0'}"
         />
@@ -105,6 +107,7 @@
       <p-inputNumber
         inputId="resolution"
         [(ngModel)]="mainSessionDataForUpdate.regionResolution"
+        (onInput)="debouncedUpdateSessionData()"
         mode="decimal"
         [inputStyle]="{'width': '100%'}"
         styleClass="w-full"
@@ -118,9 +121,11 @@
           styleClass="w-full"
           class="w-full"
           [(ngModel)]="mainSessionDataForUpdate.forecastLength.value"
+          (onInput)="debouncedUpdateSessionData()"
         />
         <p-dropdown
           [(ngModel)]="mainSessionDataForUpdate.forecastLength.unit"
+          (onChange)="debouncedUpdateSessionData()"
           [options]="['hours', 'days']"
           [style]="{'width': '7rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0'}" />
       </div>

@@ -7,7 +7,7 @@ import { Dropdown, DropdownModule } from 'primeng/dropdown';
 import { FormsModule } from '@angular/forms';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { Settings, SettingsService } from '../../services/settings/settings.service';
-import { combineLatestWith, map } from 'rxjs';
+import { combineLatestWith, debounceTime, map, Subject } from 'rxjs';
 import { MapComponent } from '../../components/map/map.component';
 import { SessionService } from '../../services/session/session.service';
 import { MainData } from '../../services/session/session.type';
@@ -31,6 +31,8 @@ export class MainComponent {
   }
 
   lastWeatherGatheringTime: Date = new Date();
+
+  updateSessionDebounce$ = new Subject<void>();
 
   readonly customLocation: Region = {
     id: -1,
@@ -183,6 +185,10 @@ export class MainComponent {
           });
         });
     })
+
+    this.updateSessionDebounce$
+      .pipe(debounceTime(300))
+      .subscribe(() => this.updateSessionData());
   }
 
   changeWeatherImageIndex(amount: number): void {
@@ -328,6 +334,10 @@ export class MainComponent {
         usedLocation: this.usedCoordinates
       }
     });
+  }
+
+  debouncedUpdateSessionData() {
+    this.updateSessionDebounce$.next();
   }
 
   updateWeatherImageOnMap(): void {
