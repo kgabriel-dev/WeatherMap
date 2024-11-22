@@ -16,6 +16,37 @@ export class MapComponent implements AfterViewInit {
   private map: L.Map | undefined;
   private isMapReady$ = new BehaviorSubject<boolean>(false);
 
+  readonly DataOverlay = L.Control.extend({
+    onAdd: (_map: L.Map): HTMLDivElement => {
+      const div = L.DomUtil.create('div', 'overlay-control');
+
+      div.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+      div.style.borderRadius = '5px';
+      div.style.margin = '0px';
+      div.style.color = 'black';
+      div.style.fontSize = '15px';
+
+      return div;
+    },
+
+    onRemove: (_map: L.Map): void => {
+      // Nothing to do here
+    },
+
+    setText: (text: string[]): void => {
+      const div = this.dataOverlay.getContainer();
+
+      console.log(!!div);
+      if(!div) return;
+
+      const paragraphs = text.map((t) => `<p style='margin: 0px'>${t}</p>`).join('');
+
+      div.innerHTML = `<h2 style='text-decoration: underline; margin: 0px'>Weather Data</h2>${paragraphs}`;
+      div.style.padding = '5px';
+    }
+  });
+  readonly dataOverlay = new this.DataOverlay({ position: 'topright' });
+
   readonly markerIcon = L.icon({
     iconUrl: 'assets/maps-pin-black-icon.png',
     iconSize: [ 25, 25 ],
@@ -62,6 +93,8 @@ export class MapComponent implements AfterViewInit {
       }
 
       this.fitRegionToScreen();
+
+      this.dataOverlay.addTo(this.map);
     })
 
     this.sessionService.getSessionDataObservable().subscribe((sessionData) => {
@@ -147,6 +180,7 @@ export class MapComponent implements AfterViewInit {
     const sessionData = this.sessionService.getLatestSessionData();
 
     const location = sessionData.mainData.selectedRegionIndex === -1 ? sessionData.mainData.usedLocation : this.locationsService.getLocations()[sessionData.mainData.selectedRegionIndex].coordinates;
+
     const regionSizeKm = this.convertRegionSizeToKm(sessionData.mainData.regionSize);
 
     const regionSizeLat = (regionSizeKm + 1) / 110.574;
@@ -159,6 +193,21 @@ export class MapComponent implements AfterViewInit {
       ],
       { animate: true, duration: 1 }
     );
+  }
+
+  updateDataInfo(lastDataGatheringDate: Date): void {
+    const sessionData = this.sessionService.getLatestSessionData();
+    const location = sessionData.mainData.selectedRegionIndex === -1 ? sessionData.mainData.usedLocation : this.locationsService.getLocations()[sessionData.mainData.selectedRegionIndex].name;
+
+    const imageDate = new Date(lastDataGatheringDate).setHours(lastDataGatheringDate.getHours() + sessionData.mainData.currentWeatherImageIndex);
+
+    this.dataOverlay.setText([
+      `Location: ${location}`,
+      `Region size: ${sessionData.mainData.regionSize.length} ${sessionData.mainData.regionSize.unit}`,
+      `Resolution: ${sessionData.mainData.regionResolution}x${sessionData.mainData.regionResolution}`,
+      `Weather data: ${sessionData.mainData.weatherCondition?.condition ?? 'N/A'}`,
+      `Time: ${new Date(imageDate).toLocaleString()}`
+    ]);
   }
 
 }

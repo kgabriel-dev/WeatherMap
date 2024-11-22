@@ -30,6 +30,8 @@ export class MainComponent {
     longitude: 0
   }
 
+  lastWeatherGatheringTime: Date = new Date();
+
   readonly customLocation: Region = {
     id: -1,
     coordinates: {
@@ -299,9 +301,11 @@ export class MainComponent {
           }
         });
 
+        this.lastWeatherGatheringTime = new Date();
+        this.lastWeatherGatheringTime.setMinutes(0, 0, 0);
+
         this.weatherImages = images;
         this.setWeatherImageIndex(0);
-        this.updateWeatherImageOnMap();
       })
       .catch((error) => {
         console.error('Error generating images:', error);
@@ -334,6 +338,7 @@ export class MainComponent {
       sessionData = this.sessionService.getLatestSessionData();
 
     this.mapComponent?.overlayWeatherImage(this.weatherImages[sessionData.mainData.currentWeatherImageIndex].filename);
+    this.mapComponent?.updateDataInfo(this.lastWeatherGatheringTime);
   }
 
   getDataSourcesList(): string[] {
