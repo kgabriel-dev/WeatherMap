@@ -21,7 +21,8 @@ import { TooltipModule } from 'primeng/tooltip';
   styleUrl: './main.component.scss'
 })
 export class MainComponent {
-  latestMainSessionData: MainData;
+  lastReadMainSessionData: MainData;
+  mainSessionDataForUpdate: MainData;
   latestWeatherDataProgress?: WeatherDataResponse;
   selectedRegionIndex: number = -1;
   usedCoordinates: SimpleLocation = {
@@ -58,13 +59,17 @@ export class MainComponent {
     public locationsService: LocationService,
     public settingsService: SettingsService,
     public sessionService: SessionService,
-    private  changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef
   ) {
-    this.latestMainSessionData = this.sessionService.getLatestSessionData().mainData;
+    this.lastReadMainSessionData = this.sessionService.getLatestSessionData().mainData;
+    this.mainSessionDataForUpdate = this.sessionService.getLatestSessionData().mainData;
+
     this.sessionService.getSessionDataObservable().subscribe((sessionData) => {
-      this.latestMainSessionData = sessionData.mainData;
-      this.selectedRegionIndex = sessionData.mainData.selectedRegionIndex;
-      this.usedCoordinates = sessionData.mainData.usedLocation;
+      const oldMainSessionData = JSON.parse(JSON.stringify(this.lastReadMainSessionData));
+      this.lastReadMainSessionData = JSON.parse(JSON.stringify(sessionData.mainData));
+      this.mainSessionDataForUpdate = JSON.parse(JSON.stringify(sessionData.mainData));
+      this.selectedRegionIndex = this.mainSessionDataForUpdate.selectedRegionIndex;
+      this.usedCoordinates = this.mainSessionDataForUpdate.usedLocation;
 
       if(this.selectedRegionIndex !== -1) {
         const selectedRegion = this.locationsService.getLocations()[this.selectedRegionIndex];
@@ -87,13 +92,13 @@ export class MainComponent {
         });
       }
 
-      this.updateWeatherConditionsList();
+      this.updateWeatherConditionsList(oldMainSessionData.weatherDataSource, oldMainSessionData.weatherCondition);
     });
 
-    this.customLocation.coordinates = this.latestMainSessionData.usedLocation;
+    this.customLocation.coordinates = this.mainSessionDataForUpdate.usedLocation;
     this.customLocation.region = {
-      resolution: this.latestMainSessionData.regionResolution,
-      size: this.latestMainSessionData.regionSize
+      resolution: this.mainSessionDataForUpdate.regionResolution,
+      size: this.mainSessionDataForUpdate.regionSize
     }
 
     this.updateWeatherConditionsList();
@@ -290,17 +295,11 @@ export class MainComponent {
 
     this.sessionService.updateSessionData({
       mainData: {
-        currentWeatherImageIndex: this.latestMainSessionData.currentWeatherImageIndex,
-        numberOfWeatherImages: this.latestMainSessionData.numberOfWeatherImages,
+        ...this.mainSessionDataForUpdate,
         selectedRegionIndex: this.selectedRegionIndex,
-        usedLocation: this.usedCoordinates,
-        regionResolution: this.latestMainSessionData.regionResolution,
-        regionSize: this.latestMainSessionData.regionSize,
-        forecastLength: this.latestMainSessionData.forecastLength,
-        weatherDataSource: this.latestMainSessionData.weatherDataSource,
-        weatherCondition: this.latestMainSessionData.weatherCondition
+        usedLocation: this.usedCoordinates
       }
-    })
+    });
   }
 
   updateWeatherImageOnMap(): void {
@@ -334,14 +333,42 @@ export class MainComponent {
     window.weather.cancelWeatherImageGeneration();
   }
 
-  private updateWeatherConditionsList(): void {
+  private updateWeatherConditionsList(oldDataGathererName?: DataGathererName, oldWeatherCondition?: WeatherCondition): void {
     window.weather.listWeatherConditions()
       .then((conditions) => {
-        this.weatherConditions = conditions[this.latestMainSessionData.weatherDataSource];
-        this.changeDetectorRef.detectChanges();
+        if(!conditions[this.lastReadMainSessionData.weatherDataSource]) {
+          console.error('No weather conditions found for the selected data source:', this.lastReadMainSessionData.weatherDataSource);
 
-        if(!conditions[this.latestMainSessionData.weatherDataSource])
-          console.error('No weather conditions found for the selected data source:', this.latestMainSessionData.weatherDataSource);
+          this.weatherConditions = [];
+          this.changeDetectorRef.detectChanges();
+
+          return;
+        }
+
+        this.weatherConditions = conditions[this.lastReadMainSessionData.weatherDataSource];
+
+        // try to select the same weather condition as before just for the new data source; only if the data source has changed
+        if(oldDataGathererName && oldDataGathererName !== this.lastReadMainSessionData.weatherDataSource && oldWeatherCondition) {
+          const newWeatherCondition = this.weatherConditions.find((condition) => condition.id == oldWeatherCondition.id);
+
+          if(newWeatherCondition) {
+            this.sessionService.updateSessionData({
+              mainData: {
+                ...this.mainSessionDataForUpdate,
+                weatherCondition: newWeatherCondition
+              }
+            });
+          } else {
+            this.sessionService.updateSessionData({
+              mainData: {
+                ...this.mainSessionDataForUpdate,
+                weatherCondition: this.weatherConditions[0]
+              }
+            });
+          }
+        }
+
+        this.changeDetectorRef.detectChanges();
       })
       .catch((error) => {
         console.error('Error getting weather conditions:', error);

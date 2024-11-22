@@ -17,9 +17,9 @@
         <p-button label="Cancel" styleClass="w-full" (onClick)="cancelWeatherImageGeneration()" />
       }
       @else {
-        <p-progressBar [value]="((latestMainSessionData.currentWeatherImageIndex + 1) / latestMainSessionData.numberOfWeatherImages) * 100" class="w-full">
+        <p-progressBar [value]="((lastReadMainSessionData.currentWeatherImageIndex + 1) / lastReadMainSessionData.numberOfWeatherImages) * 100" class="w-full">
           <ng-template pTemplate="content">
-            <span>{{latestMainSessionData.currentWeatherImageIndex + 1}} / {{latestMainSessionData.numberOfWeatherImages}}</span>
+            <span>{{lastReadMainSessionData.currentWeatherImageIndex + 1}} / {{lastReadMainSessionData.numberOfWeatherImages}}</span>
           </ng-template>
         </p-progressBar>
 
@@ -89,13 +89,13 @@
       <label for="size">Size:</label>
       <div class="flex flex-row">
         <p-inputNumber
-          [(ngModel)]="latestMainSessionData.regionSize.length"
+          [(ngModel)]="mainSessionDataForUpdate.regionSize.length"
           inputId="size"
           [inputStyle]="{'text-align': 'right' , 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'width': '100%'}"
           styleClass="w-full" class="w-full"
         />
         <p-dropdown
-          [(ngModel)]="latestMainSessionData.regionSize.unit"
+          [(ngModel)]="mainSessionDataForUpdate.regionSize.unit"
           [options]="['km', 'mi']"
           [style]="{'width': '7rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0'}"
         />
@@ -104,7 +104,7 @@
       <label for="resolution">Resolution (n &#x2715; n steps):</label>
       <p-inputNumber
         inputId="resolution"
-        [(ngModel)]="latestMainSessionData.regionResolution"
+        [(ngModel)]="mainSessionDataForUpdate.regionResolution"
         mode="decimal"
         [inputStyle]="{'width': '100%'}"
         styleClass="w-full"
@@ -117,10 +117,10 @@
           [inputStyle]="{'text-align': 'right' , 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'width': '100%'}"
           styleClass="w-full"
           class="w-full"
-          [(ngModel)]="latestMainSessionData.forecastLength.value"
+          [(ngModel)]="mainSessionDataForUpdate.forecastLength.value"
         />
         <p-dropdown
-          [(ngModel)]="latestMainSessionData.forecastLength.unit"
+          [(ngModel)]="mainSessionDataForUpdate.forecastLength.unit"
           [options]="['hours', 'days']"
           [style]="{'width': '7rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0'}" />
       </div>
@@ -128,7 +128,7 @@
       <label for="source">Source:</label>
       <p-dropdown
         [options]="getDataSourcesList()"
-        [(ngModel)]="latestMainSessionData.weatherDataSource"
+        [(ngModel)]="mainSessionDataForUpdate.weatherDataSource"
         (onChange)="updateSessionData()"
         [style]="{'width': '100%', 'z-index': 2}" />
 
@@ -137,7 +137,7 @@
         inputId="condition"
         optionLabel="condition"
         [options]="weatherConditions"
-        [(ngModel)]="latestMainSessionData.weatherCondition"
+        [(ngModel)]="mainSessionDataForUpdate.weatherCondition"
         (onChange)="updateSessionData()"
         [style]="{'width': '100%', 'z-index': 1}" />
     </div>

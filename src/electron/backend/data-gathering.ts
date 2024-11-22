@@ -120,15 +120,15 @@ export class OpenMeteoDataGatherer implements DataGatherer {
   listAvailableWeatherConditions(): WeatherCondition[] {
     return [
       { condition: 'Temperature (°C)', id: 'temperature_c', api: 'temperature_2m', min: -1, max: -1 },
-      { condition: 'Cloud Coverage', id: 'cloud_cover', api: 'cloud_cover', min: 0, max: 100 },
-      { condition: 'Relative Humidity', id: 'relative_humidity', api: 'relative_humidity_2m', min: 0, max: 100 },
-      { condition: 'Cloud Coverage (low)', id: 'cloud_cover_low', api: 'cloud_cover_low', min: 0, max: 100 },
-      { condition: 'Cloud Coverage (mid)', id: 'cloud_cover_mid', api: 'cloud_cover_mid', min: 0, max: 100 },
-      { condition: 'Cloud Coverage (high)', id: 'cloud_cover_high', api: 'cloud_cover_high', min: 0, max: 100 },
+      { condition: 'Cloud Coverage (%)', id: 'cloud_cover', api: 'cloud_cover', min: 0, max: 100 },
+      { condition: 'Relative Humidity (%)', id: 'relative_humidity', api: 'relative_humidity_2m', min: 0, max: 100 },
+      { condition: 'Cloud Coverage (%, low)', id: 'cloud_cover_low', api: 'cloud_cover_low', min: 0, max: 100 },
+      { condition: 'Cloud Coverage (%, mid)', id: 'cloud_cover_mid', api: 'cloud_cover_mid', min: 0, max: 100 },
+      { condition: 'Cloud Coverage (%, high)', id: 'cloud_cover_high', api: 'cloud_cover_high', min: 0, max: 100 },
       { condition: 'Dew Point (°C)', id: 'dew_point_c', api: 'dew_point_2m', min: -1, max: -1 },
-      { condition: 'Air Pressure (msl)', id: 'air_pressure', api: 'pressure_msl', min: -1, max: -1 },
-      { condition: 'Precipitation', id: 'precipitation_value', api: 'precipitation', min: 0, max: -1 },
-      { condition: 'Precipitation Probability', id: 'precipitation_probability', api: 'precipitation_probability', min: 0, max: 100 },
+      { condition: 'Air Pressure (hPa)', id: 'air_pressure', api: 'pressure_msl', min: -1, max: -1 },
+      { condition: 'Precipitation (mm)', id: 'precipitation_value', api: 'precipitation', min: 0, max: -1 },
+      { condition: 'Precipitation Probability (%)', id: 'precipitation_probability', api: 'precipitation_probability', min: 0, max: 100 },
       { condition: 'Visibility (m)', id: 'visibility', api: 'visibility', min: -1, max: -1 },
       { condition: 'UV Index', id: 'uv_index', api: 'uv_index', min: 0, max: 11 }
     ];
@@ -256,7 +256,7 @@ export class BrightSkyDataGatherer implements DataGatherer {
       { condition: 'Cloud Coverage (%)', id: 'cloud_cover', api: 'cloud_cover', min: 0, max: 100 },
       { condition: 'Dew Point (°C)', id: 'dew_point_c', api: 'dew_point', min: -1, max: -1 },
       { condition: 'Precipitation Probability (%)', id: 'precipitation_probability', api: 'precipitation_probability', min: 0, max: 100 },
-      { condition: 'Air Pressure', id: 'air_pressure', api: 'pressure_msl', min: -1, max: -1 },
+      { condition: 'Air Pressure (hPa)', id: 'air_pressure', api: 'pressure_msl', min: -1, max: -1 },
       { condition: 'Relative Humidity (%)', id: 'relative_humidity', api: 'relative_humidity', min: 0, max: 100 },
       { condition: 'Temperature (°C)', id: 'temperature_c', api: 'temperature', min: -1, max: -1 },
       { condition: 'Visibility (m)', id: 'visibility', api: 'visibility', min: -1, max: -1 },
