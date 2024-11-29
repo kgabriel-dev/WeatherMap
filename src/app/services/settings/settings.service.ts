@@ -75,11 +75,8 @@ export class SettingsService {
     return this.settings || this.defaultSettings;
   }
 
-  public setSettingsValue(key: keyof Settings, value: Settings[keyof Settings]): void {
-    if (this.settings && key in this.settings) {
-      // @ts-ignore
-      this.settings[key] = value;
-    }
+  public setSettings(newSettings: Partial<Settings>): void {
+    this.settings = { ...this.settings, ...newSettings };
 
     this.settingsChangedSubject.next(this.settings);
   }

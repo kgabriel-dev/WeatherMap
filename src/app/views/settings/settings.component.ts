@@ -118,10 +118,10 @@ export class SettingsComponent {
     // load and set the initial settings
     settingsService.getSettingsChangedObservable().subscribe((settings) => {
       this.selectedDataSource = settings.weatherCondition;
-      this.selectedLanguageKey = settings.languageCode || this.languages[0].key;
-      this.forecastLength = settings.forecastLength || this.forecastLength;
-      this.updateCheck = settings.updateCheck || this.updateCheck;
-      this.labeledImages = settings.labeledImages || this.labeledImages;
+      this.selectedLanguageKey = settings.languageCode;
+      this.forecastLength = settings.forecastLength
+      this.updateCheck = settings.updateCheck;
+      this.labeledImages = settings.labeledImages;
     });
 
     // display a message while loading the locations file
@@ -154,16 +154,16 @@ export class SettingsComponent {
   }
 
   saveSettings() {
-    this.settingsService.setSettingsValue('weatherCondition', this.selectedDataSource);
-    this.settingsService.setSettingsValue('languageCode', this.selectedLanguageKey);
-    this.settingsService.setSettingsValue('forecastLength', {
-      value: this.forecastLength.value,
-      unit: this.forecastLength.unit
+    this.settingsService.setSettings({
+      weatherCondition: this.selectedDataSource,
+      languageCode: this.selectedLanguageKey,
+      forecastLength: this.forecastLength,
+      updateCheck: this.updateCheck,
+      labeledImages: this.labeledImages
     });
-    this.settingsService.setSettingsValue('updateCheck', this.updateCheck);
-    this.settingsService.setSettingsValue('labeledImages', this.labeledImages);
 
     this.settingsService.saveSettings();
+
     this.closeWindow();
   }
 
