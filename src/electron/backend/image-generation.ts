@@ -9,7 +9,7 @@ const imagePixelSize = 512;
 
 ipcMain.on('cancel-weather-image-generation', (_event) => cancelRequested = true);
 
-export function generateWeatherImageForLocation(region: Region, dataGathererName: DataGathererName, weatherConditionId: string, forecast_length: number): Promise<{ date: string, filename: string }[]> {
+export function generateWeatherImageForLocation(region: Region, dataGathererName: DataGathererName, weatherConditionId: string, forecast_length: number, valueLabels: boolean): Promise<{ date: string, filename: string }[]> {
   const dataGatherer = getDataGatherer(dataGathererName);
 
   return new Promise((resolve, reject) => {
@@ -150,61 +150,49 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
           canvas.width = region.region.resolution * imagePixelSize;
           canvas.height = region.region.resolution * imagePixelSize;
 
-          // create the image square by square - without any labels
-          for(const [rowIndex, row] of gridCoordinates.entries()) {
-            for(const [columnIndex, coordinate] of row.entries()) {
-              const weatherData = weatherDataOverTime[timeIndex]?.find((data) => data.location.latitude === coordinate.latitude && data.location.longitude === coordinate.longitude) || null;
+            // create the image square by square - without any labels
+            for(const [rowIndex, row] of gridCoordinates.entries()) {
+              for(const [columnIndex, coordinate] of row.entries()) {
+                const weatherData = weatherDataOverTime[timeIndex]?.find((data) => data.location.latitude === coordinate.latitude && data.location.longitude === coordinate.longitude) || null;
 
-              let color: number[]; // color to draw the square with
-              if(!weatherData || weatherData.error) {
-                color = [255, 255, 255, 255]; // no data or error -> no visible square
-              } else {
-                color = _mapValueToColor(weatherData.weatherValue, minWeatherValue, maxWeatherValue);
+                let color: number[]; // color to draw the square with
+                if(!weatherData || weatherData.error) {
+                  color = [255, 255, 255, 255]; // no data or error -> no visible square
+                } else {
+                  color = _mapValueToColor(weatherData.weatherValue, minWeatherValue, maxWeatherValue);
+                }
+
+                context.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 200)`;
+                context.fillRect(rowIndex * imagePixelSize, columnIndex * imagePixelSize, imagePixelSize, imagePixelSize); // draw squares that are imagePixelSize x imagePixelSize pixels
+
+                if(valueLabels) {
+                  let value: string; // value to draw in the square as a label
+                  if(!weatherData || weatherData.error) {
+                    value = 'N/A'; // no data or error -> no visible square
+                  } else {
+                    value = weatherData.weatherValue.toString() + (weatherCondition.unit == '%' ? '' : ' ') + weatherCondition.unit;
+                  }
+
+                  context.fillStyle = 'rgba(0, 0, 0, 255)';
+                  context.font = `${imagePixelSize / 8}px Arial`;
+                  context.textAlign = 'center';
+                  context.textBaseline = 'middle';
+                  context.fillText(value, rowIndex * imagePixelSize + imagePixelSize / 2, columnIndex * imagePixelSize + imagePixelSize / 2); // add labels to the squares
+                  console.log('add text for ', columnIndex, rowIndex, value);
+                }
               }
-
-              context.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 200)`;
-              context.fillRect(rowIndex * imagePixelSize, columnIndex * imagePixelSize, imagePixelSize, imagePixelSize); // draw squares that are imagePixelSize x imagePixelSize pixels
             }
-          }
 
-          // save the image to a file in the temp directory
-          const buffer = canvas.toBuffer('image/png');
-          const filename = `${app.getPath('temp')}/WeatherMap/weather_image_${timeIndex}_excluding_labels.png`;
+            // save the image to a file in the temp directory
+            const buffer = canvas.toBuffer('image/png');
+            const filename = `${app.getPath('temp')}/WeatherMap/weather_image_${timeIndex}.png`;
 
-          try {
-            fs.writeFileSync(filename, buffer);
-            imagesToReturn.push({date: timeList[timeIndex], filename: filename});
-          } catch (error) {
-            console.error('Failed to write file', error);
-          }
-
-          // add the labels to the image square by square
-          for(const [rowIndex, row] of gridCoordinates.entries()) {
-            for(const [columnIndex, coordinate] of row.entries()) {
-              const weatherData = weatherDataOverTime[timeIndex]?.find((data) => data.location.latitude === coordinate.latitude && data.location.longitude === coordinate.longitude) || null;
-
-              let value: string; // value to draw in the square as a label
-              if(!weatherData || weatherData.error) {
-                value = 'N/A'; // no data or error -> no visible square
-              } else {
-                value = weatherData.weatherValue.toString() + weatherCondition.unit;
-              }
-
-              context.fillStyle = 'rgba(0, 0, 0, 255)';
-              context.font = '20px Arial';
-              context.fillText(value, columnIndex * imagePixelSize + 10, rowIndex * imagePixelSize + 30); // add labels to the squares
+            try {
+              fs.writeFileSync(filename, buffer);
+              imagesToReturn.push({date: timeList[timeIndex], filename: filename});
+            } catch (error) {
+              console.error('Failed to write file', error);
             }
-          }
-
-          // save the image to a file in the temp directory
-          const bufferWithLabels = canvas.toBuffer('image/png');
-          const filenameWithLabels = `${app.getPath('temp')}/WeatherMap/weather_image_${timeIndex}_including_labels.png`;
-
-          try {
-            fs.writeFileSync(filenameWithLabels, bufferWithLabels);
-          } catch (error) {
-            console.error('Failed to write file', error);
-          }
         }
 
         progress = 100;

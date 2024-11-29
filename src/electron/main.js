@@ -177,8 +177,8 @@ ipcMain.handle('write-app-file', (_event, filePath, data, encoding) => {
   }
 });
 
-ipcMain.handle('generate-weather-images-for-region', (_event, region, dataGatherer, weatherCondition, forecastLength) => {
-  return generateWeatherImageForLocation(region, dataGatherer, weatherCondition, forecastLength);
+ipcMain.handle('generate-weather-images-for-region', (_event, region, dataGatherer, weatherCondition, forecastLength, valueLabels) => {
+  return generateWeatherImageForLocation(region, dataGatherer, weatherCondition, forecastLength, valueLabels);
 });
 
 ipcMain.on('weather-generation-progress', (_event, inProgress, progressValue, progressMessage) => {
