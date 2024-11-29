@@ -156,7 +156,6 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
 
               let color: number[]; // color to draw the square with
               if(!weatherData || weatherData.error) {
-                console.log('No weather data in ', weatherData);
                 color = [255, 255, 255, 255]; // no data or error -> no visible square
               } else {
                 color = _mapValueToColor(weatherData.weatherValue, minWeatherValue, maxWeatherValue);

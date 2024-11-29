@@ -113,7 +113,6 @@ export class SettingsComponent {
     public settingsService: SettingsService,
     public locationsService: LocationService
   ) {
-    console.log(this.timezoneList)
     // load and set the initial settings
     settingsService.getSettingsChangedObservable().subscribe((settings) => {
       this.selectedDataSource = settings.weatherCondition;

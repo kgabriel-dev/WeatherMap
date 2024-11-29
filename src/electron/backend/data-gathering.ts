@@ -69,8 +69,6 @@ export class OpenMeteoDataGatherer implements DataGatherer {
         .replace('{hours}', data.hours.toString())
         .replace('{timezone}', data.tz);
 
-      console.log(url);
-
       try {
         const response = await fetch(url);
 
@@ -127,8 +125,6 @@ export class OpenMeteoDataGatherer implements DataGatherer {
         return [];
       }
     }
-
-    console.log(weatherData.map((data) => data.error));
     return weatherData;
   }
 
@@ -223,16 +219,12 @@ export class BrightSkyDataGatherer implements DataGatherer {
         .replace('{last_date}', encodeURIComponent(data.endDate.toISOString()))
         .replace('{timezone}', encodeURIComponent(data.tz));
 
-      console.log(url);
-
       try {
         const response = await fetch(url);
 
         if(cancelRequested) {
           throw new Error('Cancelled by user.');
         }
-
-        console.log(response);
 
         if(!response.ok) { // if the request failed
           for(let i = 0; i < (data.endDate.getTime() - data.startDate.getTime()); i += 3600000) {
@@ -283,7 +275,6 @@ export class BrightSkyDataGatherer implements DataGatherer {
       }
     }
 
-    console.log(weatherData);
     return weatherData;
   }
 

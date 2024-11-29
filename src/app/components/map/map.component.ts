@@ -35,8 +35,6 @@ export class MapComponent implements AfterViewInit {
 
     setText: (text: string[]): void => {
       const div = this.dataOverlay.getContainer();
-
-      console.log(!!div);
       if(!div) return;
 
       const paragraphs = text.map((t) => `<p style='margin: 0px'>${t}</p>`).join('');
