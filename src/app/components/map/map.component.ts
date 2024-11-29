@@ -203,10 +203,10 @@ export class MapComponent implements AfterViewInit {
 
     this.dataOverlay.setText([
       `Location: ${location}`,
-      `Region size: ${sessionData.mainData.regionSize.length} ${sessionData.mainData.regionSize.unit}`,
+      `Region size: ${sessionData.mainData.regionSize.length}x${sessionData.mainData.regionSize.length} ${sessionData.mainData.regionSize.unit}`,
       `Resolution: ${sessionData.mainData.regionResolution}x${sessionData.mainData.regionResolution}`,
-      `Weather data: ${sessionData.mainData.weatherCondition?.condition ?? 'N/A'}`,
-      `Time: ${new Date(imageDate).toLocaleString()}`
+      `Weather data: ${sessionData.mainData.weatherCondition?.condition ?? '** Unknown **'}`,
+      `Time: ${new Date(imageDate).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}`
     ]);
   }
 
