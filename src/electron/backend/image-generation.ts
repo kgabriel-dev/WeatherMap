@@ -1,5 +1,5 @@
 import { createCanvas } from "@napi-rs/canvas";
-import { OpenMeteoDataGatherer } from "./data-gathering";
+import { BrightSkyDataGatherer, OpenMeteoDataGatherer } from "./data-gathering";
 import { app, ipcMain } from 'electron';
 import fs from 'node:fs';
 import { sendWeatherGenerationProgressUpdate } from "../utils";
@@ -52,7 +52,7 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
         sendWeatherGenerationProgressUpdate(true, progress, 'Data gathering finished. Converting data now');
 
         // convert the data from weather over space in a time range to weather over time at a location
-        const weatherDataOverTime: { [timeIndex: number]: { weatherCondition: WeatherCondition, weatherValue: number, location: SimpleLocation }[] } = {};
+        const weatherDataOverTime: { [timeIndex: number]: { weatherCondition: WeatherCondition, weatherValue: number, error: boolean, location: SimpleLocation }[] } = {};
 
         const timeList: string[] = [];
         weatherData.forEach((data) => {
@@ -71,7 +71,8 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
           weatherDataOverTime[timeIndex].push({
             weatherCondition: data.weatherCondition,
             weatherValue: data.weatherValue,
-            location: data.coordinates
+            location: data.coordinates,
+            error: data.error
           });
         });
 
@@ -151,7 +152,12 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
             for(const [columnIndex, coordinate] of row.entries()) {
               const weatherData = weatherDataOverTime[timeIndex]?.find((data) => data.location.latitude === coordinate.latitude && data.location.longitude === coordinate.longitude) || null;
 
-              const color = weatherData ? _mapValueToColor(weatherData.weatherValue, minWeatherValue, maxWeatherValue) : [255, 0, 0, 200];
+              let color: number[]; // color to draw the square with
+              if(!weatherData || weatherData.error) {
+                color = [255, 255, 255, 255]; // no data or error -> no visible square
+              } else {
+                color = weatherData ? _mapValueToColor(weatherData.weatherValue, minWeatherValue, maxWeatherValue) : [255, 0, 0, 200];
+              }
 
               context.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 255)`;
               context.fillRect(rowIndex * 64, columnIndex * 64, 64, 64); // draw squares that are 64x64 pixels
@@ -193,9 +199,9 @@ function getDataGatherer(dataGathererName: DataGathererName): DataGatherer {
     case "OpenMeteo":
       return new OpenMeteoDataGatherer();
     case "BrightSky":
-      // TODO: return new BrightSkyDataGatherer();
-      throw new Error('BrightSky data gatherer is not implemented yet');
+      return new BrightSkyDataGatherer();
     default:
+      sendWeatherGenerationProgressUpdate(false, 100, 'Unknown data gatherer used!');
       throw new Error('Unknown data gatherer id');
   }
 }

@@ -1,4 +1,3 @@
-import { Conditional } from '@angular/compiler';
 import { sendWeatherGenerationProgressUpdate } from './../utils';
 import { ipcMain } from 'electron';
 
@@ -34,7 +33,7 @@ export class OpenMeteoDataGatherer implements DataGatherer {
           const lat = region.coordinates.latitude + locationOffset + latIndex * latStepSize;
           const lon = region.coordinates.longitude + locationOffset + lonIndex * lonStepSize;
 
-          requests.push({ lat, lon, api: condition.api, hours: forecast_hours, tz: region.timezoneCode });
+          requests.push({ lat, lon, api: condition.api, hours: forecast_hours + 1, tz: region.timezoneCode });
         }
       }
 
@@ -93,6 +92,7 @@ export class OpenMeteoDataGatherer implements DataGatherer {
             coordinates: { latitude: data.lat, longitude: data.lon },
             weatherCondition: this.listAvailableWeatherConditions().find((condition) => condition.api === data.api)!,
             weatherValue: value,
+            error: false,
             date: date.toISOString()
           });
         }
@@ -150,9 +150,9 @@ export class BrightSkyDataGatherer implements DataGatherer {
       const lonStepSize = stepSize / (111.320 * Math.cos(region.coordinates.latitude * Math.PI / 180)); // 1° longitude is 111.320 km at the equator
       const locationOffset = -Math.floor(region.region.resolution/2) + (region.region.resolution % 2 === 0 ? 0.5 : 1);
       const startDate = new Date(); // current date
-      startDate.setHours(0, 0, 0, 0);
+      startDate.setMinutes(0, 0, 0);
       const endDate = new Date(startDate);
-      endDate.setHours(startDate.getHours() + forecast_hours);
+      endDate.setHours(startDate.getHours() + forecast_hours, 0, 0, 0);
 
       const requests: { lat: number, lon: number, api: string, startDate: Date, endDate: Date, tz: string }[] = [];
 
@@ -200,9 +200,11 @@ export class BrightSkyDataGatherer implements DataGatherer {
         .replace('{lat}', data.lat.toString())
         .replace('{lon}', data.lon.toString())
         .replace('{category}', data.api)
-        .replace('{date}', data.startDate.toISOString())
-        .replace('{last_date}', data.endDate.toISOString())
-        .replace('{timezone}', data.tz);
+        .replace('{date}', encodeURIComponent(data.startDate.toISOString()))
+        .replace('{last_date}', encodeURIComponent(data.endDate.toISOString()))
+        .replace('{timezone}', encodeURIComponent(data.tz));
+
+      console.log(url);
 
       try {
         const response = await fetch(url);
@@ -211,28 +213,45 @@ export class BrightSkyDataGatherer implements DataGatherer {
           throw new Error('Cancelled by user.');
         }
 
-        if(!response.ok) {
-          console.error(`Request failed with status code ${response.status}`);
-          throw new Error(`REQUEST FAILED - Request failed with status code ${response.status}`);
+        console.log(response);
+
+        if(!response.ok) { // if the request failed
+          for(let i = 0; i < (data.endDate.getTime() - data.startDate.getTime()); i += 3600000) {
+            const date = new Date(data.startDate.getTime() + i);
+
+            weatherData.push({
+              coordinates: { latitude: data.lat, longitude: data.lon },
+              weatherCondition: this.listAvailableWeatherConditions().find((condition) => condition.api === data.api)!,
+              weatherValue: 0,
+              error: true,
+              date: date.toISOString()
+            });
+          }
+
+          progress += progressPerStep;
+          sendWeatherGenerationProgressUpdate(true, progress, `Request for location #${dataList.indexOf(data) + 1} failed`);
         }
 
-        const json = await response.json();
-        const time_values = json['hourly']['time'];
+        // if the request was successful
+        else {
+          const json = await response.json();
+          const dataArray = json['weather'];
 
-        for(let i = 0; i < time_values.length; i++) {
-          const date = new Date(time_values[i]);
-          const value = json['hourly'][data.api][i];
+          for(let i = 0; i < dataArray.length; i++) {
+            const currWeatherData = dataArray[i];
 
-          weatherData.push({
-            coordinates: { latitude: data.lat, longitude: data.lon },
-            weatherCondition: this.listAvailableWeatherConditions().find((condition) => condition.api === data.api)!,
-            weatherValue: value,
-            date: date.toISOString()
-          });
+            weatherData.push({
+              coordinates: { latitude: data.lat, longitude: data.lon },
+              weatherCondition: this.listAvailableWeatherConditions().find((condition) => condition.api === data.api)!,
+              weatherValue: currWeatherData[data.api],
+              error: false,
+              date: new Date(currWeatherData.timestamp).toISOString()
+            });
+          }
+
+          progress += progressPerStep;
+          sendWeatherGenerationProgressUpdate(true, progress, `Request for location #${dataList.indexOf(data) + 1} successful`);
         }
-
-        progress += progressPerStep;
-        sendWeatherGenerationProgressUpdate(true, progress, `Request for location #${dataList.indexOf(data) + 1} successful`);
 
         if(cancelRequested)
           throw new Error('Cancelled by user.');
@@ -240,10 +259,12 @@ export class BrightSkyDataGatherer implements DataGatherer {
         await delay(this.REQUEST_DELAY);
       }
       catch(error) {
+        console.error(error);
         return [];
       }
     }
 
+    console.log(weatherData);
     return weatherData;
   }
 
