@@ -15,8 +15,10 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
   return new Promise((resolve, reject) => {
     const weatherCondition = dataGatherer.listAvailableWeatherConditions().find((condition) => condition.id === weatherConditionId);
 
-    if(!weatherCondition)
+    if(!weatherCondition) {
       reject('Unknown weather condition id');
+      return;
+    }
 
     let progress = 0;
     sendWeatherGenerationProgressUpdate(true, progress, 'Deleting the old weather images');
@@ -40,7 +42,7 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
     const progressPerStep = 100 / (numberOfLocations + numberOfImages + 2); // how much progress is made per step (location or image); +2 for "finished data gathering"-message and for the final step
 
     // gather the data for the location
-    dataGatherer.gatherData(region, weatherCondition!, forecast_length, progressPerStep)
+    dataGatherer.gatherData(region, weatherCondition, forecast_length, progressPerStep)
       .then((weatherData) => {
         if(cancelRequested) {
           sendWeatherGenerationProgressUpdate(false, 100, 'Cancelled by user');
@@ -124,8 +126,8 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
         gridCoordinates.forEach((row) => row.sort((a, b) => a.longitude - b.longitude));
         gridCoordinates.sort((a, b) => a[0].latitude - b[0].latitude);
 
-        const maxWeatherValue = Math.max(...weatherData.map((data) => data.weatherValue));
-        const minWeatherValue = Math.min(...weatherData.map((data) => data.weatherValue));
+        const maxWeatherValue = weatherCondition.max == -1 ? Math.max(...weatherData.map((data) => data.weatherValue)) : weatherCondition.max;
+        const minWeatherValue = weatherCondition.min == -1 ? Math.min(...weatherData.map((data) => data.weatherValue)) : weatherCondition.min;
 
         // create the raster images
         for(let timeIndex = 0; timeIndex < timeList.length; timeIndex++) {
@@ -154,9 +156,10 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
 
               let color: number[]; // color to draw the square with
               if(!weatherData || weatherData.error) {
+                console.log('No weather data in ', weatherData);
                 color = [255, 255, 255, 255]; // no data or error -> no visible square
               } else {
-                color = weatherData ? _mapValueToColor(weatherData.weatherValue, minWeatherValue, maxWeatherValue) : [255, 0, 0, 200];
+                color = _mapValueToColor(weatherData.weatherValue, minWeatherValue, maxWeatherValue);
               }
 
               context.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 255)`;

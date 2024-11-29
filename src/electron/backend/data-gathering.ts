@@ -69,6 +69,8 @@ export class OpenMeteoDataGatherer implements DataGatherer {
         .replace('{hours}', data.hours.toString())
         .replace('{timezone}', data.tz);
 
+      console.log(url);
+
       try {
         const response = await fetch(url);
 
@@ -76,29 +78,45 @@ export class OpenMeteoDataGatherer implements DataGatherer {
           throw new Error('Cancelled by user.');
         }
 
+        // create an error entry for each hour if the request failed
         if(!response.ok) {
-          console.error(`Request failed with status code ${response.status}`);
-          throw new Error(`REQUEST FAILED - Request failed with status code ${response.status}`);
+          for(let i = 0; i < data.hours; i++) {
+            const date = new Date(Date.now() + i * 3600000);
+
+            weatherData.push({
+              coordinates: { latitude: data.lat, longitude: data.lon },
+              weatherCondition: this.listAvailableWeatherConditions().find((condition) => condition.api === data.api)!,
+              weatherValue: 0,
+              error: true,
+              date: date.toISOString()
+            });
+          }
+
+          progress += progressPerStep;
+          sendWeatherGenerationProgressUpdate(true, progress, `Request for location #${dataList.indexOf(data) + 1} failed`);
         }
 
-        const json = await response.json();
-        const time_values = json['hourly']['time'];
+        // if the request was successful add the data to the weatherData array
+        else {
+          const json = await response.json();
+          const time_values = json['hourly']['time'];
 
-        for(let i = 0; i < time_values.length; i++) {
-          const date = new Date(time_values[i]);
-          const value = json['hourly'][data.api][i];
+          for(let i = 0; i < time_values.length; i++) {
+            const date = new Date(time_values[i]);
+            const value = json['hourly'][data.api][i];
 
-          weatherData.push({
-            coordinates: { latitude: data.lat, longitude: data.lon },
-            weatherCondition: this.listAvailableWeatherConditions().find((condition) => condition.api === data.api)!,
-            weatherValue: value,
-            error: false,
-            date: date.toISOString()
-          });
+            weatherData.push({
+              coordinates: { latitude: data.lat, longitude: data.lon },
+              weatherCondition: this.listAvailableWeatherConditions().find((condition) => condition.api === data.api)!,
+              weatherValue: value,
+              error: false,
+              date: date.toISOString()
+            });
+          }
+
+          progress += progressPerStep;
+          sendWeatherGenerationProgressUpdate(true, progress, `Request for location #${dataList.indexOf(data) + 1} successful`);
         }
-
-        progress += progressPerStep;
-        sendWeatherGenerationProgressUpdate(true, progress, `Request for location #${dataList.indexOf(data) + 1} successful`);
 
         if(cancelRequested)
           throw new Error('Cancelled by user.');
@@ -110,6 +128,7 @@ export class OpenMeteoDataGatherer implements DataGatherer {
       }
     }
 
+    console.log(weatherData.map((data) => data.error));
     return weatherData;
   }
 
