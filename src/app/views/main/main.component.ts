@@ -264,13 +264,6 @@ export class MainComponent {
     });
   }
 
-  getLocationsList(): Region[] {
-    return [
-      ...this.locationsService.getLocations(),
-      this.customLocation
-    ];
-  }
-
   startWeatherImageGeneration(): void {
     window.weather.sendWeatherGenerationProgress(true, 0, 'Starting weather image generation');
 

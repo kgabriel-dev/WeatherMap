@@ -39,7 +39,7 @@
           <div class="flex-grow-1">
             <p-dropdown
               #locationDropdown
-              [options]="getLocationsList()"
+              [options]="locationsService.getLocations()"
               [(ngModel)]="regionInDropdown"
               (onChange)="applyLocation(regionInDropdown)"
               optionLabel="name"

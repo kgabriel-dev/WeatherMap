@@ -16,6 +16,7 @@ export class MapComponent implements AfterViewInit {
   private map: L.Map | undefined;
   private isMapReady$ = new BehaviorSubject<boolean>(false);
 
+  // --- CREATION OF OVERLAYS ---
   readonly DataOverlay = L.Control.extend({
     onAdd: (_map: L.Map): HTMLDivElement => {
       const div = L.DomUtil.create('div', 'overlay-control');
@@ -45,6 +46,7 @@ export class MapComponent implements AfterViewInit {
   });
   readonly dataOverlay = new this.DataOverlay({ position: 'topright' });
 
+  // --- "NORMAL" CODE ---
   readonly markerIcon = L.icon({
     iconUrl: 'assets/maps-pin-black-icon.png',
     iconSize: [ 25, 25 ],
