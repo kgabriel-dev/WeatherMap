@@ -18,6 +18,7 @@ declare type WeatherCondition = {
   api: string; // value to use in the API request
   min: number; // -1 represents a dynamic minimum value
   max: number; // -1 represents a dynamic maximum value
+  unit: string; // unit to display in the UI
 }
 
 declare type DataGathererName = 'OpenMeteo' | 'BrightSky';

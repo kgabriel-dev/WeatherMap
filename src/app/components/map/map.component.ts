@@ -162,7 +162,7 @@ export class MapComponent implements AfterViewInit {
     if(this.overlayedImage)
       this.map.removeLayer(this.overlayedImage);
 
-    this.overlayedImage = L.imageOverlay(filePath, imageBounds, { opacity: 0.7 }).addTo(this.map);
+    this.overlayedImage = L.imageOverlay(filePath, imageBounds).addTo(this.map);
 
     this.fitRegionToScreen();
   }

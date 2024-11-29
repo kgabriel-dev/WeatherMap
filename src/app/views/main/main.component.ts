@@ -109,6 +109,7 @@ export class MainComponent {
 
     window.app.onSettingsModalClosed(() => {
       const settings = this.settingsService.getSettings();
+      console.log(settings)
       let selectedLocation = this.locationsService.getLocations()[settings.defaultLocationIndex];
 
       if(!selectedLocation)
@@ -340,7 +341,17 @@ export class MainComponent {
       this.setWeatherImageIndex(0);
       sessionData = this.sessionService.getLatestSessionData();
 
-    this.mapComponent?.overlayWeatherImage(this.weatherImages[sessionData.mainData.currentWeatherImageIndex].filename);
+    let imageName = this.weatherImages[sessionData.mainData.currentWeatherImageIndex].filename;
+
+    console.log(this.settingsService.getSettings().labeledImages);
+    if(this.settingsService.getSettings().labeledImages)
+      // weather_image_123_excluding_labels.png -> weather_image_123_including_labels.png
+      imageName = imageName.replace('excluding', 'including');
+    else
+      // weather_image_123_including_labels.png -> weather_image_123_excluding_labels.png
+      imageName = imageName.replace('including', 'excluding');
+
+    this.mapComponent?.overlayWeatherImage(imageName);
     this.mapComponent?.updateDataInfo(this.lastWeatherGatheringTime);
   }
 

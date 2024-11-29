@@ -54,6 +54,14 @@
 
     <p-divider />
 
+    <p>Labeled weather images</p>
+    <div class="flex flex-row gap-1">
+      <p-checkbox [(ngModel)]="labeledImages" [binary]="true" inputId="labeled_images"></p-checkbox>
+      <label for="labeled_images">Show labels on the weather images.</label>
+    </div>
+
+    <p-divider />
+
     <p>Update check & notification</p>
     <div class="flex flex-row gap-1">
       <p-checkbox [(ngModel)]="updateCheck" [binary]="true" inputId="update_notification"></p-checkbox>

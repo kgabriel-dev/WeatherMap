@@ -38,6 +38,7 @@ export class SettingsComponent {
   // variables for the selected timezone
   readonly timezoneList = this.buildTimezoneList();
 
+  // TODO: Read the values directly from the data gatherers
   // variables for the selected data source
   readonly dataSources: SelectItemGroup[] = [
     {
@@ -104,6 +105,7 @@ export class SettingsComponent {
     unit: 'days'
   }
   updateCheck: boolean = true;
+  labeledImages: boolean = true;
   workingLocation?: Region;
   locationLoadingMessages: Message[] = [];
   locationsAlreadyLoaded: boolean = false;
@@ -118,6 +120,8 @@ export class SettingsComponent {
       this.selectedDataSource = settings.weatherCondition;
       this.selectedLanguageKey = settings.languageCode || this.languages[0].key;
       this.forecastLength = settings.forecastLength || this.forecastLength;
+      this.updateCheck = settings.updateCheck || this.updateCheck;
+      this.labeledImages = settings.labeledImages || this.labeledImages;
     });
 
     // display a message while loading the locations file
@@ -157,6 +161,7 @@ export class SettingsComponent {
       unit: this.forecastLength.unit
     });
     this.settingsService.setSettingsValue('updateCheck', this.updateCheck);
+    this.settingsService.setSettingsValue('labeledImages', this.labeledImages);
 
     this.settingsService.saveSettings();
     this.closeWindow();

@@ -15,7 +15,8 @@ export class SettingsService {
       unit: 'hours'
     },
     updateCheck: true,
-    defaultLocationIndex: 0
+    defaultLocationIndex: 0,
+    labeledImages: true
   }
   private settings: Settings = this.defaultSettings;
 
@@ -43,6 +44,15 @@ export class SettingsService {
         .then((data) => {
           console.info('settings.json read!');
           this.settings = JSON.parse(data);
+
+          // check for missing settings and add them
+          for (const key in this.defaultSettings) {
+            if (!(key in this.settings)) {
+              // @ts-ignore
+              this.settings[key] = this.defaultSettings[key];
+            }
+          }
+
           this.settingsChangedSubject.next(this.settings);
           this.notifySettingsRead$.next(true);
         })
@@ -100,4 +110,5 @@ export type Settings = {
   },
   updateCheck: boolean,
   defaultLocationIndex: number,
+  labeledImages: boolean
 }

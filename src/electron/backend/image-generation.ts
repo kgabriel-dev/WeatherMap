@@ -3,9 +3,9 @@ import { BrightSkyDataGatherer, OpenMeteoDataGatherer } from "./data-gathering";
 import { app, ipcMain } from 'electron';
 import fs from 'node:fs';
 import { sendWeatherGenerationProgressUpdate } from "../utils";
-import { send } from "node:process";
 
 let cancelRequested = false;
+const imagePixelSize = 512;
 
 ipcMain.on('cancel-weather-image-generation', (_event) => cancelRequested = true);
 
@@ -147,9 +147,10 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
           progress += progressPerStep;
           sendWeatherGenerationProgressUpdate(true, progress, `Creating image #${timeIndex + 1}`);
 
-          canvas.width = region.region.resolution * 64;
-          canvas.height = region.region.resolution * 64;
+          canvas.width = region.region.resolution * imagePixelSize;
+          canvas.height = region.region.resolution * imagePixelSize;
 
+          // create the image square by square - without any labels
           for(const [rowIndex, row] of gridCoordinates.entries()) {
             for(const [columnIndex, coordinate] of row.entries()) {
               const weatherData = weatherDataOverTime[timeIndex]?.find((data) => data.location.latitude === coordinate.latitude && data.location.longitude === coordinate.longitude) || null;
@@ -161,18 +162,46 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
                 color = _mapValueToColor(weatherData.weatherValue, minWeatherValue, maxWeatherValue);
               }
 
-              context.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 255)`;
-              context.fillRect(rowIndex * 64, columnIndex * 64, 64, 64); // draw squares that are 64x64 pixels
+              context.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 200)`;
+              context.fillRect(rowIndex * imagePixelSize, columnIndex * imagePixelSize, imagePixelSize, imagePixelSize); // draw squares that are imagePixelSize x imagePixelSize pixels
             }
           }
 
           // save the image to a file in the temp directory
           const buffer = canvas.toBuffer('image/png');
-          const filename = `${app.getPath('temp')}/WeatherMap/weather_image_${timeIndex}.png`;
+          const filename = `${app.getPath('temp')}/WeatherMap/weather_image_${timeIndex}_excluding_labels.png`;
 
           try {
             fs.writeFileSync(filename, buffer);
             imagesToReturn.push({date: timeList[timeIndex], filename: filename});
+          } catch (error) {
+            console.error('Failed to write file', error);
+          }
+
+          // add the labels to the image square by square
+          for(const [rowIndex, row] of gridCoordinates.entries()) {
+            for(const [columnIndex, coordinate] of row.entries()) {
+              const weatherData = weatherDataOverTime[timeIndex]?.find((data) => data.location.latitude === coordinate.latitude && data.location.longitude === coordinate.longitude) || null;
+
+              let value: string; // value to draw in the square as a label
+              if(!weatherData || weatherData.error) {
+                value = 'N/A'; // no data or error -> no visible square
+              } else {
+                value = weatherData.weatherValue.toString() + weatherCondition.unit;
+              }
+
+              context.fillStyle = 'rgba(0, 0, 0, 255)';
+              context.font = '20px Arial';
+              context.fillText(value, columnIndex * imagePixelSize + 10, rowIndex * imagePixelSize + 30); // add labels to the squares
+            }
+          }
+
+          // save the image to a file in the temp directory
+          const bufferWithLabels = canvas.toBuffer('image/png');
+          const filenameWithLabels = `${app.getPath('temp')}/WeatherMap/weather_image_${timeIndex}_including_labels.png`;
+
+          try {
+            fs.writeFileSync(filenameWithLabels, bufferWithLabels);
           } catch (error) {
             console.error('Failed to write file', error);
           }
