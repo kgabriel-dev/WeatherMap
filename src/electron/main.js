@@ -218,7 +218,6 @@ ipcMain.handle('open-progress-info-window', (_event) => {
 
   progressWindow.once('ready-to-show', () => {
     progressWindow.show();
-    progressWindow.toggleDevTools();
   });
 
   progressWindow.on('closed', () => {

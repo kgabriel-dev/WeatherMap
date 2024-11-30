@@ -109,7 +109,6 @@ export class MainComponent {
 
     window.app.onSettingsModalClosed(() => {
       const settings = this.settingsService.getSettings();
-      console.log(settings)
       let selectedLocation = this.locationsService.getLocations()[settings.defaultLocationIndex];
 
       if(!selectedLocation)
@@ -278,7 +277,7 @@ export class MainComponent {
         resolution: sessionData.mainData.regionResolution,
         size: sessionData.mainData.regionSize
       },
-      timezoneCode: this.locationsService.getLocations().find((location) => location.id === sessionData.mainData.selectedRegionIndex)?.timezoneCode || 'UTC'
+      timezoneCode: this.locationsService.getLocations().find((_location, index) => index === sessionData.mainData.selectedRegionIndex)?.timezoneCode || 'UTC'
     }
 
     const dataGathererName = sessionData.mainData.weatherDataSource;
@@ -340,7 +339,6 @@ export class MainComponent {
     if(sessionData.mainData.currentWeatherImageIndex >= sessionData.mainData.numberOfWeatherImages)
       this.setWeatherImageIndex(0);
       sessionData = this.sessionService.getLatestSessionData();
-    console.log(this.weatherImages[sessionData.mainData.currentWeatherImageIndex].filename);
 
     this.mapComponent?.overlayWeatherImage(this.weatherImages[sessionData.mainData.currentWeatherImageIndex].filename);
     this.mapComponent?.updateDataInfo(this.lastWeatherGatheringTime);

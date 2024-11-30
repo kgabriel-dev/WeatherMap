@@ -137,8 +137,8 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
             cancelRequested = false;
           }
 
-          const canvas = createCanvas(region.region.resolution, region.region.resolution);
-          const context = canvas.getContext('2d');
+          const canvas = createCanvas(region.region.resolution * imagePixelSize, region.region.resolution * imagePixelSize);
+          const context = canvas.getContext('2d', { alpha: true });
 
           if(!context) {
             reject('Failed to create image context');
@@ -146,9 +146,6 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
 
           progress += progressPerStep;
           sendWeatherGenerationProgressUpdate(true, progress, `Creating image #${timeIndex + 1}`);
-
-          canvas.width = region.region.resolution * imagePixelSize;
-          canvas.height = region.region.resolution * imagePixelSize;
 
             // create the image square by square - without any labels
             for(const [rowIndex, row] of gridCoordinates.entries()) {
@@ -162,7 +159,7 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
                   color = _mapValueToColor(weatherData.weatherValue, minWeatherValue, maxWeatherValue);
                 }
 
-                context.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 200)`;
+                context.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.8)`;
                 context.fillRect(rowIndex * imagePixelSize, columnIndex * imagePixelSize, imagePixelSize, imagePixelSize); // draw squares that are imagePixelSize x imagePixelSize pixels
 
                 if(valueLabels) {
@@ -177,14 +174,13 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
                   context.font = `${imagePixelSize / 8}px Arial`;
                   context.textAlign = 'center';
                   context.textBaseline = 'middle';
-                  context.fillText(value, rowIndex * imagePixelSize + imagePixelSize / 2, columnIndex * imagePixelSize + imagePixelSize / 2); // add labels to the squares
-                  console.log('add text for ', columnIndex, rowIndex, value);
+                  context.fillText(value, rowIndex * imagePixelSize + imagePixelSize / 2, columnIndex * imagePixelSize + imagePixelSize / 2, imagePixelSize); // add labels to the squares
                 }
               }
             }
 
             // save the image to a file in the temp directory
-            const buffer = canvas.toBuffer('image/png');
+            const buffer = canvas.encodeSync('png');
             const filename = `${app.getPath('temp')}/WeatherMap/weather_image_${timeIndex}.png`;
 
             try {
