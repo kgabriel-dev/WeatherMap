@@ -292,6 +292,7 @@ export class MainComponent {
 
     window.weather.generateWeatherImagesForRegion(region, dataGathererName, weatherConditionId, forecast_length, this.settingsService.getSettings().labeledImages)
       .then((images) => {
+        const sessionData = this.sessionService.getLatestSessionData();
 
         this.sessionService.updateSessionData({
           mainData: {
