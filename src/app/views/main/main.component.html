@@ -130,6 +130,32 @@
           [style]="{'width': '7rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0'}" />
       </div>
 
+      <p-checkbox
+        [(ngModel)]="mainSessionDataForUpdate.useOverriddenTimezone"
+        [binary]="true"
+        (onChange)="debouncedUpdateSessionData()"
+        label="Override location's timezone" />
+      <p-dropdown
+        [options]="timezoneList"
+        (onChange)="debouncedUpdateSessionData()"
+        optionValue="name"
+        optionLabel="name"
+        [group]="true"
+        styleClass="w-full"
+        [filter]="true"
+        filterBy="name"
+        [style]="{'z-index': 3}"
+        [(ngModel)]="mainSessionDataForUpdate.overriddenTimezoneCode"
+        [disabled]="!lastReadMainSessionData.useOverriddenTimezone" >
+
+        <ng-template let-group pTemplate="group">
+          <div class="flex align-items center color-primary">
+            <span>---- {{group.label}} ----</span>
+          </div>
+        </ng-template>
+
+      </p-dropdown>
+
       <label for="source">Source:</label>
       <p-dropdown
         [options]="getDataSourcesList()"

@@ -251,7 +251,7 @@ export class SettingsComponent {
 
 }
 
-type TimezoneList = {
+export type TimezoneList = {
   label: string;
   value: string;
   items: TimeZone[];

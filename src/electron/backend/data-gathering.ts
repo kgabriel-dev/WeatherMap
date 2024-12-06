@@ -19,7 +19,6 @@ export class OpenMeteoDataGatherer implements DataGatherer {
       const latStepSize = stepSize / 110.574; // 1° latitude is 110.574 km
       const lonStepSize = stepSize / (111.320 * Math.cos(region.coordinates.latitude * Math.PI / 180)); // 1° longitude is 111.320 km at the equator
       const locationOffset = Math.floor(-region.region.resolution/2) + (region.region.resolution % 2 === 0 ? 0.5 : 1); // how many steps to the left and top from the center
-      console.log(locationOffset);
       const requests: { lat: number, lon: number, api: string, hours: number, tz: string }[] = [];
 
       if(cancelRequested) {

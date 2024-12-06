@@ -12,11 +12,14 @@ import { MapComponent } from '../../components/map/map.component';
 import { SessionService } from '../../services/session/session.service';
 import { MainData } from '../../services/session/session.type';
 import { TooltipModule } from 'primeng/tooltip';
+import { getTimeZones, TimeZone } from '@vvo/tzdb';
+import { TimezoneList } from '../settings/settings.component';
+import { CheckboxModule } from 'primeng/checkbox';
 
 @Component({
   selector: 'app-main',
   standalone: true,
-  imports: [FormsModule, ProgressBarModule, ButtonModule, ImageModule, DropdownModule, InputNumberModule, MapComponent, TooltipModule],
+  imports: [FormsModule, ProgressBarModule, ButtonModule, ImageModule, DropdownModule, InputNumberModule, MapComponent, TooltipModule, CheckboxModule],
   templateUrl: './main.component.html',
   styleUrl: './main.component.scss'
 })
@@ -55,6 +58,8 @@ export class MainComponent {
   weatherImages: { date: Date, filename: string }[] = [];
 
   weatherConditions: WeatherCondition[] = [];
+
+  timezoneList = this.buildTimezoneList();
 
   @ViewChild('locationDropdown') locationDropdown?: Dropdown;
   @ViewChild('mapComponent') mapComponent?: MapComponent
@@ -277,7 +282,9 @@ export class MainComponent {
         resolution: sessionData.mainData.regionResolution,
         size: sessionData.mainData.regionSize
       },
-      timezoneCode: this.locationsService.getLocations().find((_location, index) => index === sessionData.mainData.selectedRegionIndex)?.timezoneCode || 'UTC'
+      timezoneCode: sessionData.mainData.useOverriddenTimezone ?
+        sessionData.mainData.overriddenTimezoneCode :   // use the overridden timezone if it is enabled, otherwise use the timezone of the selected region (fallback to overridden timezone)
+        this.locationsService.getLocations().find((_location, index) => index === sessionData.mainData.selectedRegionIndex)?.timezoneCode || sessionData.mainData.overriddenTimezoneCode
     }
 
     const dataGathererName = sessionData.mainData.weatherDataSource;
@@ -455,5 +462,27 @@ export class MainComponent {
       return value * 24;
 
     return 0;
+  }
+
+  private buildTimezoneList(): TimezoneList {
+    const timezoneGroups: { label: string, timezones: TimeZone[] }[] = [];
+    getTimeZones().forEach(timezone => {
+      const continent = timezone.continentName
+
+      let continentGroup = timezoneGroups.find(group => group.label === continent);
+
+      if (!continentGroup) {
+        continentGroup = { label: continent, timezones: [] };
+        timezoneGroups.push(continentGroup);
+      }
+
+      continentGroup.timezones.push(timezone);
+    });
+
+    return timezoneGroups.map(group => ({
+      label: group.label,
+      value: group.label,
+      items: group.timezones
+    }));
   }
 }

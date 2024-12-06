@@ -14,4 +14,6 @@ export type MainData = {
   forecastLength: Settings['forecastLength'];
   weatherDataSource: DataGathererName;
   weatherCondition: WeatherCondition | undefined;
+  overriddenTimezoneCode: string;
+  useOverriddenTimezone: boolean;
 }

@@ -25,7 +25,9 @@ export class SessionService {
         unit: 'hours'
       },
       weatherDataSource: 'OpenMeteo',
-      weatherCondition: undefined
+      weatherCondition: undefined,
+      overriddenTimezoneCode: 'Europe/Berlin',
+      useOverriddenTimezone: false
     }
   });
 
