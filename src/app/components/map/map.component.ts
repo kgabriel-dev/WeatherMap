@@ -16,6 +16,8 @@ export class MapComponent implements AfterViewInit {
   private map: L.Map | undefined;
   private isMapReady$ = new BehaviorSubject<boolean>(false);
 
+  private tempMarker: L.Marker | undefined;
+
   // --- CREATION OF OVERLAYS ---
   readonly DataOverlay = L.Control.extend({
     onAdd: (_map: L.Map): HTMLDivElement => {
@@ -98,12 +100,18 @@ export class MapComponent implements AfterViewInit {
     })
 
     this.sessionService.getSessionDataObservable().subscribe((sessionData) => {
+      // update the icons of the regular markers
       this.markers.forEach((marker, index) => {
-        const locationIndex = sessionData.mainData.selectedRegionIndex === -1 ? this.settingsService.getSettings().defaultLocationIndex : sessionData.mainData.selectedRegionIndex;
+        const locationIndex = sessionData.mainData.selectedRegionIndex;
         const icon = index === locationIndex ? this.markerIconSelected : this.markerIcon;
 
         marker.setIcon(icon);
       });
+      // update the icon of the temporary marker
+      if(sessionData.mainData.selectedRegionIndex === -1 && this.tempMarker)
+        this.tempMarker.setIcon(this.markerIconSelected);
+      else
+        this.tempMarker?.setIcon(this.markerIcon);
 
       this.fitRegionToScreen();
     });
@@ -114,11 +122,13 @@ export class MapComponent implements AfterViewInit {
   }
 
   private initMap() {
+    // create the map
     this.map = L.map('map', {
       center: [ 54.10352, 12.1048 ],
       zoom: 10
     });
 
+    // add tiles to the map
     const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 18,
       minZoom: 3,
@@ -127,20 +137,66 @@ export class MapComponent implements AfterViewInit {
 
     tiles.addTo(this.map);
 
+    // register right click event
+    this.map.on('contextmenu', (event) => {
+      this.sessionService.updateSessionData({
+        mainData: {
+          ...this.sessionService.getLatestSessionData().mainData,
+          usedLocation: {
+            latitude: event.latlng.lat,
+            longitude: event.latlng.lng
+          },
+          selectedRegionIndex: -1
+        }
+      });
+
+      this.fitRegionToScreen();
+
+      if(!this.map) return;
+
+      if(this.tempMarker)
+        this.map.removeLayer(this.tempMarker);
+
+      this.tempMarker = L.marker([ event.latlng.lat, event.latlng.lng ], { icon: this.markerIconSelected })
+        .addTo(this.map)
+        .bindPopup('Custom temporary location - you can create permanent locations in the settings')
+        .openPopup()
+        .on('click', () => {
+          const sessionData = this.sessionService.getLatestSessionData();
+
+          this.sessionService.updateSessionData({
+            mainData: {
+              ...sessionData.mainData,
+              selectedRegionIndex: -1,
+              usedLocation: {
+                latitude: event.latlng.lat,
+                longitude: event.latlng.lng
+              }
+            }
+          });
+
+          this.onMarkerClick(-1);
+          this.fitRegionToScreen();
+        });
+
+      this.markers.forEach((marker) => marker.setIcon(this.markerIcon));
+    });
+
+    // notify that the map is ready
     this.isMapReady$.next(true);
   }
 
   private onMarkerClick(index: number) {
     const locations = this.locationsService.getLocations();
-    const selectedLocation = locations[index];
+    const selectedLocation = index !== -1 ? locations[index] : null;
 
     this.sessionService.updateSessionData({
       mainData: {
         ...this.sessionService.getLatestSessionData().mainData,
         selectedRegionIndex: selectedLocation ? index : -1,
-        usedLocation: selectedLocation.coordinates,
-        regionResolution: selectedLocation.region.resolution,
-        regionSize: selectedLocation.region.size
+        usedLocation: selectedLocation?.coordinates ?? this.sessionService.getLatestSessionData().mainData.usedLocation,
+        regionResolution: selectedLocation?.region.resolution ?? this.sessionService.getLatestSessionData().mainData.regionResolution,
+        regionSize: selectedLocation?.region.size ?? this.sessionService.getLatestSessionData().mainData.regionSize
       }
     })
   };
@@ -186,13 +242,10 @@ export class MapComponent implements AfterViewInit {
     const regionSizeLat = (regionSizeKm + 1) / 110.574;
     const regionSizeLon = (regionSizeKm + 1) / (111.32 * Math.cos(location.latitude * Math.PI / 180));
 
-    this.map.fitBounds(
-      [
-        [ location.latitude - regionSizeLat / 2, location.longitude - regionSizeLon / 2 ],
-        [ location.latitude + regionSizeLat / 2, location.longitude + regionSizeLon / 2 ]
-      ],
-      { animate: true, duration: 1 }
-    );
+    this.map.flyToBounds([
+      [ location.latitude - regionSizeLat / 2, location.longitude - regionSizeLon / 2 ],
+      [ location.latitude + regionSizeLat / 2, location.longitude + regionSizeLon / 2 ]
+    ]);
   }
 
   updateDataInfo(lastDataGatheringDate: Date): void {
