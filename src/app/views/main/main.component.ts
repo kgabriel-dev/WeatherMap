@@ -61,6 +61,8 @@ export class MainComponent {
 
   timezoneList = this.buildTimezoneList();
 
+  initialDataReceived = false;
+
   @ViewChild('locationDropdown') locationDropdown?: Dropdown;
   @ViewChild('mapComponent') mapComponent?: MapComponent
 
@@ -80,9 +82,18 @@ export class MainComponent {
       this.selectedRegionIndex = this.mainSessionDataForUpdate.selectedRegionIndex;
       this.usedCoordinates = this.mainSessionDataForUpdate.usedLocation;
 
-      if(this.selectedRegionIndex !== -1) {
+      if(this.selectedRegionIndex > -1) {
         const selectedRegion = this.locationsService.getLocations()[this.selectedRegionIndex];
         this.regionInDropdown = selectedRegion ? selectedRegion : this.customLocation;
+      } else {
+        this.regionInDropdown = this.customLocation;
+      }
+
+      // enforce the use of the overridden timezone if the selected region is the custom location
+      // also only do this if this was not the initial setup (checked by the existence of the old main session data)
+      if(this.initialDataReceived && this.selectedRegionIndex === -1 && !this.mainSessionDataForUpdate.useOverriddenTimezone) {
+        this.mainSessionDataForUpdate.useOverriddenTimezone = true;
+        this.updateSessionData();
       }
 
       // check if the used coordinates are in the list of locations and update the selected region index
@@ -102,6 +113,8 @@ export class MainComponent {
       }
 
       this.updateWeatherConditionsList(oldMainSessionData.weatherDataSource, oldMainSessionData.weatherCondition);
+
+      this.initialDataReceived = true;
     });
 
     this.customLocation.coordinates = this.mainSessionDataForUpdate.usedLocation;
@@ -327,6 +340,10 @@ export class MainComponent {
       this.regionInDropdown = this.customLocation;
     else
       this.regionInDropdown = this.locationsService.getLocations()[this.selectedRegionIndex];
+
+    // always use the overridden timezone if the selected region is the custom location
+    if(this.selectedRegionIndex === -1)
+      this.mainSessionDataForUpdate.useOverriddenTimezone = true;
 
     this.sessionService.updateSessionData({
       mainData: {
