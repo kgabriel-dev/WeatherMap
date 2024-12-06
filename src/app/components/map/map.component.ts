@@ -4,6 +4,7 @@ import { LocationService } from '../../services/location/location.service';
 import { SettingsService } from '../../services/settings/settings.service';
 import { BehaviorSubject, combineLatestWith, map } from 'rxjs';
 import { SessionService } from '../../services/session/session.service';
+import { getTimeZones } from '@vvo/tzdb';
 
 @Component({
   selector: 'app-map',
@@ -252,7 +253,21 @@ export class MapComponent implements AfterViewInit {
     const sessionData = this.sessionService.getLatestSessionData();
     const location = sessionData.mainData.selectedRegionIndex === -1 ? sessionData.mainData.usedLocation : this.locationsService.getLocations()[sessionData.mainData.selectedRegionIndex].name;
 
-    const imageDate = new Date(lastDataGatheringDate).setHours(lastDataGatheringDate.getHours() + sessionData.mainData.currentWeatherImageIndex);
+    const imageDate = new Date(lastDataGatheringDate);  // image date is in user's timezone
+    imageDate.setHours(lastDataGatheringDate.getHours() + sessionData.mainData.currentWeatherImageIndex);  // add the index to get the exact date
+
+    // convert image date to location's timezone or overridden timezone based on user's settings
+    const timezoneCode = sessionData.mainData.useOverriddenTimezone ?
+        sessionData.mainData.overriddenTimezoneCode :   // use overridden timezone if set to true, otherwise use location's timezone (fallback to overridden timezone if location is not set)
+        (sessionData.mainData.selectedRegionIndex === -1 ? sessionData.mainData.overriddenTimezoneCode : this.locationsService.getLocations()[sessionData.mainData.selectedRegionIndex].timezoneCode);
+
+    let timezoneOffset = getTimeZones().find(tz => tz.name === timezoneCode)?.currentTimeOffsetInMinutes;
+    if(timezoneOffset === undefined) timezoneOffset = 0;
+    else timezoneOffset += new Date().getTimezoneOffset();  // add the user's timezone offset
+
+    imageDate.setMinutes(imageDate.getMinutes() + timezoneOffset);
+
+
 
     this.dataOverlay.setText([
       `Location: ${location}`,
