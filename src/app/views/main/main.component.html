@@ -24,9 +24,9 @@
         </p-progressBar>
 
         <div class="flex flex-row flex-shrink-1 gap-1">
-          <p-button icon="pi pi-arrow-left" size="small" (onClick)="changeWeatherImageIndex(-1)" />
-          <p-button icon="pi pi-pause-circle" size="small" (onClick)="pauseWeatherImageAnimation()" />
-          <p-button icon="pi pi-arrow-right" size="small" (onClick)="changeWeatherImageIndex(+1)" />
+          <p-button icon="pi pi-arrow-left" size="small" (onClick)="changeWeatherImageIndex(-1)" [disabled]="weatherImages.length === 0" />
+          <p-button [icon]="'pi ' + (imageAnimationInterval ? 'pi-pause-circle' : 'pi-play-circle')" [disabled]="weatherImages.length === 0" size="small" (onClick)="toggleWeatherImageAnimation()" />
+          <p-button icon="pi pi-arrow-right" size="small" (onClick)="changeWeatherImageIndex(+1)" [disabled]="weatherImages.length === 0" />
         </div>
       }
     </div>

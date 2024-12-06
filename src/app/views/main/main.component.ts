@@ -35,6 +35,8 @@ export class MainComponent {
 
   lastWeatherGatheringTime: Date = new Date();
 
+  imageAnimationInterval: number | undefined;
+
   updateSessionDebounce$ = new Subject<void>();
 
   readonly customLocation: Region = {
@@ -251,7 +253,17 @@ export class MainComponent {
     this.changeDetectorRef.detectChanges();
   }
 
-  pauseWeatherImageAnimation(): void {}
+  toggleWeatherImageAnimation(): void {
+    if(this.imageAnimationInterval) {
+      clearInterval(this.imageAnimationInterval);
+      this.imageAnimationInterval = undefined;
+      return;
+    } else {
+      this.imageAnimationInterval = window.setInterval(() => {
+        this.changeWeatherImageIndex(1);
+      }, 2000);
+    }
+  }
 
   applyLocation(location?: Region): void {
     const sessionData = this.sessionService.getLatestSessionData();
