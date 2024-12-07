@@ -5,6 +5,7 @@ import { SettingsService } from '../../services/settings/settings.service';
 import { BehaviorSubject, combineLatestWith, map } from 'rxjs';
 import { SessionService } from '../../services/session/session.service';
 import { getTimeZones } from '@vvo/tzdb';
+import { SessionData } from '../../services/session/session.type';
 
 @Component({
   selector: 'app-map',
@@ -18,6 +19,9 @@ export class MapComponent implements AfterViewInit {
   private isMapReady$ = new BehaviorSubject<boolean>(false);
 
   private tempMarker: L.Marker | undefined;
+
+  private lastSessionData: SessionData | undefined;
+  private initialSessionDataReceived = false;
 
   // --- CREATION OF OVERLAYS ---
   readonly DataOverlay = L.Control.extend({
@@ -114,7 +118,11 @@ export class MapComponent implements AfterViewInit {
       else
         this.tempMarker?.setIcon(this.markerIcon);
 
-      this.fitRegionToScreen();
+      if(!this.initialSessionDataReceived || this.lastSessionData && this.lastSessionData.mainData.selectedRegionIndex !== sessionData.mainData.selectedRegionIndex)
+        this.fitRegionToScreen();
+
+      this.lastSessionData = sessionData;
+      this.initialSessionDataReceived = true;
     });
   }
 
@@ -150,8 +158,6 @@ export class MapComponent implements AfterViewInit {
           selectedRegionIndex: -1
         }
       });
-
-      this.fitRegionToScreen();
 
       if(!this.map) return;
 
@@ -202,7 +208,7 @@ export class MapComponent implements AfterViewInit {
     })
   };
 
-  overlayWeatherImage(filePath: string): void {
+  overlayWeatherImage(filePath: string, fitRegion: boolean): void {
     if(!this.map) return;
 
     const sessionData = this.sessionService.getLatestSessionData();
@@ -221,7 +227,7 @@ export class MapComponent implements AfterViewInit {
 
     this.overlayedImage = L.imageOverlay(filePath, imageBounds).addTo(this.map);
 
-    this.fitRegionToScreen();
+    if(fitRegion) this.fitRegionToScreen();
   }
 
   convertRegionSizeToKm(regionSize: { length: number; unit: string }): number {

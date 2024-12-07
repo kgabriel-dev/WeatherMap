@@ -257,12 +257,15 @@ export class MainComponent {
     if(this.imageAnimationInterval) {
       clearInterval(this.imageAnimationInterval);
       this.imageAnimationInterval = undefined;
-      return;
     } else {
       this.imageAnimationInterval = window.setInterval(() => {
         this.changeWeatherImageIndex(1);
       }, 2000);
+      this.changeWeatherImageIndex(1);
     }
+
+    // detect changes to update the button icon
+    this.changeDetectorRef.detectChanges();
   }
 
   applyLocation(location?: Region): void {
@@ -377,7 +380,8 @@ export class MainComponent {
       this.setWeatherImageIndex(0);
       sessionData = this.sessionService.getLatestSessionData();
 
-    this.mapComponent?.overlayWeatherImage(this.weatherImages[sessionData.mainData.currentWeatherImageIndex].filename);
+    // update the weather image on the map and fit region to screen (except when the image is being animated)
+    this.mapComponent?.overlayWeatherImage(this.weatherImages[sessionData.mainData.currentWeatherImageIndex].filename, false);
     this.mapComponent?.updateDataInfo(this.lastWeatherGatheringTime);
   }
 
