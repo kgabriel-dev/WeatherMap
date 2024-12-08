@@ -65,6 +65,8 @@ export class MainComponent {
 
   initialDataReceived = false;
 
+  disableLocationDropdown = false;
+
   @ViewChild('locationDropdown') locationDropdown?: Dropdown;
   @ViewChild('mapComponent') mapComponent?: MapComponent
 
@@ -128,26 +130,36 @@ export class MainComponent {
     this.updateWeatherConditionsList();
 
     window.app.onSettingsModalClosed(() => {
-      const settings = this.settingsService.getSettings();
-      let selectedLocation = this.locationsService.getLocations()[settings.defaultLocationIndex];
+      this.disableLocationDropdown = true;
 
-      if(!selectedLocation)
-        selectedLocation = this.customLocation;
+      this.locationsService.rereadLocationsFile()
+        .then(() => {
+          const settings = this.settingsService.getSettings();
+          let selectedLocation = this.locationsService.getLocations()[settings.defaultLocationIndex];
 
-      this.applyLocation(selectedLocation);
+          if(!selectedLocation)
+            selectedLocation = this.customLocation;
 
-      if(this.locationDropdown)
-        this.locationDropdown.focus(); // this triggers the update of the label to the selected location
+          this.applyLocation(selectedLocation);
 
-      const sessionData = this.sessionService.getLatestSessionData();
-      this.sessionService.updateSessionData({
-        mainData: {
-          ...sessionData.mainData,
-          selectedRegionIndex: this.selectedRegionIndex,
-          regionResolution: selectedLocation.region.resolution,
-          regionSize: selectedLocation.region.size
-        }
-      });
+          this.disableLocationDropdown = false;
+
+          if(this.locationDropdown)
+            this.locationDropdown.focus(); // this triggers the update of the label to the selected location
+
+          const sessionData = this.sessionService.getLatestSessionData();
+          this.sessionService.updateSessionData({
+            mainData: {
+              ...sessionData.mainData,
+              selectedRegionIndex: this.selectedRegionIndex,
+              regionResolution: selectedLocation.region.resolution,
+              regionSize: selectedLocation.region.size
+            }
+          });
+        })
+        .catch((error) => {
+          throw Error('Error rereading locations file: ' + error);
+        });
     });
 
     window.weather.onWeatherGenerationProgress((inProgress: boolean, progressValue: number, progressMessage: string) => {

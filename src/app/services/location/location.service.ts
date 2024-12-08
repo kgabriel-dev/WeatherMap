@@ -86,4 +86,19 @@ export class LocationService {
   public isServiceReady(): Observable<boolean> {
     return this.isFileRead$.asObservable();
   }
+
+  public async rereadLocationsFile(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      window.files.readAppFile('locations.json', 'utf8')
+        .then((data) => {
+          this.locations = JSON.parse(data);
+
+          resolve();
+        })
+        .catch((error) => {
+          console.error('Error reading locations.json!', error);
+          reject(error);
+        });
+    });
+  }
 }
