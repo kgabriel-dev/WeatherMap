@@ -143,6 +143,7 @@ export class MainComponent {
           this.applyLocation(selectedLocation);
 
           this.disableLocationDropdown = false;
+          this.mapComponent?.createMarkers();
 
           if(this.locationDropdown)
             this.locationDropdown.focus(); // this triggers the update of the label to the selected location

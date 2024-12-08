@@ -64,8 +64,12 @@ export class LocationService {
   }
 
   public addLocation(locationData: RegionAddingData) {
+    let locationId = 1;
+    if(this.locations.length > 0)
+      locationId = Math.max(...this.locations.map(location => location.id ?? 0)) + 1;
+
     this.locations.push({
-      id: Math.max(...this.locations.map(location => location.id)) + 1,
+      id: locationId,
       ...locationData
     });
 

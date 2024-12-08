@@ -86,18 +86,7 @@ export class MapComponent implements AfterViewInit {
       if(!ready || !this.map)
         return;
 
-      const locations = this.locationsService.getLocations();
-      for(let i = 0; i < locations.length; i++) {
-        const location = locations[i];
-        const icon = i === this.settingsService.getSettings().defaultLocationIndex ? this.markerIconSelected : this.markerIcon;
-
-        this.markers.push(
-          L.marker([ location.coordinates.latitude, location.coordinates.longitude ], { icon })
-            .addTo(this.map)
-            .bindPopup(location.name)
-            .on('click', () => this.onMarkerClick(i))
-        )
-      }
+      this.createMarkers();
 
       this.fitRegionToScreen();
 
@@ -282,6 +271,26 @@ export class MapComponent implements AfterViewInit {
       `Weather data: ${sessionData.mainData.weatherCondition?.condition ?? '** Unknown **'}`,
       `Time: ${new Date(imageDate).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}`
     ]);
+  }
+
+  public createMarkers(): void {
+    if(!this.map) return;
+
+    this.markers.forEach((marker) => this.map?.removeLayer(marker));
+    this.markers = [];
+
+    const locations = this.locationsService.getLocations();
+      for(let i = 0; i < locations.length; i++) {
+        const location = locations[i];
+        const icon = i === this.settingsService.getSettings().defaultLocationIndex ? this.markerIconSelected : this.markerIcon;
+
+        this.markers.push(
+          L.marker([ location.coordinates.latitude, location.coordinates.longitude ], { icon })
+            .addTo(this.map)
+            .bindPopup(location.name)
+            .on('click', () => this.onMarkerClick(i))
+        )
+      }
   }
 
 }
