@@ -203,11 +203,10 @@ export class SettingsComponent {
       .find(timezone => timezone.abbreviation === code) || this.timezoneList[0].items[0];
   }
 
+  // TODO: Rewrite this function to use the location's index instead of the location's id
   setWorkingLocation(locationId: number) {
-    // if no locations are found, add an initial location and set it
     if(this.locationsList.length === 0) {
-      this.addInitialLocation();
-      return; // new location will automatically be set
+      return;
     }
 
     // make a copy of the location to avoid changing the original
@@ -237,10 +236,15 @@ export class SettingsComponent {
   addInitialLocation() {
     const listOfLocations: RegionAddingData[] = [
       { name: 'Rostock', coordinates: { latitude: 54.10352, longitude: 12.10480 }, region: { size: { length: 100, unit: 'km' }, resolution: 6 }, timezoneCode: 'Europe/Berlin' },
-      { name: 'New York City', coordinates: { latitude: 40.73164, longitude: -74.00166 }, region: { size: { length: 130, unit: 'mi' }, resolution: 7}, timezoneCode: 'America/New_York' },
+      { name: 'New York City', coordinates: { latitude: 40.73164, longitude: -74.00166 }, region: { size: { length: 90, unit: 'mi' }, resolution: 7}, timezoneCode: 'America/New_York' },
       { name: 'Madrid', coordinates: { latitude: 40.43684, longitude: -3.65193 }, region: { size: { length: 80, unit: 'km' }, resolution: 4 }, timezoneCode: 'Europe/Madrid' },
       { name: 'Sydney', coordinates: { latitude: -33.86708, longitude: 151.24548 }, region: { size: { length: 150, unit: 'km' }, resolution: 10 }, timezoneCode: 'Australia/Sydney' },
-      { name: 'Tokyo', coordinates: { latitude: 35.68267, longitude: 139.77254 }, region: { size: { length: 100, unit: 'km' }, resolution: 6 }, timezoneCode: 'Asia/Tokyo' }
+      { name: 'Tokyo', coordinates: { latitude: 35.68267, longitude: 139.77254 }, region: { size: { length: 100, unit: 'km' }, resolution: 6 }, timezoneCode: 'Asia/Tokyo' },
+      { name: 'Shanghai', coordinates: { latitude: 31.25484, longitude: 121.48382 }, region: { size: { length: 75, unit: 'km' }, resolution: 3}, timezoneCode: 'Asia/Shanghai' },
+      { name: 'New Delhi', coordinates: { latitude: 28.68422, longitude: 77.15038 }, region: { size: { length: 100, unit: 'km' }, resolution: 6 }, timezoneCode: 'Asia/Kolkata' },
+      { name: 'Cape Town', coordinates: { latitude: -33.91886, longitude: 18.42330 }, region: { size: { length: 60, unit: 'km' }, resolution: 4 }, timezoneCode: 'Africa/Johannesburg' },
+      { name: 'São Paulo', coordinates: { latitude: -23.55052, longitude: -46.63331 }, region: { size: { length: 80, unit: 'km' }, resolution: 5 }, timezoneCode: 'America/Sao_Paulo' },
+      { name: 'Mexico City', coordinates: { latitude: 19.43260, longitude: -99.13321 }, region: { size: { length: 90, unit: 'km' }, resolution: 5 }, timezoneCode: 'America/Mexico_City' }
     ]
 
     const index = Math.floor(Math.random() * listOfLocations.length);
