@@ -37,6 +37,7 @@
     "@angular-devkit/build-angular": "^18.2.4",
     "@angular/cli": "^18.2.4",
     "@angular/compiler-cli": "^18.2.0",
+    "@angular/localize": "^18.2.9",
     "@types/jasmine": "~5.1.0",
     "@types/node": "^22.7.5",
     "electron": "^32.2.2",
