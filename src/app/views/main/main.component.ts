@@ -24,6 +24,13 @@ import { CheckboxModule } from 'primeng/checkbox';
   styleUrl: './main.component.scss'
 })
 export class MainComponent {
+  readonly localizedTexts = {
+    mapPanToLocationTooltip: $localize`Click to center the map on the selected location.`,
+    selectionHours : $localize`hours`,
+    selectionDays : $localize`days`,
+    useOverriddenTimezoneLabel: $localize`Override location's timezone`,
+  }
+
   lastReadMainSessionData: MainData;
   mainSessionDataForUpdate: MainData;
   latestWeatherDataProgress?: WeatherDataResponse;

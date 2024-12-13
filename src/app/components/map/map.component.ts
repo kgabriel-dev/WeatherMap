@@ -47,7 +47,7 @@ export class MapComponent implements AfterViewInit {
 
       const paragraphs = text.map((t) => `<p style='margin: 0px'>${t}</p>`).join('');
 
-      div.innerHTML = `<h2 style='text-decoration: underline; margin: 0px'>Weather Data</h2>${paragraphs}`;
+      div.innerHTML = "<h2 style='text-decoration: underline; margin: 0px'>" + $localize`Weather Data` + `</h2>${paragraphs}`;
       div.style.padding = '5px';
     }
   });
@@ -155,7 +155,7 @@ export class MapComponent implements AfterViewInit {
 
       this.tempMarker = L.marker([ event.latlng.lat, event.latlng.lng ], { icon: this.markerIconSelected })
         .addTo(this.map)
-        .bindPopup('Custom temporary location - you can create permanent locations in the settings')
+        .bindPopup($localize`Custom temporary location - you can create permanent locations in the settings`)
         .openPopup()
         .on('click', () => {
           const sessionData = this.sessionService.getLatestSessionData();
@@ -265,11 +265,11 @@ export class MapComponent implements AfterViewInit {
 
 
     this.dataOverlay.setText([
-      `Location: ${location}`,
-      `Region size: ${sessionData.mainData.regionSize.length}x${sessionData.mainData.regionSize.length} ${sessionData.mainData.regionSize.unit}`,
-      `Resolution: ${sessionData.mainData.regionResolution}x${sessionData.mainData.regionResolution}`,
-      `Weather data: ${sessionData.mainData.weatherCondition?.condition ?? '** Unknown **'}`,
-      `Time: ${new Date(imageDate).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}`
+      $localize`Location: ${location}`,
+      $localize`Region size: ${sessionData.mainData.regionSize.length}x${sessionData.mainData.regionSize.length} ${sessionData.mainData.regionSize.unit}`,
+      $localize`Resolution: ${sessionData.mainData.regionResolution}x${sessionData.mainData.regionResolution}`,
+      $localize`Weather data: ${sessionData.mainData.weatherCondition?.condition ?? '** Unknown **'}`,
+      $localize`Time: ${new Date(imageDate).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}`
     ]);
   }
 

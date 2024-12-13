@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en-US" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="799353425260163708" datatype="html">
+        <source>Weather Data</source>
+        <target>Wetterdaten</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/map/map.component.ts</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4709166403173867389" datatype="html">
+        <source>Custom temporary location - you can create permanent locations in the settings</source>
+        <target>Benutzerdef. temporärer Ort - Permanente Orte können in den Einstellungen erzeugt werden</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/map/map.component.ts</context>
+          <context context-type="linenumber">158</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7448057649439105055" datatype="html">
+        <source>Location: <x id="PH" equiv-text="location"/></source>
+        <target>Ort:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/map/map.component.ts</context>
+          <context context-type="linenumber">268</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8528037360122551396" datatype="html">
+        <source>Region size: <x id="PH" equiv-text="sessionData.mainData.regionSize.length"/>x<x id="PH_1" equiv-text="sessionData.mainData.regionSize.length"/> <x id="PH_2" equiv-text="sessionData.mainData.regionSize.unit"/></source>
+        <target>Regionsgröße:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/map/map.component.ts</context>
+          <context context-type="linenumber">269</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="671639085952852420" datatype="html">
+        <source>Resolution: <x id="PH" equiv-text="sessionData.mainData.regionResolution"/>x<x id="PH_1" equiv-text="sessionData.mainData.regionResolution"/></source>
+        <target>Auflösung:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/map/map.component.ts</context>
+          <context context-type="linenumber">270</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9153673003425536604" datatype="html">
+        <source>Weather data: <x id="PH" equiv-text="sessionData.mainData.weatherCondition?.condition ?? '** Unknown **'"/></source>
+        <target>Wetterdaten: <x id="PH" equiv-text="sessionData.mainData.weatherCondition?.condition ?? '** Unknown **'"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/map/map.component.ts</context>
+          <context context-type="linenumber">271</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6197327008106323297" datatype="html">
+        <source>Time: <x id="PH" equiv-text="new Date(imageDate).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })"/></source>
+        <target>Zeit: <x id="PH" equiv-text="new Date(imageDate).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/map/map.component.ts</context>
+          <context context-type="linenumber">272</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="314315645942131479" datatype="html">
+        <source>Info</source>
+        <target>Info</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.html</context>
+          <context context-type="linenumber">17,18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2159130950882492111" datatype="html">
+        <source>Cancel</source>
+        <target>Abbrechen</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.html</context>
+          <context context-type="linenumber">20,21</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4510013877734913501" datatype="html">
+        <source>Location:</source>
+        <target>Ort:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.html</context>
+          <context context-type="linenumber">41,42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6691856122567960400" datatype="html">
+        <source>Latitude:</source>
+        <target>Breitengrad:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.html</context>
+          <context context-type="linenumber">67,68</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
+          <context context-type="linenumber">128,129</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1113549170516305374" datatype="html">
+        <source>Longitude:</source>
+        <target>Längengrad:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.html</context>
+          <context context-type="linenumber">80,81</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
+          <context context-type="linenumber">132,133</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7634975438452127654" datatype="html">
+        <source>Size:</source>
+        <target>Größe:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.html</context>
+          <context context-type="linenumber">94,95</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2453133106469777555" datatype="html">
+        <source>Resolution (n ✕ n steps):</source>
+        <target>Auflösung (n ✕ n Schritte):</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.html</context>
+          <context context-type="linenumber">111</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5183662121372374668" datatype="html">
+        <source>Forecast length:</source>
+        <target>Länge der Vorhersage:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.html</context>
+          <context context-type="linenumber">121,122</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="471538465380942039" datatype="html">
+        <source>Source:</source>
+        <target>Quelle:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.html</context>
+          <context context-type="linenumber">164,165</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1794295219517542419" datatype="html">
+        <source>Condition:</source>
+        <target>Bedingung:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.html</context>
+          <context context-type="linenumber">171,172</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6986136347264193054" datatype="html">
+        <source>Generate images</source>
+        <target>Bilder generieren</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.html</context>
+          <context context-type="linenumber">183,184</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1130919338670210653" datatype="html">
+        <source>Click to center the map on the selected location.</source>
+        <target>Klicken, um die Karte auf den ausgewählten Ort zu zentrieren.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3370839803061654054" datatype="html">
+        <source>hours</source>
+        <target>Stunden</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7036284206110282007" datatype="html">
+        <source>days</source>
+        <target>Tage</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6867719738023384257" datatype="html">
+        <source>Override location's timezone</source>
+        <target>Zeitzone des Ortes überschreiben</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3419681791450150574" datatype="html">
+        <source>Progress</source>
+        <target>Fortschritt</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/progress-info/progress-info.component.html</context>
+          <context context-type="linenumber">4,5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7046968719859745338" datatype="html">
+        <source>Step description</source>
+        <target>Beschreibung des Schrittes</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/progress-info/progress-info.component.html</context>
+          <context context-type="linenumber">5,6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3579205080796663296" datatype="html">
+        <source>Language:</source>
+        <target>Sprache:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
+          <context context-type="linenumber">3,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1561668622981082371" datatype="html">
+        <source>Default weather condition:</source>
+        <target>Standard-Wetterbedingung</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
+          <context context-type="linenumber">29,30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8000678855637513038" datatype="html">
+        <source>Default length of forecast:</source>
+        <target>Standardlänge der Vorhersage:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
+          <context context-type="linenumber">49,50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8363432790086329928" datatype="html">
+        <source>Labeled weather images</source>
+        <target>Beschriftete Wetterbilder</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
+          <context context-type="linenumber">57,58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1107240597598030185" datatype="html">
+        <source>Show labels on the weather images.</source>
+        <target>Zeige Label auf den Wetterbildern.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
+          <context context-type="linenumber">60,61</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4962621902898875665" datatype="html">
+        <source>Update check &amp; notification</source>
+        <target>Auf Updates prüfen &amp; benachrichtigen</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
+          <context context-type="linenumber">65,66</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6044862297969542880" datatype="html">
+        <source>Check for updates at startup and notify me when an update is available.</source>
+        <target>Prüfe beim Start auf Updates und benachrichtige mich, wenn ein Update verfügbar ist.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
+          <context context-type="linenumber">68,69</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5497472972506460974" datatype="html">
+        <source>Location name:</source>
+        <target>Name der Region:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
+          <context context-type="linenumber">103,104</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4001106038907918008" datatype="html">
+        <source>Timezone:</source>
+        <target>Zeitzone:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
+          <context context-type="linenumber">106,107</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3540408855316484742" datatype="html">
+        <source>Region size:</source>
+        <target>Regionsgröße:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
+          <context context-type="linenumber">139,140</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8829477678594768245" datatype="html">
+        <source>Resolution (results in n ✕ n steps):</source>
+        <target>Auflösung (ergibt n ✕ n Schritte):</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
+          <context context-type="linenumber">154</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1903251124965349527" datatype="html">
+        <source>No locations found. Add a location to get started.</source>
+        <target>Keine Regionen gefunden. Füge eine Region hinzu.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
+          <context context-type="linenumber">175,176</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6439365426343089851" datatype="html">
+        <source>General</source>
+        <target>Allgemein</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4022066031214545422" datatype="html">
+        <source>Locations</source>
+        <target>Regionen</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3429765269839676766" datatype="html">
+        <source>Add Location</source>
+        <target>Region hinzufügen</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

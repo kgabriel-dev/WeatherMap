@@ -35,6 +35,14 @@ import { getTimeZones, TimeZone } from '@vvo/tzdb';
   styleUrl: './settings.component.scss'
 })
 export class SettingsComponent {
+  readonly localizedTexts = {
+    titleGeneralSettings: $localize`General`,
+    titleLocationSettings: $localize`Locations`,
+    selectionHours: $localize`hours`,
+    selectionDays: $localize`days`,
+    buttonAddLocation: $localize`Add Location`
+  }
+
   // variables for the selected timezone
   readonly timezoneList = this.buildTimezoneList();
 
