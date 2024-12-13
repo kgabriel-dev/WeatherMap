@@ -94,7 +94,7 @@ export class MainComponent {
       }
 
       // enforce the use of the overridden timezone if the selected region is the custom location
-      // also only do this if this was not the initial setup (checked by the existence of the old main session data)
+      // also only do this if this was not the initial setup
       if(this.initialDataReceived && this.selectedRegionIndex === -1 && !this.mainSessionDataForUpdate.useOverriddenTimezone) {
         this.mainSessionDataForUpdate.useOverriddenTimezone = true;
         this.updateSessionData();
@@ -117,6 +117,13 @@ export class MainComponent {
       }
 
       this.updateWeatherConditionsList(oldMainSessionData.weatherDataSource, oldMainSessionData.weatherCondition);
+
+      // update the override timezone to the selected region's timezone if the dropdown is disabled
+      // used to show the current timezone so the user can decide if they want to override it
+      if(this.initialDataReceived && !this.lastReadMainSessionData.useOverriddenTimezone && this.lastReadMainSessionData.overriddenTimezoneCode !== this.regionInDropdown.timezoneCode) {
+        this.mainSessionDataForUpdate.overriddenTimezoneCode = this.regionInDropdown.timezoneCode;
+        this.updateSessionData();
+      }
 
       this.initialDataReceived = true;
     });
@@ -368,10 +375,6 @@ export class MainComponent {
       this.regionInDropdown = this.customLocation;
     else
       this.regionInDropdown = this.locationsService.getLocations()[this.selectedRegionIndex];
-
-    // always use the overridden timezone if the selected region is the custom location
-    if(this.selectedRegionIndex === -1)
-      this.mainSessionDataForUpdate.useOverriddenTimezone = true;
 
     this.sessionService.updateSessionData({
       mainData: {
