@@ -19,7 +19,9 @@ interface Window {
   },
   app: {
     onSettingsModalClosed: (callback) => void,
-    openProgressInfoWindow: () => void
+    openProgressInfoWindow: () => void,
+    setLocale: (locale: string) => void,
+    getLocale: () => Promise<string>
   },
   weather: {
     generateWeatherImagesForRegion: (region: Region, dataGatherer: DataGathererName, weatherConditionId: string, forecast_length: number, valueLabels: boolean) => Promise<{ date: Date, filename: string }[]>,

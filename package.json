@@ -8,7 +8,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "build-electron": "ng build --base-href . && cp -rf src/electron/* dist/",
+    "build-electron": "ng build --localize --base-href ./.. && cp -rf src/electron/* dist/",
     "electron": "npm run build-electron && .\\node_modules\\.bin\\electron dist/"
   },
   "private": true,

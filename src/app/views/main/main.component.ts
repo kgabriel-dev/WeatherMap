@@ -175,6 +175,26 @@ export class MainComponent {
         .catch((error) => {
           throw Error('Error rereading locations file: ' + error);
         });
+
+
+        // re-read the settings
+        this.settingsService.rereadSettingsFile()
+          .then(() => {
+            // update the locale if it has changed
+            window.app.getLocale()
+            .then((currentLocale) => {
+              const newLocale = this.settingsService.getSettings().languageCode;
+              console.log('Current locale:', currentLocale, 'New locale:', newLocale);
+              if(currentLocale !== newLocale)
+                window.app.setLocale(newLocale);
+            })
+            .catch((error) => {
+              console.error('Error getting locale:', error);
+            });
+          })
+          .catch((error) => {
+            console.error('Error re-reading settings file:', error);
+          });
     });
 
     window.weather.onWeatherGenerationProgress((inProgress: boolean, progressValue: number, progressMessage: string) => {

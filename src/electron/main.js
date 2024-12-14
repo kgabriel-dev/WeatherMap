@@ -7,8 +7,10 @@ const fs = require('node:fs')
 const { generateWeatherImageForLocation } = require('./backend/image-generation');
 const { OpenMeteoDataGatherer, BrightSkyDataGatherer } = require('./backend/data-gathering');
 
-let mainWindow, progressWindow;
+let mainWindow, progressWindow, settingsWindow;
 let latestProgressMessages = [];
+
+let locale = 'en-US';
 
 const createWindow = () => {
   // Create the browser window.
@@ -100,14 +102,14 @@ const createWindow = () => {
 
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'weather-map', 'browser', 'index.html'),
+    pathname: path.join(__dirname, 'weather-map', 'browser', locale, 'index.html'),
     protocol: 'file:',
     slashes: true
   }))
 
   // function to open the settings modal; called from the menu bar
   function openSettingsModal() {
-    let modalWindow = new BrowserWindow({
+    settingsWindow = new BrowserWindow({
       parent: mainWindow,
       width: 800,
       height: 600,
@@ -117,8 +119,8 @@ const createWindow = () => {
       }
     });
 
-    modalWindow.loadURL(url.format({
-      pathname: path.join(__dirname, 'weather-map', 'browser', 'index.html'),
+    settingsWindow.loadURL(url.format({
+      pathname: path.join(__dirname, 'weather-map', 'browser', locale, 'index.html'),
       protocol: 'file:',
       slashes: true,
       hash: '#/settings'
@@ -126,14 +128,14 @@ const createWindow = () => {
 
     let menuTemplate = [];
     let menu = Menu.buildFromTemplate(menuTemplate);
-    modalWindow.setMenu(menu);
+    settingsWindow.setMenu(menu);
 
-    modalWindow.once('ready-to-show', () => {
-      modalWindow.show();
+    settingsWindow.once('ready-to-show', () => {
+      settingsWindow.show();
     });
 
-    modalWindow.on('closed', () => {
-      modalWindow = null;
+    settingsWindow.on('closed', () => {
+      settingsWindow = null;
 
       // send a message to the main window to update the settings
       mainWindow.webContents.send('settings-modal-closed');
@@ -210,7 +212,7 @@ ipcMain.handle('open-progress-info-window', (_event) => {
   });
 
   progressWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'weather-map', 'browser', 'index.html'),
+    pathname: path.join(__dirname, 'weather-map', 'browser', locale, 'index.html'),
     protocol: 'file:',
     slashes: true,
     hash: '#/progress'
@@ -240,6 +242,37 @@ ipcMain.handle('list-weather-conditions', (_event) => {
   weatherConditions['BrightSky'] = new BrightSkyDataGatherer().listAvailableWeatherConditions();
 
   return weatherConditions;
+});
+
+ipcMain.handle('set-locale', (_event, locale) => {
+  this.locale = locale;
+
+  if(mainWindow && !mainWindow.isDestroyed())
+    mainWindow.loadURL(url.format({
+      pathname: path.join(__dirname, 'weather-map', 'browser', locale, 'index.html'),
+      protocol: 'file:',
+      slashes: true
+    }));
+
+  if(progressWindow && !progressWindow.isDestroyed())
+    progressWindow.loadURL(url.format({
+      pathname: path.join(__dirname, 'weather-map', 'browser', locale, 'index.html'),
+      protocol: 'file:',
+      slashes: true,
+      hash: '#/progress'
+    }));
+
+  if(settingsWindow && !settingsWindow.isDestroyed())
+    settingsWindow.loadURL(url.format({
+      pathname: path.join(__dirname, 'weather-map', 'browser', locale, 'index.html'),
+      protocol: 'file:',
+      slashes: true,
+      hash: '#/settings'
+    }));
+});
+
+ipcMain.handle('get-locale', (_event) => {
+  return this.locale;
 });
 
 // Helper functions

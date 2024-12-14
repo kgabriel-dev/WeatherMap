@@ -95,6 +95,32 @@ export class SettingsService {
     return this.notifySettingsRead$.asObservable();
   }
 
+  rereadSettingsFile(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      // Read settings.json file
+      window.files.readAppFile('settings.json', 'utf8')
+      .then((data) => {
+        this.settings = JSON.parse(data);
+
+        // check for missing settings and add them
+        for (const key in this.defaultSettings) {
+          if (!(key in this.settings)) {
+            // @ts-ignore
+            this.settings[key] = this.defaultSettings[key];
+          }
+        }
+
+        resolve();
+      })
+      .catch((error) => {
+        console.error('Error reading settings.json!', error);
+        this.settings = this.defaultSettings;
+
+        reject(error);
+      });
+    });
+  }
+
 }
 
 export type Settings = {
