@@ -49,7 +49,12 @@
     <p i18n>Default length of forecast:</p>
     <div class="flex flex-row">
       <p-inputNumber [(ngModel)]="forecastLength.value" styleClass="w-full" [inputStyle]="{'width': '100%', 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'text-align': 'right'}" />
-      <p-dropdown [(ngModel)]="forecastLength.unit" [options]="[localizedTexts.selectionHours, localizedTexts.selectionDays]" [style]="{'border-radius': '0 var(--border-radius) var(--border-radius) 0', 'width': '7rem'}" />
+      <p-dropdown
+        [(ngModel)]="forecastLength.unitId"
+        [options]="forecastLengthOptions"
+        optionLabel="display"
+        optionValue="id"
+        [style]="{'border-radius': '0 var(--border-radius) var(--border-radius) 0', 'width': '7rem'}" />
     </div>
 
     <p-divider />
@@ -145,8 +150,10 @@
                     styleClass="w-full"
                     class="w-full" />
                   <p-dropdown
-                    [(ngModel)]="workingLocation.region.size.unit"
-                    [options]="['km', 'mi']"
+                    [(ngModel)]="workingLocation.region.size.unitId"
+                    [options]="regionSizeOptions"
+                    optionLabel="display"
+                    optionValue="id"
                     [style]="{'width': '7rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0', 'z-index': 2}" />
                 </div>
               </div>

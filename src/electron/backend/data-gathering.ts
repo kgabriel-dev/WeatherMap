@@ -1,5 +1,6 @@
 import { sendWeatherGenerationProgressUpdate } from './../utils';
 import { ipcMain } from 'electron';
+import { SizeUnits } from './../utils';
 
 let cancelRequested = false;
 
@@ -18,7 +19,7 @@ export class OpenMeteoDataGatherer implements DataGatherer {
     this.translations = translations;
 
     return new Promise((resolve, reject) => {
-      const regionSizeInKm = convertToKm(region.region.size.length, region.region.size.unit);
+      const regionSizeInKm = convertToKm(region.region.size.length, region.region.size.unitId);
       const stepSize = regionSizeInKm / region.region.resolution;
       const latStepSize = stepSize / 110.574; // 1° latitude is 110.574 km
       const lonStepSize = stepSize / (111.320 * Math.cos(region.coordinates.latitude * Math.PI / 180)); // 1° longitude is 111.320 km at the equator
@@ -170,7 +171,7 @@ export class BrightSkyDataGatherer implements DataGatherer {
     this.translations = translations;
 
     return new Promise((resolve, reject) => {
-      const regionSizeInKm = convertToKm(region.region.size.length, region.region.size.unit);
+      const regionSizeInKm = convertToKm(region.region.size.length, region.region.size.unitId);
       const stepSize = regionSizeInKm / region.region.resolution;
       const latStepSize = stepSize / 110.574; // 1° latitude is 110.574 km
       const lonStepSize = stepSize / (111.320 * Math.cos(region.coordinates.latitude * Math.PI / 180)); // 1° longitude is 111.320 km at the equator
@@ -309,8 +310,8 @@ export class BrightSkyDataGatherer implements DataGatherer {
   }
 }
 
-function convertToKm(number: number, unit: Region['region']['size']['unit']): number {
-  return unit === 'km' ? number : number * 1.60934;
+function convertToKm(number: number, unit: SizeUnits): number {
+  return unit === SizeUnits.KILOMETERS ? number : number * 1.60934;
 }
 
 function delay(ms: number) {

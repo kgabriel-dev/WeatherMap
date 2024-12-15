@@ -97,9 +97,11 @@
           styleClass="w-full" class="w-full"
         />
         <p-dropdown
-          [(ngModel)]="mainSessionDataForUpdate.regionSize.unit"
+          [(ngModel)]="mainSessionDataForUpdate.regionSize.unitId"
           (onChange)="updateSessionData()"
-          [options]="['km', 'mi']"
+          [options]="regionSizeOptions"
+          optionLabel="display"
+          optionValue="id"
           [style]="{'width': '7rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0'}"
         />
       </div>
@@ -125,10 +127,12 @@
           (onInput)="debouncedUpdateSessionData()"
         />
         <p-dropdown
-          [(ngModel)]="mainSessionDataForUpdate.forecastLength.unit"
+          [(ngModel)]="mainSessionDataForUpdate.forecastLength.unitId"
+          optionLabel="display"
+          optionValue="id"
           (onChange)="debouncedUpdateSessionData()"
-          [options]="[localizedTexts.selectionHours, localizedTexts.selectionDays]"
-          [style]="{'width': '7rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0'}" />
+          [options]="forecastLengthOptions"
+          [style]="{'width': '9rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0'}" />
       </div>
 
       <p-checkbox

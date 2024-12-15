@@ -1,12 +1,12 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { ImageModule } from 'primeng/image';
-import { ProgressBar, ProgressBarModule } from 'primeng/progressbar';
+import { ProgressBarModule } from 'primeng/progressbar';
 import { LocationService } from '../../services/location/location.service';
 import { Dropdown, DropdownModule } from 'primeng/dropdown';
 import { FormsModule } from '@angular/forms';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { Settings, SettingsService } from '../../services/settings/settings.service';
+import { Settings, SettingsService, SizeUnits, SizeUnitStrings, TimeUnits, TimeUnitStrings } from '../../services/settings/settings.service';
 import { combineLatestWith, debounceTime, map, Subject } from 'rxjs';
 import { MapComponent } from '../../components/map/map.component';
 import { SessionService } from '../../services/session/session.service';
@@ -26,13 +26,14 @@ import { CheckboxModule } from 'primeng/checkbox';
 export class MainComponent {
   readonly localizedTexts = {
     mapPanToLocationTooltip: $localize`Click to center the map on the selected location.`,
-    selectionHours : $localize`@@hours:hours`,
-    selectionDays : $localize`@@days:days`,
     useOverriddenTimezoneLabel: $localize`Override location's timezone`,
     buttonGenerateImages: $localize`Generate Images`,
     buttonCancelImgGeneration: $localize`Cancel`,
     buttonGenerationProgressInfo: $localize`Info`
-  }
+  };
+
+  forecastLengthOptions = TimeUnitStrings;
+  regionSizeOptions = SizeUnitStrings;
 
   lastReadMainSessionData: MainData;
   mainSessionDataForUpdate: MainData;
@@ -60,7 +61,7 @@ export class MainComponent {
       resolution: 0,
       size: {
         length: 0,
-        unit: 'km'
+        unitId: SizeUnits.KILOMETERS
       }
     },
     timezoneCode: 'UTC'
@@ -105,6 +106,7 @@ export class MainComponent {
     this.mainSessionDataForUpdate = this.sessionService.getLatestSessionData().mainData;
 
     this.sessionService.getSessionDataObservable().subscribe((sessionData) => {
+      console.log(sessionData.mainData.forecastLength);
       const oldMainSessionData = JSON.parse(JSON.stringify(this.lastReadMainSessionData));
       this.lastReadMainSessionData = JSON.parse(JSON.stringify(sessionData.mainData));
       this.mainSessionDataForUpdate = JSON.parse(JSON.stringify(sessionData.mainData));
@@ -356,9 +358,9 @@ export class MainComponent {
       mainData: {
         ...sessionData.mainData,
         selectedRegionIndex: this.selectedRegionIndex,
-        usedLocation: JSON.parse(JSON.stringify(location.coordinates)),
-        regionResolution: location.region.resolution,
-        regionSize: location.region.size
+        usedLocation: JSON.parse(JSON.stringify(location!.coordinates)),
+        regionResolution: location!.region.resolution,
+        regionSize: location!.region.size
       }
     });
   }
@@ -389,7 +391,7 @@ export class MainComponent {
       return;
     }
 
-    const forecast_length = this.convertTimelengthToHours(sessionData.mainData.forecastLength.value, sessionData.mainData.forecastLength.unit);
+    const forecast_length = this.convertTimelengthToHours(sessionData.mainData.forecastLength.value, sessionData.mainData.forecastLength.unitId);
 
     window.weather.generateWeatherImagesForRegion(region, dataGathererName, weatherConditionId, forecast_length, this.settingsService.getSettings().labeledImages)
       .then((images) => {
@@ -549,11 +551,11 @@ export class MainComponent {
     });
   }
 
-  private convertTimelengthToHours(value: Settings['forecastLength']['value'], unit: Settings['forecastLength']['unit']): number {
-    if(unit == 'hours')
+  private convertTimelengthToHours(value: Settings['forecastLength']['value'], unit: Settings['forecastLength']['unitId']): number {
+    if(unit == TimeUnits.HOURS)
       return value;
 
-    if(unit == 'days')
+    if(unit == TimeUnits.DAYS)
       return value * 24;
 
     return 0;

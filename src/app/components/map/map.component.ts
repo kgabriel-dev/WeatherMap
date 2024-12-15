@@ -1,11 +1,12 @@
 import { AfterViewInit, Component } from '@angular/core';
 import * as L from 'leaflet';
 import { LocationService } from '../../services/location/location.service';
-import { SettingsService } from '../../services/settings/settings.service';
+import { SettingsService, TimeUnitStrings } from '../../services/settings/settings.service';
 import { BehaviorSubject, combineLatestWith, map } from 'rxjs';
 import { SessionService } from '../../services/session/session.service';
 import { getTimeZones } from '@vvo/tzdb';
 import { SessionData } from '../../services/session/session.type';
+import { SizeUnits } from '../../services/settings/settings.service';
 
 @Component({
   selector: 'app-map',
@@ -219,8 +220,8 @@ export class MapComponent implements AfterViewInit {
     if(fitRegion) this.fitRegionToScreen();
   }
 
-  convertRegionSizeToKm(regionSize: { length: number; unit: string }): number {
-    if(regionSize.unit === 'km')
+  convertRegionSizeToKm(regionSize: { length: number; unitId: SizeUnits }): number {
+    if(regionSize.unitId == SizeUnits.KILOMETERS)
       return regionSize.length;
 
     return regionSize.length * 1.60934;
@@ -264,7 +265,7 @@ export class MapComponent implements AfterViewInit {
 
     this.dataOverlay.setText([
       $localize`Location: ${location}`,
-      $localize`Region size: ${sessionData.mainData.regionSize.length}x${sessionData.mainData.regionSize.length} ${sessionData.mainData.regionSize.unit}`,
+      $localize`Region size: ${sessionData.mainData.regionSize.length}x${sessionData.mainData.regionSize.length} ${TimeUnitStrings[sessionData.mainData.regionSize.unitId]}`,
       $localize`Resolution: ${sessionData.mainData.regionResolution}x${sessionData.mainData.regionResolution}`,
       $localize`Weather data: ${sessionData.mainData.weatherCondition?.condition ?? '** Unknown **'}`,
       $localize`Time: ${new Date(imageDate).toLocaleString(Intl.getCanonicalLocales(this.settingsService.getSettings().languageCode), { dateStyle: 'medium', timeStyle: 'short' })}`

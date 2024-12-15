@@ -7,7 +7,7 @@ import { DividerModule } from 'primeng/divider';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { TabViewModule } from 'primeng/tabview';
-import { Settings, SettingsService } from '../../services/settings/settings.service';
+import { Settings, SettingsService, SizeUnits, SizeUnitStrings, TimeUnits, TimeUnitStrings } from '../../services/settings/settings.service';
 import { LocationService } from '../../services/location/location.service';
 import { ListboxModule } from 'primeng/listbox';
 import { InputTextModule } from 'primeng/inputtext';
@@ -38,8 +38,6 @@ export class SettingsComponent {
   readonly localizedTexts = {
     titleGeneralSettings: $localize`General`,
     titleLocationSettings: $localize`Locations`,
-    selectionHours: $localize`@@hours:hours`,
-    selectionDays: $localize`@@days:days`,
     buttonAddLocation: $localize`Add Location`,
     buttonSaveLocation: $localize`Save`,
     buttonDeleteLocation: $localize`Delete`,
@@ -47,6 +45,9 @@ export class SettingsComponent {
     buttonSettingsSave: $localize`Save`,
     buttonSettingsDiscard: $localize`Discard`
   }
+
+  forecastLengthOptions = TimeUnitStrings;
+  regionSizeOptions = SizeUnitStrings;
 
   // variables for the selected timezone
   readonly timezoneList = this.buildTimezoneList();
@@ -115,7 +116,7 @@ export class SettingsComponent {
   // other variables
   forecastLength: Settings['forecastLength'] = {
     value: 12,
-    unit: this.localizedTexts.selectionHours
+    unitId: TimeUnits.HOURS
   }
   updateCheck: boolean = true;
   labeledImages: boolean = true;
@@ -248,16 +249,16 @@ export class SettingsComponent {
 
   addInitialLocation() {
     const listOfLocations: RegionAddingData[] = [
-      { name: 'Rostock', coordinates: { latitude: 54.10352, longitude: 12.10480 }, region: { size: { length: 100, unit: 'km' }, resolution: 6 }, timezoneCode: 'Europe/Berlin' },
-      { name: 'New York City', coordinates: { latitude: 40.73164, longitude: -74.00166 }, region: { size: { length: 90, unit: 'mi' }, resolution: 7}, timezoneCode: 'America/New_York' },
-      { name: 'Madrid', coordinates: { latitude: 40.43684, longitude: -3.65193 }, region: { size: { length: 80, unit: 'km' }, resolution: 4 }, timezoneCode: 'Europe/Madrid' },
-      { name: 'Sydney', coordinates: { latitude: -33.86708, longitude: 151.24548 }, region: { size: { length: 150, unit: 'km' }, resolution: 10 }, timezoneCode: 'Australia/Sydney' },
-      { name: 'Tokyo', coordinates: { latitude: 35.68267, longitude: 139.77254 }, region: { size: { length: 100, unit: 'km' }, resolution: 6 }, timezoneCode: 'Asia/Tokyo' },
-      { name: 'Shanghai', coordinates: { latitude: 31.25484, longitude: 121.48382 }, region: { size: { length: 75, unit: 'km' }, resolution: 3}, timezoneCode: 'Asia/Shanghai' },
-      { name: 'New Delhi', coordinates: { latitude: 28.68422, longitude: 77.15038 }, region: { size: { length: 100, unit: 'km' }, resolution: 6 }, timezoneCode: 'Asia/Kolkata' },
-      { name: 'Cape Town', coordinates: { latitude: -33.91886, longitude: 18.42330 }, region: { size: { length: 60, unit: 'km' }, resolution: 4 }, timezoneCode: 'Africa/Johannesburg' },
-      { name: 'São Paulo', coordinates: { latitude: -23.55052, longitude: -46.63331 }, region: { size: { length: 80, unit: 'km' }, resolution: 5 }, timezoneCode: 'America/Sao_Paulo' },
-      { name: 'Mexico City', coordinates: { latitude: 19.43260, longitude: -99.13321 }, region: { size: { length: 90, unit: 'km' }, resolution: 5 }, timezoneCode: 'America/Mexico_City' }
+      { name: 'Rostock', coordinates: { latitude: 54.10352, longitude: 12.10480 }, region: { size: { length: 100, unitId: SizeUnits.KILOMETERS }, resolution: 6 }, timezoneCode: 'Europe/Berlin' },
+      { name: 'New York City', coordinates: { latitude: 40.73164, longitude: -74.00166 }, region: { size: { length: 90, unitId: SizeUnits.MILES }, resolution: 7}, timezoneCode: 'America/New_York' },
+      { name: 'Madrid', coordinates: { latitude: 40.43684, longitude: -3.65193 }, region: { size: { length: 80, unitId: SizeUnits.KILOMETERS }, resolution: 4 }, timezoneCode: 'Europe/Madrid' },
+      { name: 'Sydney', coordinates: { latitude: -33.86708, longitude: 151.24548 }, region: { size: { length: 150, unitId: SizeUnits.KILOMETERS }, resolution: 10 }, timezoneCode: 'Australia/Sydney' },
+      { name: 'Tokyo', coordinates: { latitude: 35.68267, longitude: 139.77254 }, region: { size: { length: 100, unitId: SizeUnits.KILOMETERS }, resolution: 6 }, timezoneCode: 'Asia/Tokyo' },
+      { name: 'Shanghai', coordinates: { latitude: 31.25484, longitude: 121.48382 }, region: { size: { length: 75, unitId: SizeUnits.KILOMETERS }, resolution: 3}, timezoneCode: 'Asia/Shanghai' },
+      { name: 'New Delhi', coordinates: { latitude: 28.68422, longitude: 77.15038 }, region: { size: { length: 100, unitId: SizeUnits.KILOMETERS }, resolution: 6 }, timezoneCode: 'Asia/Kolkata' },
+      { name: 'Cape Town', coordinates: { latitude: -33.91886, longitude: 18.42330 }, region: { size: { length: 60, unitId: SizeUnits.KILOMETERS }, resolution: 4 }, timezoneCode: 'Africa/Johannesburg' },
+      { name: 'São Paulo', coordinates: { latitude: -23.55052, longitude: -46.63331 }, region: { size: { length: 80, unitId: SizeUnits.KILOMETERS }, resolution: 5 }, timezoneCode: 'America/Sao_Paulo' },
+      { name: 'Mexico City', coordinates: { latitude: 19.43260, longitude: -99.13321 }, region: { size: { length: 90, unitId: SizeUnits.KILOMETERS }, resolution: 5 }, timezoneCode: 'America/Mexico_City' }
     ]
 
     const index = Math.floor(Math.random() * listOfLocations.length);

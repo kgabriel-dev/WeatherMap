@@ -5,7 +5,7 @@ declare type Region = {
   region: {
     size: {
       length: number;
-      unit: 'km' | 'mi';
+      unitId: SizeUnits;
     };
     resolution: number;
   },
@@ -26,9 +26,14 @@ declare type RegionAddingData = {
   region: {
     size: {
       length: number,
-      unit: 'km' | 'mi';
+      unitId: SizeUnits;
     },
     resolution: number;
   },
   timezoneCode: string;
+}
+
+declare enum SizeUnits {
+  KILOMETERS,
+  MILES
 }

@@ -6,7 +6,6 @@ import { BehaviorSubject, Observable } from 'rxjs';
 })
 export class LocationService {
   private locations: Region[] = [];
-  private fileRead = false; // flag to check if file has been read
   private isFileRead$ = new BehaviorSubject<boolean>(false);
 
   constructor() {
@@ -34,14 +33,12 @@ export class LocationService {
         .then((data) => {
           this.locations = JSON.parse(data);
 
-          this.fileRead = true;
           this.isFileRead$.next(true);
         })
         .catch((error) => {
           console.error('Error reading locations.json!', error);
           this.locations = [];
 
-          this.fileRead = true;
           this.isFileRead$.next(true);
         });
       })

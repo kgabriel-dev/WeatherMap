@@ -5,17 +5,13 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root'
 })
 export class SettingsService {
-  private readonly localizedTexts = {
-    hours: $localize`@@hours:hours`,
-  };
-
   private readonly defaultSettings: Settings = {
     version: '0.1.0',
     languageCode: 'en-US',
     weatherCondition: 'openmeteo.cloudiness',
     forecastLength: {
-      value: 12,
-      unit: this.localizedTexts.hours
+      value: 4,
+      unitId: TimeUnits.HOURS
     },
     updateCheck: true,
     defaultLocationIndex: 0,
@@ -132,9 +128,31 @@ export type Settings = {
   weatherCondition: string,
   forecastLength: {
     value: number,
-    unit: string,
+    unitId: TimeUnits,
   },
   updateCheck: boolean,
   defaultLocationIndex: number,
   labeledImages: boolean
 }
+
+export enum TimeUnits {
+  HOURS,
+  DAYS
+}
+
+export const TimeUnitStrings: {id: TimeUnits, display: string}[] = [
+  {id: TimeUnits.HOURS, display: $localize`:@@hours:hours`},
+  {id: TimeUnits.DAYS, display: $localize`:@@days:days`}
+];
+
+// TODO: Needs to be the same as in src/types/location.d.ts
+// fix this to be a shared type
+export enum SizeUnits {
+  KILOMETERS,
+  MILES
+}
+
+export const SizeUnitStrings: {id: SizeUnits, display: string}[] = [
+  {id: SizeUnits.KILOMETERS, display: $localize`:@@kilometers:km`},
+  {id: SizeUnits.MILES, display: $localize`:@@miles:mi`}
+];

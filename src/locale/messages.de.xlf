@@ -23,15 +23,15 @@
         <target>Ort: <x id="PH" equiv-text="location"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/map/map.component.ts</context>
-          <context context-type="linenumber">268</context>
+          <context context-type="linenumber">266</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8528037360122551396" datatype="html">
-        <source>Region size: <x id="PH" equiv-text="sessionData.mainData.regionSize.length"/>x<x id="PH_1" equiv-text="sessionData.mainData.regionSize.length"/> <x id="PH_2" equiv-text="sessionData.mainData.regionSize.unit"/></source>
+        <source>Region size: <x id="PH" equiv-text="sessionData.mainData.regionSize.length"/>x<x id="PH_1" equiv-text="sessionData.mainData.regionSize.length"/> <x id="PH_2" equiv-text="TimeUnitStrings[sessionData.mainData.regionSize.unitId]"/></source>
         <target>Regionsgröße: <x id="PH" equiv-text="sessionData.mainData.regionSize.length"/>x<x id="PH_1" equiv-text="sessionData.mainData.regionSize.length"/> <x id="PH_2" equiv-text="sessionData.mainData.regionSize.unit"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/map/map.component.ts</context>
-          <context context-type="linenumber">269</context>
+          <context context-type="linenumber">267</context>
         </context-group>
       </trans-unit>
       <trans-unit id="671639085952852420" datatype="html">
@@ -39,7 +39,7 @@
         <target>Auflösung: <x id="PH" equiv-text="sessionData.mainData.regionResolution"/>x<x id="PH_1" equiv-text="sessionData.mainData.regionResolution"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/map/map.component.ts</context>
-          <context context-type="linenumber">270</context>
+          <context context-type="linenumber">268</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9153673003425536604" datatype="html">
@@ -47,35 +47,47 @@
         <target>Wetterdaten: <x id="PH" equiv-text="sessionData.mainData.weatherCondition?.condition ?? '** Unknown **'"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/map/map.component.ts</context>
-          <context context-type="linenumber">271</context>
+          <context context-type="linenumber">269</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6197327008106323297" datatype="html">
-        <source>Time: <x id="PH" equiv-text="new Date(imageDate).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })"/></source>
+        <source>Time: <x id="PH" equiv-text="new Date(imageDate).toLocaleString(Intl.getCanonicalLocales(this.settingsService.getSettings().languageCode), { dateStyle: 'medium', timeStyle: 'short' })"/></source>
         <target>Zeit: <x id="PH" equiv-text="new Date(imageDate).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/map/map.component.ts</context>
-          <context context-type="linenumber">272</context>
+          <context context-type="linenumber">270</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="4591574573583320734" datatype="html">
-        <source>@@hours:hours</source>
+      <trans-unit id="hours" datatype="html">
+        <source>hours</source>
         <target>Stunden</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/services/session/session.service.ts</context>
-          <context context-type="linenumber">10</context>
+          <context context-type="sourcefile">src/app/services/settings/settings.service.ts</context>
+          <context context-type="linenumber">145</context>
         </context-group>
+      </trans-unit>
+      <trans-unit id="days" datatype="html">
+        <source>days</source>
+        <target>Tage</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings/settings.service.ts</context>
-          <context context-type="linenumber">9</context>
+          <context context-type="linenumber">146</context>
         </context-group>
+      </trans-unit>
+      <trans-unit id="kilometers" datatype="html">
+        <source>km</source>
+        <target>km</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">29</context>
+          <context context-type="sourcefile">src/app/services/settings/settings.service.ts</context>
+          <context context-type="linenumber">150</context>
         </context-group>
+      </trans-unit>
+      <trans-unit id="miles" datatype="html">
+        <source>mi</source>
+        <target>mi</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="sourcefile">src/app/services/settings/settings.service.ts</context>
+          <context context-type="linenumber">151</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4510013877734913501" datatype="html">
@@ -95,7 +107,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">128,129</context>
+          <context context-type="linenumber">133,134</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1113549170516305374" datatype="html">
@@ -107,7 +119,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">132,133</context>
+          <context context-type="linenumber">137,138</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7634975438452127654" datatype="html">
@@ -123,7 +135,7 @@
         <target>Auflösung (n ✕ n Schritte):</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.html</context>
-          <context context-type="linenumber">107</context>
+          <context context-type="linenumber">109</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5183662121372374668" datatype="html">
@@ -131,7 +143,7 @@
         <target>Länge der Vorhersage:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.html</context>
-          <context context-type="linenumber">117,118</context>
+          <context context-type="linenumber">119,120</context>
         </context-group>
       </trans-unit>
       <trans-unit id="471538465380942039" datatype="html">
@@ -139,7 +151,7 @@
         <target>Quelle:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.html</context>
-          <context context-type="linenumber">160,161</context>
+          <context context-type="linenumber">164,165</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1794295219517542419" datatype="html">
@@ -147,7 +159,7 @@
         <target>Bedingung:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.html</context>
-          <context context-type="linenumber">167,168</context>
+          <context context-type="linenumber">171,172</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1130919338670210653" datatype="html">
@@ -158,24 +170,12 @@
           <context context-type="linenumber">28</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="6791807592742339491" datatype="html">
-        <source>@@days:days</source>
-        <target>Tage</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">30</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">42</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="6867719738023384257" datatype="html">
         <source>Override location's timezone</source>
         <target>Zeitzone des Ortes überschreiben</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">29</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5312112184276395605" datatype="html">
@@ -183,7 +183,7 @@
         <target>Bilder generieren</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">30</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2159130950882492111" datatype="html">
@@ -191,7 +191,7 @@
         <target>Abbrechen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">33</context>
+          <context context-type="linenumber">31</context>
         </context-group>
       </trans-unit>
       <trans-unit id="314315645942131479" datatype="html">
@@ -199,7 +199,7 @@
         <target>Info</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">34</context>
+          <context context-type="linenumber">32</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5310131164547818745" datatype="html">
@@ -207,7 +207,7 @@
         <target>Bildgenerierung vom Nutzer gestoppt</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">588</context>
+          <context context-type="linenumber">590</context>
         </context-group>
       </trans-unit>
       <trans-unit id="819996403327805209" datatype="html">
@@ -215,7 +215,7 @@
         <target>Mehr erfahren</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">589</context>
+          <context context-type="linenumber">591</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1726363342938046830" datatype="html">
@@ -223,7 +223,7 @@
         <target>Über</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">590</context>
+          <context context-type="linenumber">592</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4320444664592658938" datatype="html">
@@ -231,7 +231,7 @@
         <target>Entwicklertools</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">591</context>
+          <context context-type="linenumber">593</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1762579199463627317" datatype="html">
@@ -239,7 +239,7 @@
         <target>Einstellungen öffnen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">592</context>
+          <context context-type="linenumber">594</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4930506384627295710" datatype="html">
@@ -247,7 +247,7 @@
         <target>Einstellungen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">593</context>
+          <context context-type="linenumber">595</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6718069813936046169" datatype="html">
@@ -255,7 +255,7 @@
         <target>Fenster</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">594</context>
+          <context context-type="linenumber">596</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7911416166208830577" datatype="html">
@@ -263,7 +263,7 @@
         <target>Hilfe</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">595</context>
+          <context context-type="linenumber">597</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9050763865008211915" datatype="html">
@@ -271,7 +271,7 @@
         <target>Minimieren</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">596</context>
+          <context context-type="linenumber">598</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7819314041543176992" datatype="html">
@@ -279,7 +279,7 @@
         <target>Schließen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">597</context>
+          <context context-type="linenumber">599</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8043717025994295310" datatype="html">
@@ -287,7 +287,7 @@
         <target>Lösche die alten Wetterbilder</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">598</context>
+          <context context-type="linenumber">600</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8477056474175343" datatype="html">
@@ -295,7 +295,7 @@
         <target>Vorgang vom Nutzer abgebrochen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">599</context>
+          <context context-type="linenumber">601</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7652993961962601314" datatype="html">
@@ -303,7 +303,7 @@
         <target>Datensammlung abgeschlossen. Konvertiere jetzt die Daten.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">600</context>
+          <context context-type="linenumber">602</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8037768404051225651" datatype="html">
@@ -311,7 +311,7 @@
         <target>Starte Generierung von Bild $index$.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">601</context>
+          <context context-type="linenumber">603</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2657148871386452832" datatype="html">
@@ -319,7 +319,7 @@
         <target>Generierung der Wetterbilder abgeschlossen.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">602</context>
+          <context context-type="linenumber">604</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9080614536932235873" datatype="html">
@@ -327,7 +327,7 @@
         <target>Unbekannte Datenquelle: $dataGathererName$</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">603</context>
+          <context context-type="linenumber">605</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3791002472107815494" datatype="html">
@@ -335,7 +335,7 @@
         <target>Abfrage für Position #$index$ erfolgreich.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">604</context>
+          <context context-type="linenumber">606</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4038999339776479110" datatype="html">
@@ -343,7 +343,7 @@
         <target>Abfrage für Position #$index$ fehlgeschlagen.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">605</context>
+          <context context-type="linenumber">607</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1811200551799059734" datatype="html">
@@ -351,7 +351,7 @@
         <target>Temperatur (°C)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">606</context>
+          <context context-type="linenumber">608</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2287124292755201210" datatype="html">
@@ -359,7 +359,7 @@
         <target>Bewölkung (%)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">607</context>
+          <context context-type="linenumber">609</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7302549771398919820" datatype="html">
@@ -367,7 +367,7 @@
         <target>Relative Luftfeuchte (%)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">608</context>
+          <context context-type="linenumber">610</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7070263524029596319" datatype="html">
@@ -375,7 +375,7 @@
         <target>Bewölkung niedrig (%)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">609</context>
+          <context context-type="linenumber">611</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6023819613234932797" datatype="html">
@@ -383,7 +383,7 @@
         <target>Bewölkung mittel (%)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">610</context>
+          <context context-type="linenumber">612</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2372908011403431975" datatype="html">
@@ -391,7 +391,7 @@
         <target>Bewölkung hoch (%)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">611</context>
+          <context context-type="linenumber">613</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1295759072632352790" datatype="html">
@@ -399,7 +399,7 @@
         <target>Taupunkt (°C)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">612</context>
+          <context context-type="linenumber">614</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7912701845646690019" datatype="html">
@@ -407,7 +407,7 @@
         <target>Luftdruck (hPa)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">613</context>
+          <context context-type="linenumber">615</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8006928638903346004" datatype="html">
@@ -415,7 +415,7 @@
         <target>Niederschlag (mm)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">614</context>
+          <context context-type="linenumber">616</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7603377279515443315" datatype="html">
@@ -423,7 +423,7 @@
         <target>Regenwahrscheinlichkeit (%)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">615</context>
+          <context context-type="linenumber">617</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3374429388643143323" datatype="html">
@@ -431,7 +431,7 @@
         <target>Sichtweite (m)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">616</context>
+          <context context-type="linenumber">618</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1254434809546707710" datatype="html">
@@ -439,7 +439,7 @@
         <target>UV Index</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">617</context>
+          <context context-type="linenumber">619</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2644893580865797737" datatype="html">
@@ -447,7 +447,7 @@
         <target>Windgeschwindigkeit (km/h)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">618</context>
+          <context context-type="linenumber">620</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3419681791450150574" datatype="html">
@@ -495,7 +495,7 @@
         <target>Beschriftete Wetterbilder</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">57,58</context>
+          <context context-type="linenumber">62,63</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1107240597598030185" datatype="html">
@@ -503,7 +503,7 @@
         <target>Zeige Label auf den Wetterbildern.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">60,61</context>
+          <context context-type="linenumber">65,66</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4962621902898875665" datatype="html">
@@ -511,7 +511,7 @@
         <target>Auf Updates prüfen &amp; benachrichtigen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">65,66</context>
+          <context context-type="linenumber">70,71</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6044862297969542880" datatype="html">
@@ -519,7 +519,7 @@
         <target>Prüfe beim Start auf Updates und benachrichtige mich, wenn ein Update verfügbar ist.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">68,69</context>
+          <context context-type="linenumber">73,74</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5497472972506460974" datatype="html">
@@ -527,7 +527,7 @@
         <target>Name der Region:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">103,104</context>
+          <context context-type="linenumber">108,109</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4001106038907918008" datatype="html">
@@ -535,7 +535,7 @@
         <target>Zeitzone:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">106,107</context>
+          <context context-type="linenumber">111,112</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3540408855316484742" datatype="html">
@@ -543,7 +543,7 @@
         <target>Regionsgröße:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">139,140</context>
+          <context context-type="linenumber">144,145</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8829477678594768245" datatype="html">
@@ -551,7 +551,7 @@
         <target>Auflösung (ergibt n ✕ n Schritte):</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">154</context>
+          <context context-type="linenumber">161</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1903251124965349527" datatype="html">
@@ -559,7 +559,7 @@
         <target>Keine Regionen gefunden. Füge eine Region hinzu.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">175,176</context>
+          <context context-type="linenumber">182,183</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6439365426343089851" datatype="html">
@@ -583,7 +583,7 @@
         <target>Neue Region</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">41</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3768927257183755959" datatype="html">
@@ -591,11 +591,11 @@
         <target>Speichern</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">44</context>
+          <context context-type="linenumber">42</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">45</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7022070615528435141" datatype="html">
@@ -603,7 +603,7 @@
         <target>Löschen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">45</context>
+          <context context-type="linenumber">43</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3823219296477075982" datatype="html">
@@ -611,11 +611,11 @@
         <target>Abbrechen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">46</context>
+          <context context-type="linenumber">44</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">48</context>
+          <context context-type="linenumber">46</context>
         </context-group>
       </trans-unit>
     </body>

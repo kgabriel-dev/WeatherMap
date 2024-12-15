@@ -1,15 +1,12 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { SessionData } from './session.type';
+import { TimeUnits, SizeUnits } from '../settings/settings.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SessionService {
-  private readonly localizedTexts = {
-    hours: $localize`@@hours:hours`,
-  };
-
   private readonly sessionDataSubject = new BehaviorSubject<SessionData>({
     mainData: {
       currentWeatherImageIndex: 0,
@@ -22,11 +19,11 @@ export class SessionService {
       regionResolution: 5,
       regionSize: {
         length: 100,
-        unit: 'km'
+        unitId: SizeUnits.KILOMETERS
       },
       forecastLength: {
         value: 12,
-        unit: this.localizedTexts.hours
+        unitId: TimeUnits.HOURS
       },
       weatherDataSource: 'OpenMeteo',
       weatherCondition: undefined,
