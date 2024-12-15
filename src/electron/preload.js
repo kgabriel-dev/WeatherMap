@@ -18,7 +18,8 @@ contextBridge.exposeInMainWorld('app', {
   onSettingsModalClosed: (callback) => ipcRenderer.on('settings-modal-closed', callback),
   openProgressInfoWindow: () => ipcRenderer.invoke('open-progress-info-window'),
   setLocale: (locale) => ipcRenderer.invoke('set-locale', locale),
-  getLocale: () => ipcRenderer.invoke('get-locale')
+  getLocale: () => ipcRenderer.invoke('get-locale'),
+  sendTranslations: (translations) => ipcRenderer.send('translations-changed', translations)
 });
 
 contextBridge.exposeInMainWorld('weather', {

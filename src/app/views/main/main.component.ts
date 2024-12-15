@@ -83,6 +83,8 @@ export class MainComponent {
     public sessionService: SessionService,
     private changeDetectorRef: ChangeDetectorRef
   ) {
+    window.app.sendTranslations(this.getTranslations());
+
     this.lastReadMainSessionData = this.sessionService.getLatestSessionData().mainData;
     this.mainSessionDataForUpdate = this.sessionService.getLatestSessionData().mainData;
 
@@ -184,9 +186,10 @@ export class MainComponent {
             window.app.getLocale()
             .then((currentLocale) => {
               const newLocale = this.settingsService.getSettings().languageCode;
-              console.log('Current locale:', currentLocale, 'New locale:', newLocale);
-              if(currentLocale !== newLocale)
+
+              if(currentLocale !== newLocale) {
                 window.app.setLocale(newLocale);
+              }
             })
             .catch((error) => {
               console.error('Error getting locale:', error);
@@ -560,5 +563,30 @@ export class MainComponent {
       value: group.label,
       items: group.timezones
     }));
+  }
+
+  // translate the texts from the electron main process here so the translation is done in the Angular locale files
+  // this is necessary because the translation files are not available in the main process
+  getTranslations(): { [key: string]: string } {
+    return {
+      imageGenerationCanceledByUser: $localize`Image generation canceled by user`,
+      menuLearnMore: $localize`Learn more`,
+      menuAbout: $localize`About`,
+      menuDevTools: $localize`Developer Tools`,
+      menuOpenSettings: $localize`Open Settings`,
+      menuSettingsTitle: $localize`Settings`,
+      menuWindowTitle: $localize`Window`,
+      menuHelpTitle: $localize`Help`,
+      menuMinimizeWindow: $localize`Minimize`,
+      menuCloseWindow: $localize`Close`,
+      imgGenerationDelOldImages: $localize`Deleting the old weather images`,
+      canceledByUser: $localize`Canceled by the user`,
+      imgGenerationDataGatheringFinished: $localize`Data gathering finished. Converting the data now.`,
+      imgGenerationStartingCreationImageIndex: $localize`Starting creation of image $index$.`,
+      imgGenerationFinished: $localize`Finished creating the weather images.`,
+      imgGenerationUnknownDataGatherer: $localize`Unknown data gatherer: $dataGathererName$`,
+      dataGatheringIndexSuccess: $localize`Request for location #$index$ succeeded.`,
+      dataGatheringIndexFailed: $localize`Request for location #$index$ failed.`
+    }
   }
 }

@@ -9,8 +9,8 @@ const imagePixelSize = 512;
 
 ipcMain.on('cancel-weather-image-generation', (_event) => cancelRequested = true);
 
-export function generateWeatherImageForLocation(region: Region, dataGathererName: DataGathererName, weatherConditionId: string, forecast_length: number, valueLabels: boolean): Promise<{ date: string, filename: string }[]> {
-  const dataGatherer = getDataGatherer(dataGathererName);
+export function generateWeatherImageForLocation(region: Region, dataGathererName: DataGathererName, weatherConditionId: string, forecast_length: number, valueLabels: boolean, translations: {[key: string]: string}): Promise<{ date: string, filename: string }[]> {
+  const dataGatherer = getDataGatherer(dataGathererName, translations);
 
   return new Promise((resolve, reject) => {
     const weatherCondition = dataGatherer.listAvailableWeatherConditions().find((condition) => condition.id === weatherConditionId);
@@ -21,7 +21,7 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
     }
 
     let progress = 0;
-    sendWeatherGenerationProgressUpdate(true, progress, 'Deleting the old weather images');
+    sendWeatherGenerationProgressUpdate(true, progress, translations["imgGenerationDelOldImages"]);
     // check if the WeatherMap dir in the temp dir exists, if not create it
     // and if it exists, delete all files in it
     const dir = `${app.getPath('temp')}/WeatherMap`;
@@ -31,7 +31,7 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
       fs.readdirSync(dir).forEach((file) => fs.unlinkSync(`${dir}/${file}`));
 
     if(cancelRequested) {
-      sendWeatherGenerationProgressUpdate(false, 100, 'Cancelled by user');
+      sendWeatherGenerationProgressUpdate(false, 100, translations["canceledByUser"]);
       reject('Cancelled by user.');
       cancelRequested = false;
     }
@@ -42,16 +42,16 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
     const progressPerStep = 100 / (numberOfLocations + numberOfImages + 2); // how much progress is made per step (location or image); +2 for "finished data gathering"-message and for the final step
 
     // gather the data for the location
-    dataGatherer.gatherData(region, weatherCondition, forecast_length, progressPerStep)
+    dataGatherer.gatherData(region, weatherCondition, forecast_length, progressPerStep, translations)
       .then((weatherData) => {
         if(cancelRequested) {
-          sendWeatherGenerationProgressUpdate(false, 100, 'Cancelled by user');
+          sendWeatherGenerationProgressUpdate(false, 100, translations["canceledByUser"]);
           reject('Cancelled by user.');
           cancelRequested = false;
         }
 
         progress += progressPerStep * numberOfLocations + progressPerStep;
-        sendWeatherGenerationProgressUpdate(true, progress, 'Data gathering finished. Converting data now');
+        sendWeatherGenerationProgressUpdate(true, progress, translations["imgGenerationDataGatheringFinished"]);
 
         // convert the data from weather over space in a time range to weather over time at a location
         const weatherDataOverTime: { [timeIndex: number]: { weatherCondition: WeatherCondition, weatherValue: number, error: boolean, location: SimpleLocation }[] } = {};
@@ -79,7 +79,7 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
         });
 
         if(cancelRequested) {
-          sendWeatherGenerationProgressUpdate(false, 100, 'Cancelled by user');
+          sendWeatherGenerationProgressUpdate(false, 100, translations["canceledByUser"]);
           reject('Cancelled by user.');
           cancelRequested = false;
         }
@@ -89,7 +89,7 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
 
 
         if(cancelRequested) {
-          sendWeatherGenerationProgressUpdate(false, 100, 'Cancelled by user');
+          sendWeatherGenerationProgressUpdate(false, 100, translations["canceledByUser"]);
           reject('Cancelled by user.');
           cancelRequested = false;
         }
@@ -117,7 +117,7 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
         }
 
         if(cancelRequested) {
-          sendWeatherGenerationProgressUpdate(false, 100, 'Cancelled by user');
+          sendWeatherGenerationProgressUpdate(false, 100, translations["canceledByUser"]);
           reject('Cancelled by user.');
           cancelRequested = false;
         }
@@ -132,7 +132,7 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
         // create the raster images
         for(let timeIndex = 0; timeIndex < timeList.length; timeIndex++) {
           if(cancelRequested) {
-            sendWeatherGenerationProgressUpdate(false, 100, 'Cancelled by user');
+            sendWeatherGenerationProgressUpdate(false, 100, translations["canceledByUser"]);
             reject('Cancelled by user.');
             cancelRequested = false;
           }
@@ -145,7 +145,7 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
           }
 
           progress += progressPerStep;
-          sendWeatherGenerationProgressUpdate(true, progress, `Creating image #${timeIndex + 1}`);
+          sendWeatherGenerationProgressUpdate(true, progress, translations["imgGenerationStartingCreationImageIndex"].replace('$index$', (timeIndex + 1).toString()));
 
             // create the image square by square - without any labels
             for(const [rowIndex, row] of gridCoordinates.entries()) {
@@ -192,7 +192,7 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
         }
 
         progress = 100;
-        sendWeatherGenerationProgressUpdate(false, progress, 'Finished data gathering and image creation!');
+        sendWeatherGenerationProgressUpdate(false, progress, translations["imgGenerationFinished"]);
         resolve(imagesToReturn);
       })
       .catch((error) => {
@@ -209,14 +209,14 @@ function _mapValueToColor(value: number, min: number, max: number): number[] {
   return [255 - colorValue, 255 - colorValue, 255];
 }
 
-function getDataGatherer(dataGathererName: DataGathererName): DataGatherer {
+function getDataGatherer(dataGathererName: DataGathererName, translations: {[key: string]: string}): DataGatherer {
   switch(dataGathererName) {
     case "OpenMeteo":
       return new OpenMeteoDataGatherer();
     case "BrightSky":
       return new BrightSkyDataGatherer();
     default:
-      sendWeatherGenerationProgressUpdate(false, 100, 'Unknown data gatherer used!');
+      sendWeatherGenerationProgressUpdate(false, 100, translations["imgGenerationUnknownDataGatherer"].replace('$dataGathererName$', dataGathererName));
       throw new Error('Unknown data gatherer id');
   }
 }

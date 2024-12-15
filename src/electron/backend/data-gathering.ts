@@ -9,9 +9,13 @@ export class OpenMeteoDataGatherer implements DataGatherer {
   readonly API_URL = "https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly={category}&forecast_hours={hours}&timezone={timezone}";
   readonly REQUEST_DELAY = 300; // time in ms to wait between two requests
 
-  gatherData(region: Region, condition: WeatherCondition, forecast_hours: number, progressPerStep: number): Promise<WeatherData[]> {
+  translations: {[key: string]: string} = {};
+
+  gatherData(region: Region, condition: WeatherCondition, forecast_hours: number, progressPerStep: number, translations: {[key: string]: string}): Promise<WeatherData[]> {
     if(!this.listAvailableWeatherConditions().find((availableCondition) => availableCondition.id === condition.id))
       throw new Error('The selected Weather Condition not available');
+
+    this.translations = translations;
 
     return new Promise((resolve, reject) => {
       const regionSizeInKm = convertToKm(region.region.size.length, region.region.size.unit);
@@ -22,7 +26,7 @@ export class OpenMeteoDataGatherer implements DataGatherer {
       const requests: { lat: number, lon: number, api: string, hours: number, tz: string }[] = [];
 
       if(cancelRequested) {
-        sendWeatherGenerationProgressUpdate(false, 100, 'Cancelled by user');
+        sendWeatherGenerationProgressUpdate(false, 100, this.translations["canceledByUser"]);
         reject('Cancelled by user.');
         cancelRequested = false;
       }
@@ -37,7 +41,7 @@ export class OpenMeteoDataGatherer implements DataGatherer {
       }
 
       if(cancelRequested) {
-        sendWeatherGenerationProgressUpdate(false, 100, 'Cancelled by user');
+        sendWeatherGenerationProgressUpdate(false, 100, this.translations["canceledByUser"]);
         reject('Cancelled by user.');
         cancelRequested = false;
       }
@@ -92,7 +96,7 @@ export class OpenMeteoDataGatherer implements DataGatherer {
           }
 
           progress += progressPerStep;
-          sendWeatherGenerationProgressUpdate(true, progress, `Request for location #${dataList.indexOf(data) + 1} failed`);
+          sendWeatherGenerationProgressUpdate(true, progress, this.translations["dataGatheringIndexFailed"].replace('$index$', (dataList.indexOf(data) + 1).toString()));
         }
 
         // if the request was successful add the data to the weatherData array
@@ -114,7 +118,7 @@ export class OpenMeteoDataGatherer implements DataGatherer {
           }
 
           progress += progressPerStep;
-          sendWeatherGenerationProgressUpdate(true, progress, `Request for location #${dataList.indexOf(data) + 1} successful`);
+          sendWeatherGenerationProgressUpdate(true, progress, this.translations["dataGatheringIndexSuccess"].replace('$index$', (dataList.indexOf(data) + 1).toString()));
         }
 
         if(cancelRequested)
@@ -155,9 +159,13 @@ export class BrightSkyDataGatherer implements DataGatherer {
   readonly API_URL = "https://api.brightsky.dev/weather?date={date}&last_date={last_date}&lat={lat}&lon={lon}&tz={timezone}";
   readonly REQUEST_DELAY = 300; // time in ms to wait between two requests
 
-  gatherData(region: Region, condition: WeatherCondition, forecast_hours: number, progressPerStep: number): Promise<WeatherData[]> {
+  translations: {[key: string]: string} = {};
+
+  gatherData(region: Region, condition: WeatherCondition, forecast_hours: number, progressPerStep: number, translations: {[key: string]: string}): Promise<WeatherData[]> {
     if(!this.listAvailableWeatherConditions().find((availableCondition) => availableCondition.id === condition.id))
       throw new Error('The selected Weather Condition not available');
+
+    this.translations = translations;
 
     return new Promise((resolve, reject) => {
       const regionSizeInKm = convertToKm(region.region.size.length, region.region.size.unit);
@@ -173,7 +181,7 @@ export class BrightSkyDataGatherer implements DataGatherer {
       const requests: { lat: number, lon: number, api: string, startDate: Date, endDate: Date, tz: string }[] = [];
 
       if(cancelRequested) {
-        sendWeatherGenerationProgressUpdate(false, 100, 'Cancelled by user');
+        sendWeatherGenerationProgressUpdate(false, 100, this.translations["canceledByUser"]);
         reject('Cancelled by user.');
         cancelRequested = false;
       }
@@ -188,7 +196,7 @@ export class BrightSkyDataGatherer implements DataGatherer {
       }
 
       if(cancelRequested) {
-        sendWeatherGenerationProgressUpdate(false, 100, 'Cancelled by user');
+        sendWeatherGenerationProgressUpdate(false, 100, this.translations["canceledByUser"]);
         reject('Cancelled by user.');
         cancelRequested = false;
       }
@@ -241,7 +249,7 @@ export class BrightSkyDataGatherer implements DataGatherer {
           }
 
           progress += progressPerStep;
-          sendWeatherGenerationProgressUpdate(true, progress, `Request for location #${dataList.indexOf(data) + 1} failed`);
+          sendWeatherGenerationProgressUpdate(true, progress, this.translations["dataGatheringIndexFailed"].replace('$index$', (dataList.indexOf(data) + 1).toString()));
         }
 
         // if the request was successful
@@ -262,7 +270,7 @@ export class BrightSkyDataGatherer implements DataGatherer {
           }
 
           progress += progressPerStep;
-          sendWeatherGenerationProgressUpdate(true, progress, `Request for location #${dataList.indexOf(data) + 1} successful`);
+          sendWeatherGenerationProgressUpdate(true, progress, this.translations["dataGatheringIndexSuccess"].replace('$index$', (dataList.indexOf(data) + 1).toString()));
         }
 
         if(cancelRequested)

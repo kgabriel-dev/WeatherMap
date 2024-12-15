@@ -1,6 +1,6 @@
 require('ts-node').register();
 
-const { app, BrowserWindow, ipcMain, Menu } = require('electron')
+const { app, BrowserWindow, ipcMain, Menu, webContents } = require('electron')
 const path = require('node:path')
 const url = require('node:url')
 const fs = require('node:fs')
@@ -11,6 +11,12 @@ let mainWindow, progressWindow, settingsWindow;
 let latestProgressMessages = [];
 
 let locale = 'en-US';
+let translations = {};
+
+ipcMain.on('translations-changed', (_event, newTranslations) => {
+  translations = newTranslations;
+  createAndSetMenu();
+});
 
 const createWindow = () => {
   // Create the browser window.
@@ -24,81 +30,7 @@ const createWindow = () => {
   })
 
   // Create the application menu
-  const isMac = process.platform === 'darwin';
-  const menuTemplate = [
-    ...(isMac
-      ? [{
-        label: app.name,
-        submenu: [
-          { role: 'about' },
-          { type: 'separator' },
-          { role: 'services' },
-          { type: 'separator' },
-          { role: 'hide' },
-          { role: 'hideOthers' },
-          { role: 'unhide' },
-          { type: 'separator' },
-          { role: 'quit' }
-        ]
-      }]
-    : []),
-  // { role: 'settingsMenu' }
-  {
-    label: 'Settings',
-    submenu: [
-      {
-        label: 'Open Settings',
-        accelerator: 'CmdOrCtrl+,',
-        click: () => openSettingsModal()
-      }
-    ]
-  },
-  // { role: 'windowMenu' }
-  {
-    label: 'Window',
-    submenu: [
-      { role: 'minimize' },
-      ...(isMac
-        ? [
-            { type: 'separator' },
-            { role: 'front' },
-            { type: 'separator' },
-            { role: 'window' }
-          ]
-        : [
-            { role: 'close' }
-          ])
-    ]
-  },
-  {
-    role: 'help',
-    submenu: [
-      {
-        label: 'Learn More',
-        click: async () => {
-          const { shell } = require('electron')
-          await shell.openExternal('https://github.com/kgabriel-dev/WeatherMap')
-        }
-      },
-      {
-        role: 'about',
-        label: 'About'
-      },
-      {
-        'label': 'Dev. Tools',
-        'accelerator': 'CmdOrCtrl+Shift+I',
-        'click': async () => {
-          mainWindow.webContents.toggleDevTools();
-        }
-      }
-    ]
-  }];
-  const menu = Menu.buildFromTemplate(menuTemplate);
-  Menu.setApplicationMenu(menu);
-
-  // maximize the window and show it
-  mainWindow.maximize()
-  mainWindow.show()
+  createAndSetMenu();
 
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({
@@ -107,40 +39,14 @@ const createWindow = () => {
     slashes: true
   }))
 
-  // function to open the settings modal; called from the menu bar
-  function openSettingsModal() {
-    settingsWindow = new BrowserWindow({
-      parent: mainWindow,
-      width: 800,
-      height: 600,
-      show: false,
-      webPreferences: {
-        preload: path.join(__dirname, 'preload.js')
-      }
-    });
+  mainWindow.once('ready-to-show', () => {
+    // maximize the window and show it
+    mainWindow.maximize()
+    mainWindow.show()
 
-    settingsWindow.loadURL(url.format({
-      pathname: path.join(__dirname, 'weather-map', 'browser', locale, 'index.html'),
-      protocol: 'file:',
-      slashes: true,
-      hash: '#/settings'
-    }))
-
-    let menuTemplate = [];
-    let menu = Menu.buildFromTemplate(menuTemplate);
-    settingsWindow.setMenu(menu);
-
-    settingsWindow.once('ready-to-show', () => {
-      settingsWindow.show();
-    });
-
-    settingsWindow.on('closed', () => {
-      settingsWindow = null;
-
-      // send a message to the main window to update the settings
-      mainWindow.webContents.send('settings-modal-closed');
-    });
-  }
+    // get the translations from the renderer process
+    mainWindow.webContents.send('request-translations');
+  });
 }
 
 app.whenReady().then(() => {
@@ -150,6 +56,41 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
+
+// function to open the settings modal; called from the menu bar
+function openSettingsModal() {
+  settingsWindow = new BrowserWindow({
+    parent: mainWindow,
+    width: 800,
+    height: 600,
+    show: false,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js')
+    }
+  });
+
+  settingsWindow.loadURL(url.format({
+    pathname: path.join(__dirname, 'weather-map', 'browser', locale, 'index.html'),
+    protocol: 'file:',
+    slashes: true,
+    hash: '#/settings'
+  }))
+
+  let menuTemplate = [];
+  let menu = Menu.buildFromTemplate(menuTemplate);
+  settingsWindow.setMenu(menu);
+
+  settingsWindow.once('ready-to-show', () => {
+    settingsWindow.show();
+  });
+
+  settingsWindow.on('closed', () => {
+    settingsWindow = null;
+
+    // send a message to the main window to update the settings
+    mainWindow.webContents.send('settings-modal-closed');
+  });
+}
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
@@ -180,7 +121,7 @@ ipcMain.handle('write-app-file', (_event, filePath, data, encoding) => {
 });
 
 ipcMain.handle('generate-weather-images-for-region', (_event, region, dataGatherer, weatherCondition, forecastLength, valueLabels) => {
-  return generateWeatherImageForLocation(region, dataGatherer, weatherCondition, forecastLength, valueLabels);
+  return generateWeatherImageForLocation(region, dataGatherer, weatherCondition, forecastLength, valueLabels, translations);
 });
 
 ipcMain.on('weather-generation-progress', (_event, inProgress, progressValue, progressMessage) => {
@@ -231,7 +172,7 @@ ipcMain.handle('cancel-weather-image-generation', (_event) => {
   ipcMain.emit('cancel-weather-image-generation');
 });
 ipcMain.on('canceled-weather-image-generation', (_event) => {
-  ipcMain.emit('weather-generation-progress', false, 100, 'Weather image generation cancelled by user.');
+  ipcMain.emit('weather-generation-progress', false, 100, translations.imageGenerationCanceledByUser);
 });
 
 
@@ -244,8 +185,8 @@ ipcMain.handle('list-weather-conditions', (_event) => {
   return weatherConditions;
 });
 
-ipcMain.handle('set-locale', (_event, locale) => {
-  this.locale = locale;
+ipcMain.handle('set-locale', (_event, newLocale) => {
+  locale = newLocale;
 
   if(mainWindow && !mainWindow.isDestroyed())
     mainWindow.loadURL(url.format({
@@ -272,7 +213,7 @@ ipcMain.handle('set-locale', (_event, locale) => {
 });
 
 ipcMain.handle('get-locale', (_event) => {
-  return this.locale;
+  return locale;
 });
 
 // Helper functions
@@ -283,4 +224,79 @@ function readFile(filePath, encoding) {
     console.error('Error reading file:', err)
     throw err;
   }
+}
+
+function createAndSetMenu() {
+  const isMac = process.platform === 'darwin';
+  const menuTemplate = [
+    ...(isMac
+      ? [{
+        label: app.name,
+        submenu: [
+          { role: 'about' },
+          { type: 'separator' },
+          { role: 'services' },
+          { type: 'separator' },
+          { role: 'hide' },
+          { role: 'hideOthers' },
+          { role: 'unhide' },
+          { type: 'separator' },
+          { role: 'quit' }
+        ]
+      }]
+    : []),
+  // { role: 'settingsMenu' }
+  {
+    label: translations.menuSettingsTitle,
+    submenu: [
+      {
+        label: translations.menuOpenSettings,
+        accelerator: 'CmdOrCtrl+,',
+        click: () => openSettingsModal()
+      }
+    ]
+  },
+  // { role: 'windowMenu' }
+  {
+    label: translations.menuWindowTitle,
+    submenu: [
+      { role: 'minimize', label: translations.menuMinimizeWindow },
+      ...(isMac
+        ? [
+            { type: 'separator' },
+            { role: 'front' },
+            { type: 'separator' },
+            { role: 'window' }
+          ]
+        : [
+            { role: 'close', label: translations.menuCloseWindow }
+          ])
+    ]
+  },
+  {
+    role: 'help',
+    label: translations.menuHelpTitle,
+    submenu: [
+      {
+        label: translations.menuLearnMore,
+        click: async () => {
+          const { shell } = require('electron')
+          await shell.openExternal('https://github.com/kgabriel-dev/WeatherMap')
+        }
+      },
+      {
+        role: 'about',
+        label: translations.menuAbout
+      },
+      {
+        'label': translations.menuDevTools,
+        'accelerator': 'CmdOrCtrl+Shift+I',
+        'click': async () => {
+          mainWindow.webContents.toggleDevTools();
+        }
+      }
+    ]
+  }];
+  const menu = Menu.buildFromTemplate(menuTemplate);
+  Menu.setApplicationMenu(menu);
 }
