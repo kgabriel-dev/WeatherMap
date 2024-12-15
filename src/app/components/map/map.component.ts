@@ -262,14 +262,12 @@ export class MapComponent implements AfterViewInit {
 
     imageDate.setMinutes(imageDate.getMinutes() + timezoneOffset);
 
-
-
     this.dataOverlay.setText([
       $localize`Location: ${location}`,
       $localize`Region size: ${sessionData.mainData.regionSize.length}x${sessionData.mainData.regionSize.length} ${sessionData.mainData.regionSize.unit}`,
       $localize`Resolution: ${sessionData.mainData.regionResolution}x${sessionData.mainData.regionResolution}`,
       $localize`Weather data: ${sessionData.mainData.weatherCondition?.condition ?? '** Unknown **'}`,
-      $localize`Time: ${new Date(imageDate).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}`
+      $localize`Time: ${new Date(imageDate).toLocaleString(Intl.getCanonicalLocales(this.settingsService.getSettings().languageCode), { dateStyle: 'medium', timeStyle: 'short' })}`
     ]);
   }
 

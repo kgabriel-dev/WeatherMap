@@ -7,7 +7,7 @@ import { DividerModule } from 'primeng/divider';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { TabViewModule } from 'primeng/tabview';
-import { SettingsService } from '../../services/settings/settings.service';
+import { Settings, SettingsService } from '../../services/settings/settings.service';
 import { LocationService } from '../../services/location/location.service';
 import { ListboxModule } from 'primeng/listbox';
 import { InputTextModule } from 'primeng/inputtext';
@@ -38,9 +38,14 @@ export class SettingsComponent {
   readonly localizedTexts = {
     titleGeneralSettings: $localize`General`,
     titleLocationSettings: $localize`Locations`,
-    selectionHours: $localize`hours`,
-    selectionDays: $localize`days`,
-    buttonAddLocation: $localize`Add Location`
+    selectionHours: $localize`@@hours:hours`,
+    selectionDays: $localize`@@days:days`,
+    buttonAddLocation: $localize`Add Location`,
+    buttonSaveLocation: $localize`Save`,
+    buttonDeleteLocation: $localize`Delete`,
+    buttonDiscardLocation: $localize`Discard`,
+    buttonSettingsSave: $localize`Save`,
+    buttonSettingsDiscard: $localize`Discard`
   }
 
   // variables for the selected timezone
@@ -108,9 +113,9 @@ export class SettingsComponent {
   selectedLanguageKey: string = this.languages[0].key;
 
   // other variables
-  forecastLength: { value: number, unit: 'hours' | 'days' } = {
-    value: 4,
-    unit: 'days'
+  forecastLength: Settings['forecastLength'] = {
+    value: 12,
+    unit: this.localizedTexts.selectionHours
   }
   updateCheck: boolean = true;
   labeledImages: boolean = true;

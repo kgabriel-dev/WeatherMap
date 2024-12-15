@@ -71,8 +71,8 @@
     <p-divider />
 
     <div class="flex flex-row gap-2">
-      <p-button label="Save" icon="pi pi-save" (onClick)="saveSettings()" />
-      <p-button label="Discard" icon="pi pi-times" (onClick)="closeWindow()" />
+      <p-button [label]="localizedTexts.buttonSettingsSave" icon="pi pi-save" (onClick)="saveSettings()" />
+      <p-button [label]="localizedTexts.buttonSettingsDiscard" icon="pi pi-times" (onClick)="closeWindow()" />
     </div>
 
     <div class="flex-grow-1"></div>
@@ -163,9 +163,9 @@
             <p-divider />
 
             <div class="flex flex-row gap-2 w-full justify-content-center">
-              <p-button label="Save" icon="pi pi-save" (onClick)="saveWorkingLocation()" />
-              <p-button label="Discard" icon="pi pi-times" (onClick)="closeWindow()" />
-              <p-button label="Delete" icon="pi pi-trash" (onClick)="deleteWorkingLocation()" />
+              <p-button [label]="localizedTexts.buttonSaveLocation" icon="pi pi-save" (onClick)="saveWorkingLocation()" />
+              <p-button [label]="localizedTexts.buttonDiscardLocation" icon="pi pi-times" (onClick)="closeWindow()" />
+              <p-button [label]="localizedTexts.buttonDeleteLocation" icon="pi pi-trash" (onClick)="deleteWorkingLocation()" />
             </div>
           </div>
         </div>

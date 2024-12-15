@@ -6,6 +6,10 @@ import { SessionData } from './session.type';
   providedIn: 'root'
 })
 export class SessionService {
+  private readonly localizedTexts = {
+    hours: $localize`@@hours:hours`,
+  };
+
   private readonly sessionDataSubject = new BehaviorSubject<SessionData>({
     mainData: {
       currentWeatherImageIndex: 0,
@@ -22,7 +26,7 @@ export class SessionService {
       },
       forecastLength: {
         value: 12,
-        unit: 'hours'
+        unit: this.localizedTexts.hours
       },
       weatherDataSource: 'OpenMeteo',
       weatherCondition: undefined,

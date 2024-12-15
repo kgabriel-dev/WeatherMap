@@ -13,12 +13,8 @@
           </ng-template>
         </p-progressBar>
 
-        <p-button (onClick)="openProgressInfoWindow()" styleClass="w-full">
-          <span pButtonLabel i18n>Info</span>
-        </p-button>
-        <p-button styleClass="w-full" (onClick)="cancelWeatherImageGeneration()">
-          <span pButtonLabel i18n>Cancel</span>
-        </p-button>
+        <p-button [label]="localizedTexts.buttonGenerationProgressInfo" (onClick)="openProgressInfoWindow()" styleClass="w-full" />
+        <p-button [label]="localizedTexts.buttonCancelImgGeneration" styleClass="w-full" (onClick)="cancelWeatherImageGeneration()" />
       }
       @else {
         <p-progressBar [value]="((lastReadMainSessionData.currentWeatherImageIndex + 1) / lastReadMainSessionData.numberOfWeatherImages) * 100" class="w-full">
@@ -179,8 +175,7 @@
     </div>
 
     <div class="flex-grow-1 border-bottom-2 border-primary-500"></div>
-    <p-button (onClick)="startWeatherImageGeneration()" styleClass="w-full">
-      <span pButtonLabel i18n>Generate images</span>
+    <p-button [label]="localizedTexts.buttonGenerateImages" (onClick)="startWeatherImageGeneration()" styleClass="w-full">
     </p-button>
   </div>
 </div>

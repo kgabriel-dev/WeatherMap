@@ -26,9 +26,12 @@ import { CheckboxModule } from 'primeng/checkbox';
 export class MainComponent {
   readonly localizedTexts = {
     mapPanToLocationTooltip: $localize`Click to center the map on the selected location.`,
-    selectionHours : $localize`hours`,
-    selectionDays : $localize`days`,
+    selectionHours : $localize`@@hours:hours`,
+    selectionDays : $localize`@@days:days`,
     useOverriddenTimezoneLabel: $localize`Override location's timezone`,
+    buttonGenerateImages: $localize`Generate Images`,
+    buttonCancelImgGeneration: $localize`Cancel`,
+    buttonGenerationProgressInfo: $localize`Info`
   }
 
   lastReadMainSessionData: MainData;

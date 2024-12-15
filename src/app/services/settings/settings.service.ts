@@ -5,6 +5,9 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root'
 })
 export class SettingsService {
+  private readonly localizedTexts = {
+    hours: $localize`@@hours:hours`,
+  };
 
   private readonly defaultSettings: Settings = {
     version: '0.1.0',
@@ -12,7 +15,7 @@ export class SettingsService {
     weatherCondition: 'openmeteo.cloudiness',
     forecastLength: {
       value: 12,
-      unit: 'hours'
+      unit: this.localizedTexts.hours
     },
     updateCheck: true,
     defaultLocationIndex: 0,
@@ -129,7 +132,7 @@ export type Settings = {
   weatherCondition: string,
   forecastLength: {
     value: number,
-    unit: 'hours' | 'days',
+    unit: string,
   },
   updateCheck: boolean,
   defaultLocationIndex: number,
