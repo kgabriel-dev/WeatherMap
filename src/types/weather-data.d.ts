@@ -1,7 +1,7 @@
 declare interface DataGatherer {
   getName: () => string;
   gatherData: (region: Region, condition: WeatherCondition, forecast_hours: number, progressPerStep: number, translations: {[key: string]: string}) => Promise<WeatherData[]>;
-  listAvailableWeatherConditions: () => WeatherCondition[];
+  listAvailableWeatherConditions: (translations: {[key: string]: string}) => WeatherCondition[];
 }
 
 declare type WeatherData = {

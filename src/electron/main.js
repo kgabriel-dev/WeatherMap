@@ -179,8 +179,8 @@ ipcMain.on('canceled-weather-image-generation', (_event) => {
 ipcMain.handle('list-weather-conditions', (_event) => {
   const weatherConditions = {};
 
-  weatherConditions['OpenMeteo'] = new OpenMeteoDataGatherer().listAvailableWeatherConditions();
-  weatherConditions['BrightSky'] = new BrightSkyDataGatherer().listAvailableWeatherConditions();
+  weatherConditions['OpenMeteo'] = new OpenMeteoDataGatherer().listAvailableWeatherConditions(translations);
+  weatherConditions['BrightSky'] = new BrightSkyDataGatherer().listAvailableWeatherConditions(translations);
 
   return weatherConditions;
 });

@@ -298,6 +298,97 @@
           <context context-type="linenumber">589</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="1811200551799059734" datatype="html">
+        <source>Temperature (°C)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
+          <context context-type="linenumber">590</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2287124292755201210" datatype="html">
+        <source>Cloud Coverage (%)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
+          <context context-type="linenumber">591</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7302549771398919820" datatype="html">
+        <source>Relative Humidity (%)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
+          <context context-type="linenumber">592</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7070263524029596319" datatype="html">
+        <source>Cloud Coverage Low (%)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
+          <context context-type="linenumber">593</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6023819613234932797" datatype="html">
+        <source>Cloud Coverage Mid (%)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
+          <context context-type="linenumber">594</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2372908011403431975" datatype="html">
+        <source>Cloud Coverage High (%)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
+          <context context-type="linenumber">595</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1295759072632352790" datatype="html">
+        <source>Dew Point (°C)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
+          <context context-type="linenumber">596</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7912701845646690019" datatype="html">
+        <source>Air Pressure (hPa)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
+          <context context-type="linenumber">597</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8006928638903346004" datatype="html">
+        <source>Precipitation (mm)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
+          <context context-type="linenumber">598</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7603377279515443315" datatype="html">
+        <source>Precipitation Probability (%)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
+          <context context-type="linenumber">599</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3374429388643143323" datatype="html">
+        <source>Visibility (m)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
+          <context context-type="linenumber">600</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1254434809546707710" datatype="html">
+        <source>UV Index</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
+          <context context-type="linenumber">601</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2644893580865797737" datatype="html">
+        <source>Wind Speed (km/h)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
+          <context context-type="linenumber">602</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="3419681791450150574" datatype="html">
         <source>Progress</source>
         <context-group purpose="location">

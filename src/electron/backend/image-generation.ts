@@ -13,7 +13,7 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
   const dataGatherer = getDataGatherer(dataGathererName, translations);
 
   return new Promise((resolve, reject) => {
-    const weatherCondition = dataGatherer.listAvailableWeatherConditions().find((condition) => condition.id === weatherConditionId);
+    const weatherCondition = dataGatherer.listAvailableWeatherConditions(translations).find((condition) => condition.id === weatherConditionId);
 
     if(!weatherCondition) {
       reject('Unknown weather condition id');

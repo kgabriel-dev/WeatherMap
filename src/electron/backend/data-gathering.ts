@@ -12,7 +12,7 @@ export class OpenMeteoDataGatherer implements DataGatherer {
   translations: {[key: string]: string} = {};
 
   gatherData(region: Region, condition: WeatherCondition, forecast_hours: number, progressPerStep: number, translations: {[key: string]: string}): Promise<WeatherData[]> {
-    if(!this.listAvailableWeatherConditions().find((availableCondition) => availableCondition.id === condition.id))
+    if(!this.listAvailableWeatherConditions(this.translations).find((availableCondition) => availableCondition.id === condition.id))
       throw new Error('The selected Weather Condition not available');
 
     this.translations = translations;
@@ -88,7 +88,7 @@ export class OpenMeteoDataGatherer implements DataGatherer {
 
             weatherData.push({
               coordinates: { latitude: data.lat, longitude: data.lon },
-              weatherCondition: this.listAvailableWeatherConditions().find((condition) => condition.api === data.api)!,
+              weatherCondition: this.listAvailableWeatherConditions(this.translations).find((condition) => condition.api === data.api)!,
               weatherValue: 0,
               error: true,
               date: date.toISOString()
@@ -110,7 +110,7 @@ export class OpenMeteoDataGatherer implements DataGatherer {
 
             weatherData.push({
               coordinates: { latitude: data.lat, longitude: data.lon },
-              weatherCondition: this.listAvailableWeatherConditions().find((condition) => condition.api === data.api)!,
+              weatherCondition: this.listAvailableWeatherConditions(this.translations).find((condition) => condition.api === data.api)!,
               weatherValue: value,
               error: false,
               date: date.toISOString()
@@ -137,20 +137,22 @@ export class OpenMeteoDataGatherer implements DataGatherer {
     return 'OpenMeteo';
   }
 
-  listAvailableWeatherConditions(): WeatherCondition[] {
+  listAvailableWeatherConditions(translations: {[key: string]: string}): WeatherCondition[] {
+    this.translations = translations;
+
     return [
-      { condition: 'Temperature (°C)', id: 'temperature_c', api: 'temperature_2m', min: -1, max: -1, unit: '°C' },
-      { condition: 'Cloud Coverage (%)', id: 'cloud_cover', api: 'cloud_cover', min: 0, max: 100, unit: '%' },
-      { condition: 'Relative Humidity (%)', id: 'relative_humidity', api: 'relative_humidity_2m', min: 0, max: 100, unit: '%' },
-      { condition: 'Cloud Coverage (%, low)', id: 'cloud_cover_low', api: 'cloud_cover_low', min: 0, max: 100, unit: '%' },
-      { condition: 'Cloud Coverage (%, mid)', id: 'cloud_cover_mid', api: 'cloud_cover_mid', min: 0, max: 100, unit: '%' },
-      { condition: 'Cloud Coverage (%, high)', id: 'cloud_cover_high', api: 'cloud_cover_high', min: 0, max: 100, unit: '%' },
-      { condition: 'Dew Point (°C)', id: 'dew_point_c', api: 'dew_point_2m', min: -1, max: -1, unit: '°C' },
-      { condition: 'Air Pressure (hPa)', id: 'air_pressure', api: 'pressure_msl', min: -1, max: -1, unit: 'hPa' },
-      { condition: 'Precipitation (mm)', id: 'precipitation_value', api: 'precipitation', min: 0, max: -1, unit: 'mm' },
-      { condition: 'Precipitation Probability (%)', id: 'precipitation_probability', api: 'precipitation_probability', min: 0, max: 100, unit: '%' },
-      { condition: 'Visibility (m)', id: 'visibility', api: 'visibility', min: -1, max: -1, unit: 'm' },
-      { condition: 'UV Index', id: 'uv_index', api: 'uv_index', min: 0, max: 11, unit: '' },
+      { condition: this.translations["dataGathererCategoryTempC"], id: 'temperature_c', api: 'temperature_2m', min: -1, max: -1, unit: '°C' },
+      { condition: this.translations["dataGathererCategoryCloudCover"], id: 'cloud_cover', api: 'cloud_cover', min: 0, max: 100, unit: '%' },
+      { condition: this.translations["dataGathererCategoryRelHumidity"], id: 'relative_humidity', api: 'relative_humidity_2m', min: 0, max: 100, unit: '%' },
+      { condition: this.translations["dataGathererCategoryCloudsLow"], id: 'cloud_cover_low', api: 'cloud_cover_low', min: 0, max: 100, unit: '%' },
+      { condition: this.translations["dataGathererCategoryCloudsMid"], id: 'cloud_cover_mid', api: 'cloud_cover_mid', min: 0, max: 100, unit: '%' },
+      { condition: this.translations["dataGathererCategoryCloudsHigh"], id: 'cloud_cover_high', api: 'cloud_cover_high', min: 0, max: 100, unit: '%' },
+      { condition: this.translations["dataGathererCategoryDewPointC"], id: 'dew_point_c', api: 'dew_point_2m', min: -1, max: -1, unit: '°C' },
+      { condition: this.translations["dataGathererCategoryAirPressure"], id: 'air_pressure', api: 'pressure_msl', min: -1, max: -1, unit: 'hPa' },
+      { condition: this.translations["dataGathererCategoryPrecipitation"], id: 'precipitation_value', api: 'precipitation', min: 0, max: -1, unit: 'mm' },
+      { condition: this.translations["dataGathererCategoryPrecipitationProbability"], id: 'precipitation_probability', api: 'precipitation_probability', min: 0, max: 100, unit: '%' },
+      { condition: this.translations["dataGathererCategoryVisibility"], id: 'visibility', api: 'visibility', min: -1, max: -1, unit: 'm' },
+      { condition: this.translations["dataGathererCategoryUvIndex"], id: 'uv_index', api: 'uv_index', min: 0, max: 11, unit: '' },
     ];
   }
 }
@@ -162,7 +164,7 @@ export class BrightSkyDataGatherer implements DataGatherer {
   translations: {[key: string]: string} = {};
 
   gatherData(region: Region, condition: WeatherCondition, forecast_hours: number, progressPerStep: number, translations: {[key: string]: string}): Promise<WeatherData[]> {
-    if(!this.listAvailableWeatherConditions().find((availableCondition) => availableCondition.id === condition.id))
+    if(!this.listAvailableWeatherConditions(translations).find((availableCondition) => availableCondition.id === condition.id))
       throw new Error('The selected Weather Condition not available');
 
     this.translations = translations;
@@ -241,7 +243,7 @@ export class BrightSkyDataGatherer implements DataGatherer {
 
             weatherData.push({
               coordinates: { latitude: data.lat, longitude: data.lon },
-              weatherCondition: this.listAvailableWeatherConditions().find((condition) => condition.api === data.api)!,
+              weatherCondition: this.listAvailableWeatherConditions(this.translations).find((condition) => condition.api === data.api)!,
               weatherValue: 0,
               error: true,
               date: date.toISOString()
@@ -262,7 +264,7 @@ export class BrightSkyDataGatherer implements DataGatherer {
 
             weatherData.push({
               coordinates: { latitude: data.lat, longitude: data.lon },
-              weatherCondition: this.listAvailableWeatherConditions().find((condition) => condition.api === data.api)!,
+              weatherCondition: this.listAvailableWeatherConditions(this.translations).find((condition) => condition.api === data.api)!,
               weatherValue: currWeatherData[data.api],
               error: false,
               date: new Date(currWeatherData.timestamp).toISOString()
@@ -291,16 +293,18 @@ export class BrightSkyDataGatherer implements DataGatherer {
     return 'BrightSky';
   }
 
-  listAvailableWeatherConditions(): WeatherCondition[] {
+  listAvailableWeatherConditions(translations: {[key: string]: string}): WeatherCondition[] {
+    this.translations = translations;
+
     return [
-      { condition: 'Cloud Coverage (%)', id: 'cloud_cover', api: 'cloud_cover', min: 0, max: 100, unit: '%' },
-      { condition: 'Dew Point (°C)', id: 'dew_point_c', api: 'dew_point', min: -1, max: -1, unit: '°C' },
-      { condition: 'Precipitation Probability (%)', id: 'precipitation_probability', api: 'precipitation_probability', min: 0, max: 100 , unit: '%' },
-      { condition: 'Air Pressure (hPa)', id: 'air_pressure', api: 'pressure_msl', min: -1, max: -1, unit: 'hPa' },
-      { condition: 'Relative Humidity (%)', id: 'relative_humidity', api: 'relative_humidity', min: 0, max: 100, unit: '%' },
-      { condition: 'Temperature (°C)', id: 'temperature_c', api: 'temperature', min: -1, max: -1, unit: '°C' },
-      { condition: 'Visibility (m)', id: 'visibility', api: 'visibility', min: -1, max: -1, unit: 'm' },
-      { condition: 'Wind speed (km/h)', id: 'wind_speed', api: 'wind_speed', min: 0, max: -1, unit: 'km/h' },
+      { condition: this.translations["dataGathererCategoryCloudCover"], id: 'cloud_cover', api: 'cloud_cover', min: 0, max: 100, unit: '%' },
+      { condition: this.translations["dataGathererCategoryDewPointC"], id: 'dew_point_c', api: 'dew_point', min: -1, max: -1, unit: '°C' },
+      { condition: this.translations["dataGathererCategoryPrecipitationProbability"], id: 'precipitation_probability', api: 'precipitation_probability', min: 0, max: 100 , unit: '%' },
+      { condition: this.translations["dataGathererCategoryAirPressure"], id: 'air_pressure', api: 'pressure_msl', min: -1, max: -1, unit: 'hPa' },
+      { condition: this.translations["dataGathererCategoryRelHumidity"], id: 'relative_humidity', api: 'relative_humidity', min: 0, max: 100, unit: '%' },
+      { condition: this.translations["dataGathererCategoryTempC"], id: 'temperature_c', api: 'temperature', min: -1, max: -1, unit: '°C' },
+      { condition: this.translations["dataGathererCategoryVisibility"], id: 'visibility', api: 'visibility', min: -1, max: -1, unit: 'm' },
+      { condition: this.translations["dataGathererCategoryWindSpeed"], id: 'wind_speed', api: 'wind_speed', min: 0, max: -1, unit: 'km/h' },
     ];
   }
 }

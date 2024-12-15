@@ -586,7 +586,20 @@ export class MainComponent {
       imgGenerationFinished: $localize`Finished creating the weather images.`,
       imgGenerationUnknownDataGatherer: $localize`Unknown data gatherer: $dataGathererName$`,
       dataGatheringIndexSuccess: $localize`Request for location #$index$ succeeded.`,
-      dataGatheringIndexFailed: $localize`Request for location #$index$ failed.`
+      dataGatheringIndexFailed: $localize`Request for location #$index$ failed.`,
+      dataGathererCategoryTempC: $localize`Temperature (°C)`,
+      dataGathererCategoryCloudCover: $localize`Cloud Coverage (%)`,
+      dataGathererCategoryRelHumidity: $localize`Relative Humidity (%)`,
+      dataGathererCategoryCloudsLow: $localize`Cloud Coverage Low (%)`,
+      dataGathererCategoryCloudsMid: $localize`Cloud Coverage Mid (%)`,
+      dataGathererCategoryCloudsHigh: $localize`Cloud Coverage High (%)`,
+      dataGathererCategoryDewPointC: $localize`Dew Point (°C)`,
+      dataGathererCategoryAirPressure: $localize`Air Pressure (hPa)`,
+      dataGathererCategoryPrecipitation: $localize`Precipitation (mm)`,
+      dataGathererCategoryPrecipitationProbability: $localize`Precipitation Probability (%)`,
+      dataGathererCategoryVisibility: $localize`Visibility (m)`,
+      dataGathererCategoryUvIndex: $localize`UV Index`,
+      dataGathererCategoryWindSpeed: $localize`Wind Speed (km/h)`,
     }
   }
 }
