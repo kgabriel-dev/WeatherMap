@@ -1,7 +1,7 @@
 import { AfterViewInit, Component } from '@angular/core';
 import * as L from 'leaflet';
 import { LocationService } from '../../services/location/location.service';
-import { SettingsService, TimeUnitStrings } from '../../services/settings/settings.service';
+import { SettingsService, SizeUnitStrings } from '../../services/settings/settings.service';
 import { BehaviorSubject, combineLatestWith, map } from 'rxjs';
 import { SessionService } from '../../services/session/session.service';
 import { getTimeZones } from '@vvo/tzdb';
@@ -265,7 +265,7 @@ export class MapComponent implements AfterViewInit {
 
     this.dataOverlay.setText([
       $localize`Location: ${location}`,
-      $localize`Region size: ${sessionData.mainData.regionSize.length}x${sessionData.mainData.regionSize.length} ${TimeUnitStrings[sessionData.mainData.regionSize.unitId]}`,
+      $localize`Region size: ${sessionData.mainData.regionSize.length}x${sessionData.mainData.regionSize.length} ${SizeUnitStrings[sessionData.mainData.regionSize.unitId].display}`,
       $localize`Resolution: ${sessionData.mainData.regionResolution}x${sessionData.mainData.regionResolution}`,
       $localize`Weather data: ${sessionData.mainData.weatherCondition?.condition ?? '** Unknown **'}`,
       $localize`Time: ${new Date(imageDate).toLocaleString(Intl.getCanonicalLocales(this.settingsService.getSettings().languageCode), { dateStyle: 'medium', timeStyle: 'short' })}`

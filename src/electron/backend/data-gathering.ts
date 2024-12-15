@@ -73,8 +73,6 @@ export class OpenMeteoDataGatherer implements DataGatherer {
         .replace('{hours}', data.hours.toString())
         .replace('{timezone}', data.tz);
 
-      console.log(url);
-
       try {
         const response = await fetch(url);
 

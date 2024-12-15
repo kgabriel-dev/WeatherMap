@@ -41,13 +41,13 @@ const createWindow = () => {
 
   mainWindow.once('ready-to-show', () => {
     // wait until the locale is set and the translations are loaded before showing the window
-    setInterval(() => {
+    checkInterval = setInterval(() => {
       if(Object.keys(translations).length > 0) {
-        clearInterval(this);
+        clearInterval(checkInterval);
 
         // maximize the window and show it
-        mainWindow.maximize()
-        mainWindow.show()
+        mainWindow.maximize();
+        mainWindow.show();
       }
     }, 200);
 

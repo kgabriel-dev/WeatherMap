@@ -106,7 +106,6 @@ export class MainComponent {
     this.mainSessionDataForUpdate = this.sessionService.getLatestSessionData().mainData;
 
     this.sessionService.getSessionDataObservable().subscribe((sessionData) => {
-      console.log(sessionData.mainData.forecastLength);
       const oldMainSessionData = JSON.parse(JSON.stringify(this.lastReadMainSessionData));
       this.lastReadMainSessionData = JSON.parse(JSON.stringify(sessionData.mainData));
       this.mainSessionDataForUpdate = JSON.parse(JSON.stringify(sessionData.mainData));
