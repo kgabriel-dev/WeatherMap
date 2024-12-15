@@ -85,6 +85,19 @@ export class MainComponent {
   ) {
     window.app.sendTranslations(this.getTranslations());
 
+    settingsService.isServiceReady().subscribe((isReady) => {
+      if(!isReady) return;
+
+      const settings = settingsService.getSettings();
+
+      window.app.getLocale()
+        .then((currentLocale) => {
+          if(currentLocale !== settings.languageCode) {
+            window.app.setLocale(settings.languageCode);
+          }
+        })
+    });
+
     this.lastReadMainSessionData = this.sessionService.getLatestSessionData().mainData;
     this.mainSessionDataForUpdate = this.sessionService.getLatestSessionData().mainData;
 

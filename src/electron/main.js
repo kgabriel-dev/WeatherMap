@@ -40,9 +40,16 @@ const createWindow = () => {
   }))
 
   mainWindow.once('ready-to-show', () => {
-    // maximize the window and show it
-    mainWindow.maximize()
-    mainWindow.show()
+    // wait until the locale is set and the translations are loaded before showing the window
+    setInterval(() => {
+      if(Object.keys(translations).length > 0) {
+        clearInterval(this);
+
+        // maximize the window and show it
+        mainWindow.maximize()
+        mainWindow.show()
+      }
+    }, 200);
 
     // get the translations from the renderer process
     mainWindow.webContents.send('request-translations');
