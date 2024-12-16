@@ -409,6 +409,12 @@ export class MainComponent {
         this.weatherImages = images;
 
         this.mapComponent?.preloadImageFiles(images.map((image) => image.filename));
+
+        // rush through the images in order to load them into the cache and display them faster later on
+        for(let i = 0; i < images.length; i++)
+          this.setWeatherImageIndex(i);
+
+        // set the first image as the current image
         this.setWeatherImageIndex(0);
       })
       .catch((error) => {
