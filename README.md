@@ -1,27 +1,51 @@
-# WeatherMap
+<p align="center"><img src="https://socialify.git.ci/kgabriel-dev/WeatherMap/image?description=1&amp;descriptionEditable=Visualizing%20weather%20conditions%20across%20any%20selected%20region.&amp;font=Jost&amp;forks=1&amp;issues=1&amp;name=1&amp;owner=1&amp;pattern=Signal&amp;pulls=1&amp;stargazers=1&amp;theme=Dark" alt="project-image"></p>
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.4.
+<hr>
 
-## Development server
+<div align="center">
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## What is this project about?
+Designed for astronomy and astrophotography enthusiasts, this project visualizes precise weather conditions across selected regions, aiding in the planning of ideal observational activities.
 
-## Code scaffolding
+<br>
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Project Screenshot
+<img src="README/AppScreenshot.png" alt="project-screenshot" width="75%">
 
-## Build
+<br>
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## Features
+Visualize weather data
+Choose between different data sources
+Check the weather conditions at different locations
 
-## Running unit tests
+<br>
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## How to run this project
+There are two ways to run this project:
 
-## Running end-to-end tests
+Install it using the installer <br />
+or <br />
+Build it yourself from the code in this repository <br />
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+<br>
 
-## Further help
+### If you want to run the project locally, follow these steps:
+Download the latest installer from the <a href="https://github.com/kgabriel-dev/WeatherMap/releases">releases page</a> <br />
+Run the installer and follow the installation instructions <br />
+Open the installed application
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+<br>
+
+### To build the project from this repository, follow these steps:
+Make sure you have <a href="https://nodejs.org/en/download/">Node.js</a> installed at version 20.18 or higher <br />
+Clone this repository using `git clone https://github.com/kgabriel-dev/WeatherMap.git` <br />
+Navigate to the project directory using `cd WeatherMap` <br />
+Install the project dependencies using `npm install` <br />
+Run the project using `npm run electron` <br />
+
+<br>
+
+## How to contribute?
+Contributions are always welcome! Feel free to open an issue on <a href="https://github.com/kgabriel-dev/WeatherMap/issues">the issues page</a> or submit a pull request if you have any suggestions or improvements to this project.
+</div>
