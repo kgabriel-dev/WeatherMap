@@ -407,6 +407,8 @@ export class MainComponent {
         this.lastWeatherGatheringTime.setMinutes(0, 0, 0);
 
         this.weatherImages = images;
+
+        this.mapComponent?.preloadImageFiles(images.map((image) => image.filename));
         this.setWeatherImageIndex(0);
       })
       .catch((error) => {
@@ -444,7 +446,7 @@ export class MainComponent {
       sessionData = this.sessionService.getLatestSessionData();
 
     // update the weather image on the map and fit region to screen (except when the image is being animated)
-    this.mapComponent?.overlayWeatherImage(this.weatherImages[sessionData.mainData.currentWeatherImageIndex].filename, false);
+    this.mapComponent?.overlayWeatherImage(sessionData.mainData.currentWeatherImageIndex, false);
     this.mapComponent?.updateDataInfo(this.lastWeatherGatheringTime);
   }
 

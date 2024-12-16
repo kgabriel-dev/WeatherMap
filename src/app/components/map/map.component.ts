@@ -19,6 +19,9 @@ export class MapComponent implements AfterViewInit {
   private map: L.Map | undefined;
   private isMapReady$ = new BehaviorSubject<boolean>(false);
 
+  private filePath: string = '';
+  private imageOverlays: L.ImageOverlay[] = [];
+
   private tempMarker: L.Marker | undefined;
 
   private lastSessionData: SessionData | undefined;
@@ -198,24 +201,31 @@ export class MapComponent implements AfterViewInit {
     })
   };
 
-  overlayWeatherImage(filePath: string, fitRegion: boolean): void {
-    if(!this.map) return;
-
+  preloadImageFiles(filePaths: string[]): void {
     const sessionData = this.sessionService.getLatestSessionData();
-
     const location = sessionData.mainData.selectedRegionIndex === -1 ? sessionData.mainData.usedLocation : this.locationsService.getLocations()[sessionData.mainData.selectedRegionIndex].coordinates;
     const regionSizeLat = this.convertRegionSizeToKm(sessionData.mainData.regionSize) / 110.574;
     const regionSizeLon = this.convertRegionSizeToKm(sessionData.mainData.regionSize) / (111.32 * Math.cos(location.latitude * Math.PI / 180));
-
     const imageBounds = L.latLngBounds(
       [ location.latitude - regionSizeLat / 2, location.longitude - regionSizeLon / 2 ],
       [ location.latitude + regionSizeLat / 2, location.longitude + regionSizeLon / 2 ]
     )
 
+    this.imageOverlays = [];
+    for(let i = 0; i < filePaths.length; i++)
+      this.imageOverlays.push(L.imageOverlay(filePaths[i], imageBounds));
+
+    this.overlayWeatherImage(0, true)
+  }
+
+  overlayWeatherImage(fileIndex: number, fitRegion: boolean): void {
+    if(!this.map) return;
+
     if(this.overlayedImage)
       this.map.removeLayer(this.overlayedImage);
 
-    this.overlayedImage = L.imageOverlay(filePath, imageBounds).addTo(this.map);
+    this.overlayedImage = this.imageOverlays[fileIndex];
+    this.overlayedImage.addTo(this.map);
 
     if(fitRegion) this.fitRegionToScreen();
   }
