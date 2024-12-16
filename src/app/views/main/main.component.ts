@@ -44,6 +44,8 @@ export class MainComponent {
     longitude: 0
   }
 
+  latestProgressValue = 0;
+
   lastWeatherGatheringTime: Date = new Date();
 
   imageAnimationInterval: number | undefined;
@@ -224,6 +226,7 @@ export class MainComponent {
         message: progressMessage
       };
 
+      this.latestProgressValue = Math.floor(progressValue);
       this.changeDetectorRef.detectChanges();
     });
 

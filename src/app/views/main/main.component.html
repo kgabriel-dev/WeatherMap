@@ -7,11 +7,7 @@
 
     <div class="flex flex-row align-items-center gap-4" style="height: 30px;">
       @if (this.latestWeatherDataProgress?.inProgress) {
-        <p-progressBar mode="indeterminate" class="w-full" #inProgressProgressBar>
-          <ng-template pTemplate="content">
-            <span>{{ this.latestWeatherDataProgress?.message }}</span>
-          </ng-template>
-        </p-progressBar>
+        <p-progressBar [value]="latestProgressValue" class="w-full" id="inProgressProgressBar" #inProgressProgressBar />
 
         <p-button [label]="localizedTexts.buttonGenerationProgressInfo" (onClick)="openProgressInfoWindow()" styleClass="w-full" />
         <p-button [label]="localizedTexts.buttonCancelImgGeneration" styleClass="w-full" (onClick)="cancelWeatherImageGeneration()" />
