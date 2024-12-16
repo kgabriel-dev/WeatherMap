@@ -122,9 +122,9 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
           cancelRequested = false;
         }
 
-        // sort the grid
-        gridCoordinates.forEach((row) => row.sort((a, b) => a.longitude - b.longitude));
-        gridCoordinates.sort((a, b) => a[0].latitude - b[0].latitude);
+        // sort the grid coordinates by latitude and longitude (most northern and western first)
+        gridCoordinates.sort((row1, row2) => row2[0].latitude - row1[0].latitude);
+        gridCoordinates.forEach((row) => row.sort((coord1, coord2) => coord1.longitude - coord2.longitude));
 
         const maxWeatherValue = weatherCondition.max == -1 ? Math.max(...weatherData.map((data) => data.weatherValue)) : weatherCondition.max;
         const minWeatherValue = weatherCondition.min == -1 ? Math.min(...weatherData.map((data) => data.weatherValue)) : weatherCondition.min;
@@ -147,9 +147,9 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
           progress += progressPerStep;
           sendWeatherGenerationProgressUpdate(true, progress, translations["imgGenerationStartingCreationImageIndex"].replace('$index$', (timeIndex + 1).toString()));
 
-            // create the image square by square - without any labels
-            for(const [rowIndex, row] of gridCoordinates.entries()) {
-              for(const [columnIndex, coordinate] of row.entries()) {
+            // create the image square by square starting from the most northern and western coordinate
+            gridCoordinates.forEach((row, rowIndex) => {
+              row.forEach((coordinate, columnIndex) => {
                 const weatherData = weatherDataOverTime[timeIndex]?.find((data) => data.location.latitude === coordinate.latitude && data.location.longitude === coordinate.longitude) || null;
 
                 let color: number[]; // color to draw the square with
@@ -160,7 +160,7 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
                 }
 
                 context.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.8)`;
-                context.fillRect(rowIndex * imagePixelSize, columnIndex * imagePixelSize, imagePixelSize, imagePixelSize); // draw squares that are imagePixelSize x imagePixelSize pixels
+                context.fillRect(columnIndex * imagePixelSize, rowIndex * imagePixelSize, imagePixelSize, imagePixelSize); // draw squares that are imagePixelSize x imagePixelSize pixels
 
                 if(valueLabels) {
                   let value: string; // value to draw in the square as a label
@@ -174,10 +174,10 @@ export function generateWeatherImageForLocation(region: Region, dataGathererName
                   context.font = `${imagePixelSize / 8}px Arial`;
                   context.textAlign = 'center';
                   context.textBaseline = 'middle';
-                  context.fillText(value, rowIndex * imagePixelSize + imagePixelSize / 2, columnIndex * imagePixelSize + imagePixelSize / 2, imagePixelSize); // add labels to the squares
+                  context.fillText(value, columnIndex * imagePixelSize + imagePixelSize / 2, rowIndex * imagePixelSize + imagePixelSize / 2, imagePixelSize); // add labels to the squares
                 }
-              }
-            }
+              })
+            });
 
             // save the image to a file in the temp directory
             const buffer = canvas.encodeSync('png');
