@@ -212,8 +212,10 @@ export class MapComponent implements AfterViewInit {
     )
 
     this.imageOverlays = [];
-    for(let i = 0; i < filePaths.length; i++)
-      this.imageOverlays.push(L.imageOverlay(filePaths[i], imageBounds));
+    for(let i = 0; i < filePaths.length; i++) {
+      const url = `${filePaths[i]}?t=${new Date().getTime()}`; // Append timestamp to prevent caching
+      this.imageOverlays.push(L.imageOverlay(url, imageBounds));
+    }
 
     this.overlayWeatherImage(0, true)
   }
