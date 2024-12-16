@@ -54,49 +54,12 @@ export class SettingsComponent {
 
   // TODO: Read the values directly from the data gatherers
   // variables for the selected data source
-  readonly dataSources: SelectItemGroup[] = [
-    {
-      label: 'OpenMeteo',
-      value: 'OpenMeteo',
-      items: [
-        { label: 'Cloudiness (%)', value: 'openmeteo.cloudiness' },
-        { label: 'Temperature (°C)', value: 'openmeteo.temperature_c' },
-        { label: 'Temperature (°F)', value: 'openmeteo.temperature_f' },
-        { label: 'Relative Humidity (%)', value: 'openmeteo.humidity' },
-        { label: 'Cloudiness low (%)', value: 'openmeteo.cloudiness_low' },
-        { label: 'Cloudiness mid (%)', value: 'openmeteo.cloudiness_mid' },
-        { label: 'Cloudiness high (%)', value: 'openmeteo.cloudiness_high' },
-        { label: 'Dew point (°C)', value: 'openmeteo.dew_point_c' },
-        { label: 'Dew point (°F)', value: 'openmeteo.dew_point_f' },
-        { label: 'Air pressure (hPa)', value: 'openmeteo.pressure' },
-        { label: 'Precipitation (mm)', value: 'openmeteo.precipitation' },
-        { label: 'Precipitation probability (%)', value: 'openmeteo.precipitation_prob' },
-        { label: 'Visibility (m)', value: 'openmeteo.visibility' },
-        { label: 'UV index', value: 'openmeteo.uv_index' }
-      ]
-    },
-    {
-      label: 'BrightSky (DWD)',
-      value: 'BrightSky',
-      items: [
-        { label: 'Cloudiness (%)', value: 'brightsky.cloudiness' },
-        { label: 'Temperature (°C)', value: 'brightsky.temperature_c' },
-        { label: 'Temperature (°F)', value: 'brightsky.temperature_f' },
-        { label: 'Relative Humidity (%)', value: 'brightsky.humidity' },
-        { label: 'Dew point (°C)', value: 'brightsky.dew_point_c' },
-        { label: 'Dew point (°F)', value: 'brightsky.dew_point_f' },
-        { label: 'Air pressure (hPa)', value: 'brightsky.pressure' },
-        { label: 'Precipitation probability (%)', value: 'brightsky.precipitation_prob' },
-        { label: 'Visibility (m)', value: 'brightsky.visibility' },
-        { label: 'Wind speed (m/s)', value: 'brightsky.wind_speed' }
-      ]
-    }
-  ]
+  dataSources: SelectItemGroup[] = [];
   readonly dataSourceIcons: {[key: string]: string} = {
     'OpenMeteo': 'assets/openmeteo-favicon.png',
     'BrightSky': 'assets/brightsky-favicon.svg'
   }
-  selectedDataSource: string = this.dataSources[0].items[0].value;
+  selectedDataSource: string = '';
 
   // variables for the selected language
   languages: {label: string; key: string; flag: string}[] = [
@@ -129,6 +92,8 @@ export class SettingsComponent {
     public settingsService: SettingsService,
     public locationsService: LocationService
   ) {
+    this.getWeatherDataSources();
+
     // load and set the initial settings
     settingsService.getSettingsChangedObservable().subscribe((settings) => {
       this.selectedDataSource = settings.weatherCondition;
@@ -265,6 +230,42 @@ export class SettingsComponent {
     this.locationsService.addLocation(listOfLocations[index]);
     this.locationsList = this.locationsService.getLocations();
     this.setWorkingLocation(this.locationsList[this.locationsList.length - 1].id);
+  }
+
+  getWeatherDataSources(): void {
+    const sources: SelectItemGroup[] = [];
+
+    window.weather.listWeatherConditions()
+      .then((s) => {
+        sources.push({
+          label: 'OpenMeteo',
+          value: 'OpenMeteo',
+          items: s['OpenMeteo'].map((item: WeatherCondition) => {
+            return {
+              label: item.condition,
+              value: item.id
+            }
+          })
+        });
+
+        sources.push({
+          label: 'BrightSky (DWD)',
+          value: 'BrightSky',
+          items: s['BrightSky'].map((item: WeatherCondition) => {
+            return {
+              label: item.condition,
+              value: item.id
+            }
+          })
+        });
+      })
+    .catch((e) => {
+      console.error('Error while loading weather conditions:', e);
+    })
+    .finally(() => {
+      this.dataSources = sources;
+      this.selectedDataSource = sources[0].items[0].value;
+    });
   }
 
 }

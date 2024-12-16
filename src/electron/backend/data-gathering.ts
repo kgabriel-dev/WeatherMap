@@ -140,8 +140,8 @@ export class OpenMeteoDataGatherer implements DataGatherer {
     this.translations = translations;
 
     return [
-      { condition: this.translations["dataGathererCategoryTempC"], id: 'temperature_c', api: 'temperature_2m', min: -1, max: -1, unit: '°C' },
       { condition: this.translations["dataGathererCategoryCloudCover"], id: 'cloud_cover', api: 'cloud_cover', min: 0, max: 100, unit: '%' },
+      { condition: this.translations["dataGathererCategoryTempC"], id: 'temperature_c', api: 'temperature_2m', min: -1, max: -1, unit: '°C' },
       { condition: this.translations["dataGathererCategoryRelHumidity"], id: 'relative_humidity', api: 'relative_humidity_2m', min: 0, max: 100, unit: '%' },
       { condition: this.translations["dataGathererCategoryCloudsLow"], id: 'cloud_cover_low', api: 'cloud_cover_low', min: 0, max: 100, unit: '%' },
       { condition: this.translations["dataGathererCategoryCloudsMid"], id: 'cloud_cover_mid', api: 'cloud_cover_mid', min: 0, max: 100, unit: '%' },
