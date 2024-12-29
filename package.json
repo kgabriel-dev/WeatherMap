@@ -8,7 +8,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "typescript": "tsc --project tsconfig.json && tsc --project src/electron/tsconfig.json && cp -rf dist/electron/* dist/ && rm -rf dist/electron",
+    "typescript": "tsc --project tsconfig.json && cp -rf dist/electron/* dist/ && rm -rf dist/electron",
     "build-electron": "ng build --localize --base-href ./.. && cp -rf src/electron/* dist/ && npm run typescript",
     "electron": "rm -rf ./dist && npm run build-electron && .\\node_modules\\.bin\\electron dist/"
   },

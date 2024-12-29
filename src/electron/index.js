@@ -6,8 +6,6 @@ import { generateWeatherImageForLocation } from './backend/image-generation.js';
 import { OpenMeteoDataGatherer, BrightSkyDataGatherer } from './backend/data-gathering.js';
 import { fileURLToPath } from 'node:url';
 
-export { };
-
 let mainWindow, progressWindow, settingsWindow;
 let latestProgressMessages = [];
 
@@ -29,8 +27,6 @@ const createWindow = () => {
     height: 720,
     show: false,
     webPreferences: {
-      contextIsolation: true,
-      nodeIntegration: true,
       preload: path.join(__dirname, 'preload.js')
     }
   })
