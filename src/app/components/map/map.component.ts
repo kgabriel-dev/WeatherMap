@@ -259,7 +259,7 @@ export class MapComponent implements AfterViewInit {
 
   updateDataInfo(lastDataGatheringDate: Date): void {
     const sessionData = this.sessionService.getLatestSessionData();
-    const location = sessionData.mainData.selectedRegionIndex === -1 ? sessionData.mainData.usedLocation : this.locationsService.getLocations()[sessionData.mainData.selectedRegionIndex].name;
+    const location = sessionData.mainData.selectedRegionIndex === -1 ? $localize`Custom Location` : this.locationsService.getLocations()[sessionData.mainData.selectedRegionIndex].name;
 
     const imageDate = new Date(lastDataGatheringDate);  // image date is in user's timezone
     imageDate.setHours(lastDataGatheringDate.getHours() + sessionData.mainData.currentWeatherImageIndex);  // add the index to get the exact date
