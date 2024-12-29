@@ -1,7 +1,10 @@
 {
   "name": "weather-map",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "author": "Gabriel Kleebaum",
+  "description": "WeatherMap",
+  "main": "index.js",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -10,7 +13,8 @@
     "test": "ng test",
     "typescript": "tsc --project tsconfig.json && cp -rf dist/electron/* dist/ && rm -rf dist/electron",
     "build-electron": "ng build --localize --base-href ./.. && cp -rf src/electron/* dist/ && npm run typescript",
-    "electron": "rm -rf ./dist && npm run build-electron && .\\node_modules\\.bin\\electron dist/"
+    "electron": "rm -rf ./dist && npm run build-electron && .\\node_modules\\.bin\\electron dist/",
+    "dist": "electron-builder"
   },
   "private": true,
   "dependencies": {
@@ -23,7 +27,6 @@
     "@angular/platform-browser-dynamic": "^18.2.0",
     "@angular/router": "^18.2.0",
     "@napi-rs/canvas": "^0.1.56",
-    "@types/leaflet": "^1.9.12",
     "@vvo/tzdb": "^6.147.0",
     "flag-icons": "^7.2.3",
     "leaflet": "^1.9.4",
@@ -41,7 +44,9 @@
     "@angular/localize": "^18.2.9",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.7.5",
+    "@types/leaflet": "^1.9.12",
     "electron": "^32.2.2",
+    "electron-builder": "^25.1.8",
     "jasmine-core": "~5.2.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
@@ -53,5 +58,33 @@
   },
   "volta": {
     "node": "20.18.0"
+  },
+  "build": {
+    "appId": "kgabriel.weathermap",
+    "productName": "WeatherMap",
+    "directories": {
+      "output": "out"
+    },
+    "files": [
+      "dist/**/*"
+    ],
+    "extraMetadata": {
+      "main": "dist/index.js"
+    },
+    "dmg": {
+      "title": "WeatherMap ${version}"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "app.ico"
+    }
   }
 }
