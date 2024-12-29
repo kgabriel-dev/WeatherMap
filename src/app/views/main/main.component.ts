@@ -15,6 +15,8 @@ import { TooltipModule } from 'primeng/tooltip';
 import { getTimeZones, TimeZone } from '@vvo/tzdb';
 import { TimezoneList } from '../settings/settings.component';
 import { CheckboxModule } from 'primeng/checkbox';
+import { Region, SimpleLocation } from '../../../types/location';
+import { WeatherDataResponse, WeatherCondition, DataGathererName } from '../../../types/weather-data';
 
 @Component({
   selector: 'app-main',

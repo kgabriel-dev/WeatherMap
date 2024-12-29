@@ -1,8 +1,9 @@
 {
   "name": "weather-map",
   "version": "0.1.0",
-  "main": "main.js",
+  "main": "index.js",
   "volta": {
     "node": "20.18.0"
-  }
+  },
+  "type": "module"
 }

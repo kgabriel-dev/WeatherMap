@@ -1,17 +1,21 @@
-require('ts-node').register();
+import { app, BrowserWindow, ipcMain, Menu, shell } from 'electron';
+import path from 'node:path';
+import url from 'node:url';
+import fs from 'node:fs';
+import { generateWeatherImageForLocation } from './backend/image-generation.js';
+import { OpenMeteoDataGatherer, BrightSkyDataGatherer } from './backend/data-gathering.js';
+import { fileURLToPath } from 'node:url';
 
-const { app, BrowserWindow, ipcMain, Menu, webContents } = require('electron')
-const path = require('node:path')
-const url = require('node:url')
-const fs = require('node:fs')
-const { generateWeatherImageForLocation } = require('./backend/image-generation');
-const { OpenMeteoDataGatherer, BrightSkyDataGatherer } = require('./backend/data-gathering');
+export { };
 
 let mainWindow, progressWindow, settingsWindow;
 let latestProgressMessages = [];
 
 let locale = 'en-US';
 let translations = {};
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 ipcMain.on('translations-changed', (_event, newTranslations) => {
   translations = newTranslations;
@@ -25,6 +29,8 @@ const createWindow = () => {
     height: 720,
     show: false,
     webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: true,
       preload: path.join(__dirname, 'preload.js')
     }
   })
@@ -41,15 +47,19 @@ const createWindow = () => {
 
   mainWindow.once('ready-to-show', () => {
     // wait until the locale is set and the translations are loaded before showing the window
-    checkInterval = setInterval(() => {
-      if(Object.keys(translations).length > 0) {
-        clearInterval(checkInterval);
+//     let checkInterval = setInterval(() => {
+//       if(Object.keys(translations).length > 0) {
+//         clearInterval(checkInterval);
+//
+//         // maximize the window and show it
+//         mainWindow.maximize();
+//         mainWindow.show();
+//       }
+//     }, 200);
 
-        // maximize the window and show it
-        mainWindow.maximize();
-        mainWindow.show();
-      }
-    }, 200);
+    // maximize the window and show it
+    mainWindow.maximize();
+    mainWindow.show();
 
     // get the translations from the renderer process
     mainWindow.webContents.send('request-translations');
@@ -287,7 +297,6 @@ function createAndSetMenu() {
       {
         label: translations.menuLearnMore,
         click: async () => {
-          const { shell } = require('electron')
           await shell.openExternal('https://github.com/kgabriel-dev/WeatherMap')
         }
       },

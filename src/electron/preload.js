@@ -1,5 +1,7 @@
-const { contextBridge, ipcRenderer } = require('electron');
-const { on } = require('events');
+import { contextBridge, ipcRenderer } from 'electron';
+import { process } from 'node:process';
+
+export { };
 
 contextBridge.exposeInMainWorld('versions', {
   node: () => process.versions.node,

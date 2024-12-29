@@ -1,4 +1,4 @@
-declare type Region = {
+export type Region = {
   name: string;
   id: number;
   coordinates: SimpleLocation;
@@ -12,12 +12,12 @@ declare type Region = {
   timezoneCode: string;
 }
 
-declare type SimpleLocation = {
+export type SimpleLocation = {
   latitude: number;
   longitude: number;
 }
 
-declare type RegionAddingData = {
+export type RegionAddingData = {
   name: string;
   coordinates: {
     latitude: number;
@@ -33,7 +33,7 @@ declare type RegionAddingData = {
   timezoneCode: string;
 }
 
-declare enum SizeUnits {
+export enum SizeUnits {
   KILOMETERS,
   MILES
 }

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { Region, RegionAddingData } from '../../../types/location';
 
 @Injectable({
   providedIn: 'root'

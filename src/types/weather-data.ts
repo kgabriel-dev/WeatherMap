@@ -1,10 +1,12 @@
-declare interface DataGatherer {
+import { Region, SimpleLocation } from "./location";
+
+export interface DataGatherer {
   getName: () => string;
   gatherData: (region: Region, condition: WeatherCondition, forecast_hours: number, progressPerStep: number, translations: {[key: string]: string}) => Promise<WeatherData[]>;
   listAvailableWeatherConditions: (translations: {[key: string]: string}) => WeatherCondition[];
 }
 
-declare type WeatherData = {
+export type WeatherData = {
   coordinates: SimpleLocation,
   weatherCondition: WeatherCondition,
   weatherValue: number,
@@ -12,7 +14,7 @@ declare type WeatherData = {
   date: string
 }
 
-declare type WeatherCondition = {
+export type WeatherCondition = {
   condition: string; // name to display in the UI
   id: string; // key to identify the condition on a change of the DataGatherer
   api: string; // value to use in the API request
@@ -21,9 +23,9 @@ declare type WeatherCondition = {
   unit: string; // unit to display in the UI
 }
 
-declare type DataGathererName = 'OpenMeteo' | 'BrightSky';
+export type DataGathererName = 'OpenMeteo' | 'BrightSky';
 
-declare type WeatherDataResponse = {
+export type WeatherDataResponse = {
   inProgress: boolean;
   progress: number;
   message: string;

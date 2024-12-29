@@ -1,19 +1,21 @@
 import { createCanvas } from "@napi-rs/canvas";
-import { BrightSkyDataGatherer, OpenMeteoDataGatherer } from "./data-gathering";
+import { OpenMeteoDataGatherer, BrightSkyDataGatherer } from "./data-gathering.js";
 import { app, ipcMain } from 'electron';
-import fs from 'node:fs';
-import { sendWeatherGenerationProgressUpdate } from "../utils";
+import { sendWeatherGenerationProgressUpdate } from "../utils.js";
+import { Region, SimpleLocation } from "../../types/location";
+import { DataGathererName, DataGatherer, WeatherCondition } from "../../types/weather-data";
+import * as fs from 'fs';
 
 let cancelRequested = false;
 const imagePixelSize = 512;
 
 ipcMain.on('cancel-weather-image-generation', (_event) => cancelRequested = true);
 
-export function generateWeatherImageForLocation(region: Region, dataGathererName: DataGathererName, weatherConditionId: string, forecast_length: number, valueLabels: boolean, translations: {[key: string]: string}): Promise<{ date: string, filename: string }[]> {
-  const dataGatherer = getDataGatherer(dataGathererName, translations);
+function generateWeatherImageForLocation(region: Region, dataGathererName: DataGathererName, weatherConditionId: string, forecast_length: number, valueLabels: boolean, translations: {[key: string]: string}): Promise<{ date: string, filename: string }[]> {
+  const dataGatherer: DataGatherer = getDataGatherer(dataGathererName, translations);
 
   return new Promise((resolve, reject) => {
-    const weatherCondition = dataGatherer.listAvailableWeatherConditions(translations).find((condition) => condition.id === weatherConditionId);
+    const weatherCondition = dataGatherer.listAvailableWeatherConditions(translations).find((condition: WeatherCondition) => condition.id === weatherConditionId);
 
     if(!weatherCondition) {
       reject('Unknown weather condition id');
@@ -221,6 +223,4 @@ function getDataGatherer(dataGathererName: DataGathererName, translations: {[key
   }
 }
 
-module.exports = {
-  generateWeatherImageForLocation
-};
+export { generateWeatherImageForLocation };

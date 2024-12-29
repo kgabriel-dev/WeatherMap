@@ -3,7 +3,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "./dist/out-tsc",
+    "outDir": "./dist",
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
@@ -18,7 +18,7 @@
     "moduleResolution": "Node",
     "importHelpers": true,
     "target": "ES6",
-    "module": "CommonJS",
+    "module": "ESNext",
     "lib": [
       "ES2022",
       "dom"
@@ -30,8 +30,7 @@
     ],
     "types": [
       "node",
-      "location",
-      "weather-data"
+      "jest"
     ]
   },
   "angularCompilerOptions": {

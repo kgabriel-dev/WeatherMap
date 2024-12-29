@@ -1,12 +1,13 @@
-import { sendWeatherGenerationProgressUpdate } from './../utils';
 import { ipcMain } from 'electron';
-import { SizeUnits } from './../utils';
+import { SizeUnits, sendWeatherGenerationProgressUpdate } from './../utils.js';
+import { DataGatherer, WeatherCondition, WeatherData } from './../../types/weather-data';
+import { Region } from './../../types/location';
 
 let cancelRequested = false;
 
 ipcMain.on('cancel-weather-image-generation', (_event) => cancelRequested = true);
 
-export class OpenMeteoDataGatherer implements DataGatherer {
+class OpenMeteoDataGatherer implements DataGatherer {
   readonly API_URL = "https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly={category}&forecast_hours={hours}&timezone={timezone}";
   readonly REQUEST_DELAY = 300; // time in ms to wait between two requests
 
@@ -156,7 +157,7 @@ export class OpenMeteoDataGatherer implements DataGatherer {
   }
 }
 
-export class BrightSkyDataGatherer implements DataGatherer {
+class BrightSkyDataGatherer implements DataGatherer {
   readonly API_URL = "https://api.brightsky.dev/weather?date={date}&last_date={last_date}&lat={lat}&lon={lon}&tz={timezone}";
   readonly REQUEST_DELAY = 300; // time in ms to wait between two requests
 
@@ -315,3 +316,5 @@ function convertToKm(number: number, unit: SizeUnits): number {
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+export { OpenMeteoDataGatherer, BrightSkyDataGatherer };
