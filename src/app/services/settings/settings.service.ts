@@ -10,7 +10,7 @@ export class SettingsService {
     languageCode: 'en-US',
     weatherCondition: 'openmeteo.cloudiness',
     forecastLength: {
-      value: 4,
+      value: 12,
       unitId: TimeUnits.HOURS
     },
     updateCheck: true,

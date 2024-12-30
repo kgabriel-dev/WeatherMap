@@ -1,6 +1,6 @@
 {
   "name": "weather-map",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
   "author": "Gabriel Kleebaum",
   "description": "WeatherMap",
@@ -62,6 +62,7 @@
   "build": {
     "appId": "kgabriel.weathermap",
     "productName": "WeatherMap",
+    "asar": false,
     "directories": {
       "output": "out"
     },
@@ -85,6 +86,13 @@
         "nsis"
       ],
       "icon": "app.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "uninstallDisplayName": "WeatherMap Uninstaller",
+      "uninstallerIcon": "app.ico",
+      "installerIcon": "app.ico"
     }
   }
 }

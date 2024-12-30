@@ -43,19 +43,15 @@ const createWindow = () => {
 
   mainWindow.once('ready-to-show', () => {
     // wait until the locale is set and the translations are loaded before showing the window
-//     let checkInterval = setInterval(() => {
-//       if(Object.keys(translations).length > 0) {
-//         clearInterval(checkInterval);
-//
-//         // maximize the window and show it
-//         mainWindow.maximize();
-//         mainWindow.show();
-//       }
-//     }, 200);
+    let checkInterval = setInterval(() => {
+      if(Object.keys(translations).length > 0) {
+        clearInterval(checkInterval);
 
-    // maximize the window and show it
-    mainWindow.maximize();
-    mainWindow.show();
+        // maximize the window and show it
+        mainWindow.maximize();
+        mainWindow.show();
+      }
+    }, 200);
 
     // get the translations from the renderer process
     mainWindow.webContents.send('request-translations');
@@ -116,16 +112,16 @@ ipcMain.handle('read-file', (_event, filePath, encoding) => {
 
 ipcMain.handle('read-app-file', (_event, filePath, encoding) => {
   // use the app's path and the read-file function to read the file
-  return readFile(path.join(app.getAppPath(), filePath), encoding);
+  return readFile(path.join(app.getPath("userData"), filePath), encoding);
 });
 
 ipcMain.handle('check-app-file-exists', (_event, filePath) => {
-  return fs.existsSync(path.join(app.getAppPath(), filePath));
+  return fs.existsSync(path.join(app.getPath("userData"), filePath));
 });
 
 ipcMain.handle('write-app-file', (_event, filePath, data, encoding) => {
   try {
-    fs.writeFileSync(path.join(app.getAppPath(), filePath), data, { encoding, flag: 'w' });
+    fs.writeFileSync(path.join(app.getPath("userData"), filePath), data, { encoding, flag: 'w' });
     return true;
   } catch (err) {
     console.error('Error writing file:', err);
