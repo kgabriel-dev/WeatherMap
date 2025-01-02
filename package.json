@@ -1,9 +1,14 @@
 {
   "name": "weather-map",
-  "version": "2.0.0",
+  "version": "1.9.0",
   "type": "module",
-  "author": "Gabriel Kleebaum",
+  "author": {
+    "name": "kGabriel",
+    "email": "kgabrieldev@gmail.com",
+    "url": "https://www.kgabriel.dev"
+  },
   "description": "WeatherMap",
+  "repository": "https://github.com/kgabriel-dev/WeatherMap-Testing",
   "main": "index.js",
   "scripts": {
     "ng": "ng",
@@ -11,10 +16,11 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "translate": "ng extract-i18n --output-path src/locale --format xlf",
     "typescript": "tsc --project tsconfig.json && cp -rf dist/electron/* dist/ && rm -rf dist/electron",
     "build-electron": "ng build --localize --base-href ./.. && cp -rf src/electron/* dist/ && npm run typescript",
     "electron": "rm -rf ./dist && npm run build-electron && .\\node_modules\\.bin\\electron dist/",
-    "dist": "electron-builder"
+    "dist": "rm -rf out && electron-builder"
   },
   "private": true,
   "dependencies": {
@@ -28,6 +34,7 @@
     "@angular/router": "^18.2.0",
     "@napi-rs/canvas": "^0.1.56",
     "@vvo/tzdb": "^6.147.0",
+    "electron-updater": "^6.3.9",
     "flag-icons": "^7.2.3",
     "leaflet": "^1.9.4",
     "primeflex": "^3.3.1",
@@ -43,8 +50,8 @@
     "@angular/compiler-cli": "^18.2.0",
     "@angular/localize": "^18.2.9",
     "@types/jest": "^29.5.14",
-    "@types/node": "^22.7.5",
     "@types/leaflet": "^1.9.12",
+    "@types/node": "^22.7.5",
     "electron": "^32.2.2",
     "electron-builder": "^25.1.8",
     "jasmine-core": "~5.2.0",
@@ -62,7 +69,7 @@
   "build": {
     "appId": "kgabriel.weathermap",
     "productName": "WeatherMap",
-    "asar": false,
+    "asar": true,
     "directories": {
       "output": "out"
     },

@@ -458,6 +458,38 @@
           <context context-type="linenumber">632</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="2807800733729323332" datatype="html">
+        <source>Yes</source>
+        <target>Ja</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
+          <context context-type="linenumber">633</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3542042671420335679" datatype="html">
+        <source>No</source>
+        <target>Nein</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
+          <context context-type="linenumber">634</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8505784703243293328" datatype="html">
+        <source>An update is available. Do you want to download it now?</source>
+        <target>Es ist ein Update verfügbar. Möchten Sie es jetzt downloaden?</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
+          <context context-type="linenumber">635</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="509090351011426949" datatype="html">
+        <source>Update available</source>
+        <target>Update verfügbar</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
+          <context context-type="linenumber">636</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="3419681791450150574" datatype="html">
         <source>Progress</source>
         <target>Fortschritt</target>

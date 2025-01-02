@@ -1,10 +1,16 @@
-import { app, BrowserWindow, ipcMain, Menu, shell } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu, shell, dialog } from 'electron';
 import path from 'node:path';
 import url from 'node:url';
 import fs from 'node:fs';
 import { generateWeatherImageForLocation } from './backend/image-generation.js';
 import { OpenMeteoDataGatherer, BrightSkyDataGatherer } from './backend/data-gathering.js';
 import { fileURLToPath } from 'node:url';
+
+import pkg from 'electron-updater';
+const { autoUpdater } = pkg;
+
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = false;
 
 let mainWindow, progressWindow, settingsWindow;
 let latestProgressMessages = [];
@@ -55,6 +61,9 @@ const createWindow = () => {
 
     // get the translations from the renderer process
     mainWindow.webContents.send('request-translations');
+
+    // check for updates
+    autoUpdater.checkForUpdatesAndNotify();
   });
 }
 
@@ -65,6 +74,10 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
+
+autoUpdater.on('update-not-available', () => {
+  console.log('No updates available');
+});
 
 // function to open the settings modal; called from the menu bar
 function openSettingsModal() {
@@ -308,3 +321,18 @@ function createAndSetMenu() {
   const menu = Menu.buildFromTemplate(menuTemplate);
   Menu.setApplicationMenu(menu);
 }
+
+autoUpdater.on('update-available', () => {
+  const dialogOpts = {
+    type: 'info',
+    buttons: [translations.updateAvailableDialogButtonYes, translations.updateAvailableDialogButtonNo],
+    title: translations.updateAvailableDialogTitle,
+    message: translations.updateAvailableDialogMessage
+  };
+
+  dialog.showMessageBox(dialogOpts).then((returnValue) => {
+    if (returnValue.response === 0) {
+      shell.openExternal('https://github.com/kgabriel-dev/WeatherMap/releases/latest')
+    }
+  });
+});

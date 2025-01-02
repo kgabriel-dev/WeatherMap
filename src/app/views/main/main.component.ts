@@ -630,6 +630,10 @@ export class MainComponent {
       dataGathererCategoryVisibility: $localize`Visibility (m)`,
       dataGathererCategoryUvIndex: $localize`UV Index`,
       dataGathererCategoryWindSpeed: $localize`Wind Speed (km/h)`,
+      updateAvailableDialogButtonYes: $localize`Yes`,
+      updateAvailableDialogButtonNo: $localize`No`,
+      updateAvailableDialogMessage: $localize`An update is available. Do you want to download it now?`,
+      updateAvailableDialogTitle: $localize`Update available`,
     }
   }
 }
