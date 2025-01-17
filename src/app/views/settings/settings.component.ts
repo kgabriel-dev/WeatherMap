@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Message, SelectItemGroup } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -40,12 +40,12 @@ export class SettingsComponent {
   readonly localizedTexts = {
     titleGeneralSettings: $localize`General`,
     titleLocationSettings: $localize`Locations`,
+    titleUpdateSettings: $localize`Updates`,
     buttonAddLocation: $localize`Add Location`,
     buttonSaveLocation: $localize`Save`,
     buttonDeleteLocation: $localize`Delete`,
     buttonDiscardLocation: $localize`Discard`,
-    buttonSettingsSave: $localize`Save`,
-    buttonSettingsDiscard: $localize`Discard`
+    buttonCheckForUpdates: $localize`Check for Updates`,
   }
 
   forecastLengthOptions = TimeUnitStrings;
@@ -108,8 +108,8 @@ export class SettingsComponent {
     // display a message while loading the locations file
     this.locationLoadingMessages = [{
       severity: 'info',
-      summary: 'Loading locations...',
-      detail: 'Please wait a moment.'
+      summary: $localize`Loading locations...`,
+      detail: $localize`Please wait a moment.`
     }];
 
     // load the locations file
@@ -127,9 +127,9 @@ export class SettingsComponent {
       if(this.locationsAlreadyLoaded) return;
 
       this.locationLoadingMessages = [{
-        severity: 'warn',
-        summary: 'Loading locations...',
-        detail: 'This is taking longer than expected. Please wait a moment.'
+        severity:'warn',
+        summary: $localize`Loading locations...`,
+        detail: $localize`This is taking longer than expected. Please wait a moment.`
       }]
     }, 3000);
   }
@@ -144,12 +144,6 @@ export class SettingsComponent {
     });
 
     this.settingsService.saveSettings();
-
-    this.closeWindow();
-  }
-
-  closeWindow() {
-    window.close();
   }
 
   private buildTimezoneList(): TimezoneList {
@@ -270,6 +264,9 @@ export class SettingsComponent {
     });
   }
 
+  triggerUpdateCheck(): void {
+    window.app.triggerUpdateCheck();
+  }
 }
 
 export type TimezoneList = {

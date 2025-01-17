@@ -1,14 +1,18 @@
-:host {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
 p {
   margin-bottom: 5px;
 }
 
-:host, .container {
-  height: 100vh;
-  background-color: var(--background-color);
+:host {
+  height: 100%;
+  display: block;
+}
+
+p-tabview {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+div.p-tabview-panels {
+  height: 100% !important;
 }

@@ -62,8 +62,7 @@ const createWindow = () => {
     // get the translations from the renderer process
     mainWindow.webContents.send('request-translations');
 
-    // check for updates
-    autoUpdater.checkForUpdatesAndNotify();
+    openSettingsModal();
   });
 }
 
@@ -104,6 +103,8 @@ function openSettingsModal() {
 
   settingsWindow.once('ready-to-show', () => {
     settingsWindow.show();
+
+    settingsWindow.toggleDevTools();
   });
 
   settingsWindow.on('closed', () => {
@@ -238,6 +239,25 @@ ipcMain.handle('get-locale', (_event) => {
   return locale;
 });
 
+ipcMain.handle('trigger-update-check', (_event) => {
+  autoUpdater.checkForUpdatesAndNotify();
+});
+
+autoUpdater.on('update-available', () => {
+  const dialogOpts = {
+    type: 'info',
+    buttons: [translations.updateAvailableDialogButtonYes, translations.updateAvailableDialogButtonNo],
+    title: translations.updateAvailableDialogTitle,
+    message: translations.updateAvailableDialogMessage
+  };
+
+  dialog.showMessageBox(dialogOpts).then((returnValue) => {
+    if (returnValue.response === 0) {
+      shell.openExternal('https://github.com/kgabriel-dev/WeatherMap/releases/latest')
+    }
+  });
+});
+
 // Helper functions
 function readFile(filePath, encoding) {
   try {
@@ -321,18 +341,3 @@ function createAndSetMenu() {
   const menu = Menu.buildFromTemplate(menuTemplate);
   Menu.setApplicationMenu(menu);
 }
-
-autoUpdater.on('update-available', () => {
-  const dialogOpts = {
-    type: 'info',
-    buttons: [translations.updateAvailableDialogButtonYes, translations.updateAvailableDialogButtonNo],
-    title: translations.updateAvailableDialogTitle,
-    message: translations.updateAvailableDialogMessage
-  };
-
-  dialog.showMessageBox(dialogOpts).then((returnValue) => {
-    if (returnValue.response === 0) {
-      shell.openExternal('https://github.com/kgabriel-dev/WeatherMap/releases/latest')
-    }
-  });
-});

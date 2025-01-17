@@ -19,10 +19,12 @@ interface Window {
   },
   app: {
     onSettingsModalClosed: (callback) => void,
+    onSettingsModalClosing: (callback) => void,
     openProgressInfoWindow: () => void,
     setLocale: (locale: string) => void,
     getLocale: () => Promise<string>,
-    sendTranslations: (translations: {[key: string]: string}) => void
+    sendTranslations: (translations: {[key: string]: string}) => void,
+    triggerUpdateCheck: () => void,
   },
   weather: {
     generateWeatherImagesForRegion: (region: Region, dataGatherer: DataGathererName, weatherConditionId: string, forecast_length: number, valueLabels: boolean) => Promise<{ date: Date, filename: string }[]>,

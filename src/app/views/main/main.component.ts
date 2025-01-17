@@ -104,6 +104,10 @@ export class MainComponent {
             window.app.setLocale(settings.languageCode);
           }
         })
+
+      if(settings.updateCheck) {
+        window.app.triggerUpdateCheck();
+      }
     });
 
     this.lastReadMainSessionData = this.sessionService.getLatestSessionData().mainData;

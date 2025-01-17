@@ -19,7 +19,7 @@
     "translate": "ng extract-i18n --output-path src/locale --format xlf",
     "typescript": "tsc --project tsconfig.json && cp -rf dist/electron/* dist/ && rm -rf dist/electron",
     "build-electron": "ng build --localize --base-href ./.. && cp -rf src/electron/* dist/ && npm run typescript",
-    "electron": "rm -rf ./dist && npm run build-electron && .\\node_modules\\.bin\\electron dist/",
+    "electron": "rm -rf ./dist && npm run build-electron && ./node_modules/.bin/electron dist/",
     "dist": "rm -rf out && electron-builder"
   },
   "private": true,

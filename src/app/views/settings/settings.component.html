@@ -1,4 +1,4 @@
-<p-tabView class="w-full h-full" [classList]="'flex flex-grow-1'" styleClass="flex flex-column flex-grow-1" [scrollable]="true">
+<p-tabView [scrollable]="true" styleClass="flex flex-column h-full">
   <p-tabPanel [header]="localizedTexts.titleGeneralSettings">
     <p class="mt-0" i18n>Language:</p>
     <p-dropdown
@@ -64,23 +64,6 @@
       <p-checkbox [(ngModel)]="labeledImages" [binary]="true" inputId="labeled_images"></p-checkbox>
       <label for="labeled_images" i18n>Show labels on the weather images.</label>
     </div>
-
-    <p-divider />
-
-    <p i18n>Update check & notification</p>
-    <div class="flex flex-row gap-1">
-      <p-checkbox [(ngModel)]="updateCheck" [binary]="true" inputId="update_notification"></p-checkbox>
-      <label for="update_notification" i18n>Check for updates at startup and notify me when an update is available.</label>
-    </div>
-
-    <p-divider />
-
-    <div class="flex flex-row gap-2">
-      <p-button [label]="localizedTexts.buttonSettingsSave" icon="pi pi-save" (onClick)="saveSettings()" />
-      <p-button [label]="localizedTexts.buttonSettingsDiscard" icon="pi pi-times" (onClick)="closeWindow()" />
-    </div>
-
-    <div class="flex-grow-1"></div>
   </p-tabPanel>
 
   <p-tabPanel [header]="localizedTexts.titleLocationSettings">
@@ -170,8 +153,6 @@
             <p-divider />
 
             <div class="flex flex-row gap-2 w-full justify-content-center">
-              <p-button [label]="localizedTexts.buttonSaveLocation" icon="pi pi-save" (onClick)="saveWorkingLocation()" />
-              <p-button [label]="localizedTexts.buttonDiscardLocation" icon="pi pi-times" (onClick)="closeWindow()" />
               <p-button [label]="localizedTexts.buttonDeleteLocation" icon="pi pi-trash" (onClick)="deleteWorkingLocation()" />
             </div>
           </div>
@@ -195,4 +176,23 @@
       </div>
     }
   </p-tabPanel>
+
+  <p-tabPanel [header]="localizedTexts.titleUpdateSettings">
+    <p i18n>Update check & notification</p>
+    <div class="flex flex-row gap-1">
+      <p-checkbox [(ngModel)]="updateCheck" [binary]="true" inputId="update_notification"></p-checkbox>
+      <label for="update_notification" i18n>Check for updates at startup and notify me when an update is available.</label>
+    </div>
+
+    <p-divider />
+
+    <p-button [label]="localizedTexts.buttonCheckForUpdates" (onClick)="triggerUpdateCheck()" />
+  </p-tabPanel>
+
+  <div class="flex flex-grow-1"></div>
+
+  <div class="flex flex-row gap-2 justify-content-center m-2">
+    <p-button i18n>Save & Close</p-button>
+    <p-button i18n>Discard & Close</p-button>
+  </div>
 </p-tabView>
