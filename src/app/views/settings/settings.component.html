@@ -26,6 +26,10 @@
 
     <p-divider />
 
+    <p-checkbox [binary]="true" (onChange)="toggleDarkMode($event.checked)" />
+
+    <p-divider />
+
     <p i18n>Default weather condition:</p>
     <p-dropdown
       [options]="dataSources"
@@ -169,10 +173,10 @@
       <div class="w-full h-full flex flex-column justify-content-center align-items-center">
         <p-progressSpinner />
 
-        <p-messages
+        <!-- <p-messages
           [(value)]="locationLoadingMessages"
           [enableService]="false"
-          [closable]="false" />
+          [closable]="false" /> -->
       </div>
     }
   </p-tabPanel>
@@ -191,7 +195,7 @@
 
   <div class="flex flex-grow-1"></div>
 
-  <div class="flex flex-row gap-2 justify-content-center m-2">
+  <div class="flex flex-row flex-grow-1 gap-2 justify-content-center m-2">
     <p-button i18n (onClick)="saveAndClose()">Save & Close</p-button>
     <p-button i18n (onClick)="closeWindow()">Discard & Close</p-button>
   </div>

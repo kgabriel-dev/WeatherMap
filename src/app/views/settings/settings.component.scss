@@ -13,6 +13,8 @@ p-tabview {
   display: block;
 }
 
-div.p-tabview-panels {
+.p-tabview-panels {
   height: 100% !important;
+  display: flex;
+  flex-grow: 1;
 }

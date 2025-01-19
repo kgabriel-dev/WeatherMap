@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { ImageModule } from 'primeng/image';
 import { ProgressBarModule } from 'primeng/progressbar';
@@ -14,14 +14,14 @@ import { MainData } from '../../services/session/session.type';
 import { TooltipModule } from 'primeng/tooltip';
 import { getTimeZones, TimeZone } from '@vvo/tzdb';
 import { TimezoneList } from '../settings/settings.component';
-import { CheckboxModule } from 'primeng/checkbox';
+import { Checkbox } from 'primeng/checkbox';
 import { Region, SimpleLocation } from '../../../types/location';
 import { WeatherDataResponse, WeatherCondition, DataGathererName } from '../../../types/weather-data';
 
 @Component({
   selector: 'app-main',
   standalone: true,
-  imports: [FormsModule, ProgressBarModule, ButtonModule, ImageModule, DropdownModule, InputNumberModule, MapComponent, TooltipModule, CheckboxModule],
+  imports: [FormsModule, ProgressBarModule, ButtonModule, ImageModule, DropdownModule, InputNumberModule, MapComponent, TooltipModule, Checkbox],
   templateUrl: './main.component.html',
   styleUrl: './main.component.scss'
 })

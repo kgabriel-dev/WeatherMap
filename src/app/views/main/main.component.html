@@ -135,7 +135,7 @@
         [(ngModel)]="mainSessionDataForUpdate.useOverriddenTimezone"
         [binary]="true"
         (onChange)="debouncedUpdateSessionData()"
-        [label]="localizedTexts.useOverriddenTimezoneLabel" />
+        [value]="localizedTexts.useOverriddenTimezoneLabel" />
       <p-dropdown
         [options]="timezoneList"
         (onChange)="debouncedUpdateSessionData()"

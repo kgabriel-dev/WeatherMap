@@ -1,6 +1,6 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Message, SelectItemGroup } from 'primeng/api';
+import { SelectItemGroup } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DividerModule } from 'primeng/divider';
@@ -16,6 +16,7 @@ import { MessagesModule } from 'primeng/messages';
 import { getTimeZones, TimeZone } from '@vvo/tzdb';
 import { Region, RegionAddingData } from '../../../types/location';
 import { WeatherCondition } from '../../../types/weather-data';
+import { Message } from 'primeng/message';
 
 @Component({
   selector: 'app-settings',
@@ -106,11 +107,12 @@ export class SettingsComponent {
     });
 
     // display a message while loading the locations file
-    this.locationLoadingMessages = [{
-      severity: 'info',
-      summary: $localize`Loading locations...`,
-      detail: $localize`Please wait a moment.`
-    }];
+    this.locationLoadingMessages = [
+      // {
+      //   severity: 'info',
+      //   text: $localize`Loading locations...` + $localize`Please wait a moment.`,
+      // }
+    ];
 
     // load the locations file
     locationsService.isServiceReady().subscribe((fileRead: boolean) => {
@@ -126,11 +128,13 @@ export class SettingsComponent {
     setTimeout(() => {
       if(this.locationsAlreadyLoaded) return;
 
-      this.locationLoadingMessages = [{
-        severity:'warn',
-        summary: $localize`Loading locations...`,
-        detail: $localize`This is taking longer than expected. Please wait a moment.`
-      }]
+      this.locationLoadingMessages = [
+        // {
+        //   severity:'warn',
+        //   summary: $localize`Loading locations...`,
+        //   detail: $localize`This is taking longer than expected. Please wait a moment.`
+        // }
+      ]
     }, 3000);
   }
 
@@ -275,6 +279,11 @@ export class SettingsComponent {
 
   triggerUpdateCheck(): void {
     window.app.triggerUpdateCheck();
+  }
+
+  toggleDarkMode(value: boolean): void {
+    const html = document.querySelector('html');
+    html?.classList.toggle('dark-mode', value);
   }
 }
 
