@@ -61,8 +61,6 @@ const createWindow = () => {
 
     // get the translations from the renderer process
     mainWindow.webContents.send('request-translations');
-
-    openSettingsModal();
   });
 }
 
@@ -104,8 +102,6 @@ function openSettingsModal() {
 
   settingsWindow.once('ready-to-show', () => {
     settingsWindow.show();
-
-    settingsWindow.toggleDevTools();
   });
 
   settingsWindow.on('closed', () => {
