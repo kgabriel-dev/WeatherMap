@@ -31,7 +31,9 @@ export class MainComponent {
     useOverriddenTimezoneLabel: $localize`Override location's timezone`,
     buttonGenerateImages: $localize`Generate Images`,
     buttonCancelImgGeneration: $localize`Cancel`,
-    buttonGenerationProgressInfo: $localize`Info`
+    buttonGenerationProgressInfo: $localize`Info`,
+    locationDropdownPlaceholder: $localize`Select a location`,
+    customLocationName: $localize`Custom Location`,
   };
 
   forecastLengthOptions = TimeUnitStrings;
@@ -60,7 +62,7 @@ export class MainComponent {
       latitude: 0,
       longitude: 0
     },
-    name: 'Custom Location',
+    name: this.localizedTexts.customLocationName,
     region: {
       resolution: 0,
       size: {

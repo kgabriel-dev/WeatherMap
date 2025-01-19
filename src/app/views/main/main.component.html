@@ -39,7 +39,7 @@
               [(ngModel)]="regionInDropdown"
               (onChange)="applyLocation(regionInDropdown)"
               optionLabel="name"
-              placeholder="Select a location"
+              [placeholder]="localizedTexts.locationDropdownPlaceholder"
               styleClass="w-full"
               [disabled]="disableLocationDropdown"
             />
