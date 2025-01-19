@@ -82,6 +82,7 @@ autoUpdater.on('update-not-available', () => {
 function openSettingsModal() {
   settingsWindow = new BrowserWindow({
     parent: mainWindow,
+    modal: true,
     width: 800,
     height: 600,
     show: false,
@@ -167,6 +168,7 @@ ipcMain.handle('get-latest-progress-messages', (_event) => {
 ipcMain.handle('open-progress-info-window', (_event) => {
   progressWindow = new BrowserWindow({
     parent: mainWindow,
+    modal: true,
     width: 800,
     height: 600,
     show: false,
