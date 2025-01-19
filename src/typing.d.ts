@@ -25,6 +25,7 @@ interface Window {
     getLocale: () => Promise<string>,
     sendTranslations: (translations: {[key: string]: string}) => void,
     triggerUpdateCheck: () => void,
+    closeSettings: () => void
   },
   weather: {
     generateWeatherImagesForRegion: (region: Region, dataGatherer: DataGathererName, weatherConditionId: string, forecast_length: number, valueLabels: boolean) => Promise<{ date: Date, filename: string }[]>,

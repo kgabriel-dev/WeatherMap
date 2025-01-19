@@ -14,6 +14,7 @@ contextBridge.exposeInMainWorld('app', {
   getLocale: () => ipcRenderer.invoke('get-locale'),
   sendTranslations: (translations) => ipcRenderer.send('translations-changed', translations),
   triggerUpdateCheck: () => ipcRenderer.invoke('trigger-update-check'),
+  closeSettings: () => ipcRenderer.invoke('close-settings')
 });
 
 contextBridge.exposeInMainWorld('weather', {

@@ -192,7 +192,7 @@
   <div class="flex flex-grow-1"></div>
 
   <div class="flex flex-row gap-2 justify-content-center m-2">
-    <p-button i18n>Save & Close</p-button>
-    <p-button i18n>Discard & Close</p-button>
+    <p-button i18n (onClick)="saveAndClose()">Save & Close</p-button>
+    <p-button i18n (onClick)="closeWindow()">Discard & Close</p-button>
   </div>
 </p-tabView>

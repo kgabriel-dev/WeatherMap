@@ -258,6 +258,11 @@ autoUpdater.on('update-available', () => {
   });
 });
 
+ipcMain.handle('close-settings', (_event) => {
+  if(settingsWindow && !settingsWindow.isDestroyed())
+    settingsWindow.close();
+});
+
 // Helper functions
 function readFile(filePath, encoding) {
   try {

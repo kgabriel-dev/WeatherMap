@@ -146,6 +146,15 @@ export class SettingsComponent {
     this.settingsService.saveSettings();
   }
 
+  saveAndClose(): void {
+    this.saveSettings();
+    this.closeWindow();
+  }
+
+  closeWindow(): void {
+    window.app.closeSettings();
+  }
+
   private buildTimezoneList(): TimezoneList {
     const timezoneGroups: { label: string, timezones: TimeZone[] }[] = [];
     getTimeZones().forEach(timezone => {
