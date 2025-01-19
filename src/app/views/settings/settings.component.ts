@@ -55,7 +55,6 @@ export class SettingsComponent {
   // variables for the selected timezone
   readonly timezoneList = this.buildTimezoneList();
 
-  // TODO: Read the values directly from the data gatherers
   // variables for the selected data source
   dataSources: SelectItemGroup[] = [];
   readonly dataSourceIcons: {[key: string]: string} = {
@@ -90,6 +89,7 @@ export class SettingsComponent {
   locationLoadingMessages: Message[] = [];
   locationsAlreadyLoaded: boolean = false;
   locationsList: Region[] = [];
+  darkMode: boolean = false;
 
   constructor(
     public settingsService: SettingsService,
@@ -104,6 +104,7 @@ export class SettingsComponent {
       this.forecastLength = settings.forecastLength
       this.updateCheck = settings.updateCheck;
       this.labeledImages = settings.labeledImages;
+      this.darkMode = settings.darkMode;
     });
 
     // display a message while loading the locations file
@@ -144,7 +145,8 @@ export class SettingsComponent {
       languageCode: this.selectedLanguageKey,
       forecastLength: this.forecastLength,
       updateCheck: this.updateCheck,
-      labeledImages: this.labeledImages
+      labeledImages: this.labeledImages,
+      darkMode: this.darkMode
     });
 
     this.settingsService.saveSettings();
@@ -282,8 +284,7 @@ export class SettingsComponent {
   }
 
   toggleDarkMode(value: boolean): void {
-    const html = document.querySelector('html');
-    html?.classList.toggle('dark-mode', value);
+    window.app.toggleDarkMode(value);
   }
 }
 

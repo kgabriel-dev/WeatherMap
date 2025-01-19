@@ -26,7 +26,11 @@
 
     <p-divider />
 
-    <p-checkbox [binary]="true" (onChange)="toggleDarkMode($event.checked)" />
+    
+    <div class="flex items-center gap-2">
+      <p-checkbox [binary]="true" (onChange)="toggleDarkMode($event.checked)" [(ngModel)]="darkMode" inputId="darkModeToggle" />
+      <label for="darkModeToggle" i18n>Dark mode</label>
+  </div>
 
     <p-divider />
 

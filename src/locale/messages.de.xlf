@@ -119,7 +119,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">116,117</context>
+          <context context-type="linenumber">124,125</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1113549170516305374" datatype="html">
@@ -131,7 +131,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">120,121</context>
+          <context context-type="linenumber">128,129</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7634975438452127654" datatype="html">
@@ -526,12 +526,20 @@
           <context context-type="linenumber">3,4</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="1356890996281769972" datatype="html">
+        <source>Dark mode</source>
+        <target>Dunkler Modus</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
+          <context context-type="linenumber">32,33</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="1561668622981082371" datatype="html">
         <source>Default weather condition:</source>
         <target>Standard-Wetterbedingung</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">29,30</context>
+          <context context-type="linenumber">37,38</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8000678855637513038" datatype="html">
@@ -539,7 +547,7 @@
         <target>Standardlänge der Vorhersage:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">49,50</context>
+          <context context-type="linenumber">57,58</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8363432790086329928" datatype="html">
@@ -547,7 +555,7 @@
         <target>Beschriftete Wetterbilder</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">62,63</context>
+          <context context-type="linenumber">70,71</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1107240597598030185" datatype="html">
@@ -555,7 +563,7 @@
         <target>Zeige Label auf den Wetterbildern.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">65,66</context>
+          <context context-type="linenumber">73,74</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5497472972506460974" datatype="html">
@@ -563,7 +571,7 @@
         <target>Name der Region:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">91,92</context>
+          <context context-type="linenumber">99,100</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4001106038907918008" datatype="html">
@@ -571,7 +579,7 @@
         <target>Zeitzone:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">94,95</context>
+          <context context-type="linenumber">102,103</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3540408855316484742" datatype="html">
@@ -579,7 +587,7 @@
         <target>Regionsgröße:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">127,128</context>
+          <context context-type="linenumber">135,136</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8829477678594768245" datatype="html">
@@ -587,7 +595,7 @@
         <target>Auflösung (ergibt n ✕ n Schritte):</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">144</context>
+          <context context-type="linenumber">152</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1903251124965349527" datatype="html">
@@ -595,7 +603,7 @@
         <target>Keine Regionen gefunden. Füge eine Region hinzu.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">163,164</context>
+          <context context-type="linenumber">171,172</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4962621902898875665" datatype="html">
@@ -603,7 +611,7 @@
         <target>Auf Updates prüfen &amp; benachrichtigen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">181,182</context>
+          <context context-type="linenumber">189,190</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6044862297969542880" datatype="html">
@@ -611,7 +619,7 @@
         <target>Prüfe beim Start auf Updates und benachrichtige mich, wenn ein Update verfügbar ist.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">184,185</context>
+          <context context-type="linenumber">192,193</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2448998566468414760" datatype="html">
@@ -619,7 +627,7 @@
         <target>Speichern &amp; Schließen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">195</context>
+          <context context-type="linenumber">203</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6665722712497831206" datatype="html">
@@ -627,7 +635,7 @@
         <target>Verwerfen &amp; Schließen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">196</context>
+          <context context-type="linenumber">204</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6439365426343089851" datatype="html">
@@ -635,7 +643,7 @@
         <target>Allgemein</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="linenumber">42</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4022066031214545422" datatype="html">
@@ -643,7 +651,7 @@
         <target>Regionen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">42</context>
+          <context context-type="linenumber">43</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8842123318392393416" datatype="html">
@@ -651,7 +659,7 @@
         <target>Updates</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">44</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3429765269839676766" datatype="html">
@@ -659,7 +667,7 @@
         <target>Neue Region</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">44</context>
+          <context context-type="linenumber">45</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3768927257183755959" datatype="html">
@@ -667,7 +675,7 @@
         <target>Speichern</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">45</context>
+          <context context-type="linenumber">46</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7022070615528435141" datatype="html">
@@ -675,7 +683,7 @@
         <target>Löschen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">46</context>
+          <context context-type="linenumber">47</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3823219296477075982" datatype="html">
@@ -683,7 +691,7 @@
         <target>Abbrechen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">48</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6299803518261935782" datatype="html">
@@ -691,35 +699,7 @@
         <target>Auf Updates prüfen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">48</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="719553356650717763" datatype="html">
-        <source>Loading locations...</source>
-        <target>Lade Standorte...</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">111</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">131</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="8312841402649007072" datatype="html">
-        <source>Please wait a moment.</source>
-        <target>Bitte warte einen Moment.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">112</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="6078879738091446056" datatype="html">
-        <source>This is taking longer than expected. Please wait a moment.</source>
-        <target>Das dauert länger als gewöhnlich. Bitte warte einen Moment.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">132</context>
+          <context context-type="linenumber">49</context>
         </context-group>
       </trans-unit>
     </body>

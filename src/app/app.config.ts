@@ -34,10 +34,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
-        preset: WeatherMapTheme,
-        options: {
-          darkModeSelector: '.dark-mode'
-        }
+        preset: WeatherMapTheme
       }
     })
   ]

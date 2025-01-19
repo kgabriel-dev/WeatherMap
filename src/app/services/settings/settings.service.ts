@@ -15,7 +15,8 @@ export class SettingsService {
     },
     updateCheck: true,
     defaultLocationIndex: 0,
-    labeledImages: true
+    labeledImages: true,
+    darkMode: false
   }
   private settings: Settings = this.defaultSettings;
 
@@ -51,6 +52,8 @@ export class SettingsService {
               this.settings[key] = this.defaultSettings[key];
             }
           }
+
+          window.app.toggleDarkMode(this.settings.darkMode);
 
           this.settingsChangedSubject.next(this.settings);
           this.notifySettingsRead$.next(true);
@@ -132,7 +135,8 @@ export type Settings = {
   },
   updateCheck: boolean,
   defaultLocationIndex: number,
-  labeledImages: boolean
+  labeledImages: boolean,
+  darkMode: boolean
 }
 
 export enum TimeUnits {

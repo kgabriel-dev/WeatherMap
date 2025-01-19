@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Menu, shell, dialog } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu, shell, dialog, nativeTheme } from 'electron';
 import path from 'node:path';
 import url from 'node:url';
 import fs from 'node:fs';
@@ -263,6 +263,10 @@ autoUpdater.on('update-available', () => {
 ipcMain.handle('close-settings', (_event) => {
   if(settingsWindow && !settingsWindow.isDestroyed())
     settingsWindow.close();
+});
+
+ipcMain.handle('toggle-dark-mode', (_event, value) => {
+  nativeTheme.themeSource = value ? 'dark' : 'light';
 });
 
 // Helper functions
