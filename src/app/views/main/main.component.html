@@ -178,8 +178,6 @@
         [style]="{'width': '100%', 'z-index': 1}" />
     </div>
 
-    <!-- <div class="flex-grow-1 border-bottom-2 border-primary-500"></div> -->
-    <p-button [label]="localizedTexts.buttonGenerateImages" (onClick)="startWeatherImageGeneration()" styleClass="w-full">
-    </p-button>
+    <p-button [label]="localizedTexts.buttonGenerateImages" (onClick)="startWeatherImageGeneration()" [disabled]="latestWeatherDataProgress?.inProgress" styleClass="w-full" />
   </div>
 </div>
