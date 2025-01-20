@@ -28,7 +28,6 @@ import { WeatherDataResponse, WeatherCondition, DataGathererName } from '../../.
 export class MainComponent {
   readonly localizedTexts = {
     mapPanToLocationTooltip: $localize`Click to center the map on the selected location.`,
-    useOverriddenTimezoneLabel: $localize`Override location's timezone`,
     buttonGenerateImages: $localize`Generate Images`,
     buttonCancelImgGeneration: $localize`Cancel`,
     buttonGenerationProgressInfo: $localize`Info`,

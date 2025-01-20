@@ -29,7 +29,7 @@
   </div>
 
   <div class="flex flex-column flex-grow-0 gap-3 h-full" style="width: 20%; min-width: 180px; max-width: 350px;">
-    <div class="flex flex-column flex-grow-1 gap-3 pr-4 overflow-y-auto">
+    <div class="flex flex-column flex-grow-1 gap-3 pr-4 overflow-y-auto border-bottom-2 border-primary-500">
       <label for="location" i18n>Location:</label>
       <div class="w-full flex gap-1">
           <div class="flex-grow-1">
@@ -48,9 +48,9 @@
           <p-button
             (onClick)="mapPanToLocation()"
             icon="pi pi-map-marker"
-            [style]="{'color': 'var(--primary-color)'}"
-            styleClass="surface-100 hover:bg-primary border-transparent"
+            styleClass="bg-primary border-transparent"
             [pTooltip]="localizedTexts.mapPanToLocationTooltip"
+            tooltipPosition="left"
           />
         </div>
 
@@ -131,11 +131,15 @@
           [style]="{'width': '9rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0'}" />
       </div>
 
-      <p-checkbox
+      <div class="flex items-center gap-2">
+        <p-checkbox
         [(ngModel)]="mainSessionDataForUpdate.useOverriddenTimezone"
         [binary]="true"
         (onChange)="debouncedUpdateSessionData()"
-        [value]="localizedTexts.useOverriddenTimezoneLabel" />
+        inputId="overrideTimezoneCheckbox" />
+        <label for="overrideTimezoneCheckbox" i18n>Override location's timezone</label>
+      </div>
+      
       <p-dropdown
         [options]="timezoneList"
         (onChange)="debouncedUpdateSessionData()"
@@ -174,7 +178,7 @@
         [style]="{'width': '100%', 'z-index': 1}" />
     </div>
 
-    <div class="flex-grow-1 border-bottom-2 border-primary-500"></div>
+    <!-- <div class="flex-grow-1 border-bottom-2 border-primary-500"></div> -->
     <p-button [label]="localizedTexts.buttonGenerateImages" (onClick)="startWeatherImageGeneration()" styleClass="w-full">
     </p-button>
   </div>
