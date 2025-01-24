@@ -1,13 +1,16 @@
-import { createCanvas } from "@napi-rs/canvas";
+import { createCanvas, GlobalFonts } from "@napi-rs/canvas";
 import { OpenMeteoDataGatherer, BrightSkyDataGatherer } from "./data-gathering.js";
 import { app, ipcMain } from 'electron';
 import { sendWeatherGenerationProgressUpdate } from "../utils.js";
 import { Region, SimpleLocation } from "../../types/location";
 import { DataGathererName, DataGatherer, WeatherCondition } from "../../types/weather-data";
 import * as fs from 'fs';
+import path from "path";
 
 let cancelRequested = false;
 const imagePixelSize = 512;
+
+GlobalFonts.registerFromPath(path.join(app.getPath("userData"), "Poppins-Regular.ttf"), 'Poppins');
 
 ipcMain.on('cancel-weather-image-generation', (_event) => cancelRequested = true);
 
@@ -173,7 +176,7 @@ function generateWeatherImageForLocation(region: Region, dataGathererName: DataG
                   }
 
                   context.fillStyle = 'rgba(0, 0, 0, 255)';
-                  context.font = `${imagePixelSize / 8}px Arial`;
+                  context.font = `${imagePixelSize / 8}px Poppins`;
                   context.textAlign = 'center';
                   context.textBaseline = 'middle';
                   context.fillText(value, columnIndex * imagePixelSize + imagePixelSize / 2, rowIndex * imagePixelSize + imagePixelSize / 2, imagePixelSize); // add labels to the squares

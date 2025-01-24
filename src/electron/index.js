@@ -65,6 +65,18 @@ const createWindow = () => {
 }
 
 app.whenReady().then(() => {
+  // copy the font files to the app's userData directory
+  const fontFiles = ["Poppins-Regular.ttf"];
+  fontFiles.forEach((fontFile) => {
+    const srcPath = path.join(__dirname, "weather-map", "browser", locale, "assets", "fonts", fontFile);
+    const destPath = path.join(app.getPath("userData"), fontFile);
+
+    if(!fs.existsSync(destPath)) {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  });
+
+  // create the main window
   createWindow()
 
   app.on('activate', () => {
