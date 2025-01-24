@@ -157,6 +157,15 @@ export class SettingsComponent {
     this.closeWindow();
   }
 
+  discardAndClose(): void {
+    const oldSettings = this.settingsService.getSettings();
+
+    // reset the dark mode setting
+    window.app.toggleDarkMode(oldSettings.darkMode);
+
+    this.closeWindow();
+  }
+
   closeWindow(): void {
     window.app.closeSettings();
   }
