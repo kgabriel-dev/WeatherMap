@@ -4,3 +4,13 @@
 @import "primeflex/primeflex.css";
 @import "primeicons/primeicons.css";
 @import "flag-icons/css/flag-icons.min.css";
+
+@font-face {
+    font-family: 'Poppins';
+    src: url(assets/Poppins-Regular.ttf) format('truetype');
+}
+
+* {
+    font-family: 'Poppins', 'regular';
+    font-size: 12pt;
+}
