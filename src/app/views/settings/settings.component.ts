@@ -150,6 +150,9 @@ export class SettingsComponent {
     });
 
     this.settingsService.saveSettings();
+
+    if(this.workingLocation)
+      this.locationsService.updateLocation(this.workingLocation);
   }
 
   saveAndClose(): void {
