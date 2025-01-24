@@ -172,7 +172,7 @@
       <p-dropdown
         inputId="condition"
         optionLabel="condition"
-        [options]="weatherConditions"
+        [options]="allWeatherConditions[lastReadMainSessionData.weatherDataSource]"
         [(ngModel)]="mainSessionDataForUpdate.weatherCondition"
         (onChange)="updateSessionData()"
         [style]="{'width': '100%', 'z-index': 1}" />

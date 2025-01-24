@@ -263,7 +263,7 @@ export class SettingsComponent {
           items: s['OpenMeteo'].map((item: WeatherCondition) => {
             return {
               label: item.condition,
-              value: item.id
+              value: `openmeteo.${item.id}`
             }
           })
         });
@@ -274,7 +274,7 @@ export class SettingsComponent {
           items: s['BrightSky'].map((item: WeatherCondition) => {
             return {
               label: item.condition,
-              value: item.id
+              value: `brightsky.${item.id}`
             }
           })
         });

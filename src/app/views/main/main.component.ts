@@ -17,6 +17,7 @@ import { TimezoneList } from '../settings/settings.component';
 import { Checkbox } from 'primeng/checkbox';
 import { Region, SimpleLocation } from '../../../types/location';
 import { WeatherDataResponse, WeatherCondition, DataGathererName } from '../../../types/weather-data';
+import { from } from 'rxjs';
 
 @Component({
   selector: 'app-main',
@@ -75,7 +76,8 @@ export class MainComponent {
   regionInDropdown = this.customLocation;
   weatherImages: { date: Date, filename: string }[] = [];
 
-  weatherConditions: WeatherCondition[] = [];
+  // weatherConditions: WeatherCondition[] = [];
+  allWeatherConditions: { [key: string]: WeatherCondition[] } = {};
 
   timezoneList = this.buildTimezoneList();
 
@@ -110,6 +112,11 @@ export class MainComponent {
         window.app.triggerUpdateCheck();
       }
     });
+
+    const listWeatherConditions$ = from(window.weather.listWeatherConditions()
+      .then((sources) => {
+        this.allWeatherConditions = sources;
+      }));
 
     this.lastReadMainSessionData = this.sessionService.getLatestSessionData().mainData;
     this.mainSessionDataForUpdate = this.sessionService.getLatestSessionData().mainData;
@@ -190,13 +197,28 @@ export class MainComponent {
           if(this.locationDropdown)
             this.locationDropdown.focus(); // this triggers the update of the label to the selected location
 
+          let weatherDataSource: DataGathererName;
+          switch(settings.weatherCondition.split('.')[0]) {
+            case 'openmeteo':
+              weatherDataSource = 'OpenMeteo';
+              break;
+            case 'brightsky':
+              weatherDataSource = 'BrightSky';
+              break;
+            default:
+              weatherDataSource = 'OpenMeteo';
+          }
+
           const sessionData = this.sessionService.getLatestSessionData();
           this.sessionService.updateSessionData({
             mainData: {
               ...sessionData.mainData,
               selectedRegionIndex: this.selectedRegionIndex,
               regionResolution: selectedLocation.region.resolution,
-              regionSize: selectedLocation.region.size
+              regionSize: selectedLocation.region.size,
+              weatherDataSource,
+              weatherCondition: this.allWeatherConditions[weatherDataSource].find((condition) => condition.id == settings.weatherCondition.split('.')[1]),
+              forecastLength: settings.forecastLength
             }
           });
         })
@@ -255,32 +277,32 @@ export class MainComponent {
 
       const sessionData = this.sessionService.getLatestSessionData();
 
-      this.setInitialWeatherCondition()
-        .then((weatherCondition) => {
-          this.sessionService.updateSessionData({
-            mainData: {
-              ...sessionData.mainData,
-              selectedRegionIndex: selectedRegionIndex,
-              regionResolution: selectedRegion ? selectedRegion.region.resolution : sessionData.mainData.regionResolution,
-              regionSize: selectedRegion ? selectedRegion.region.size : sessionData.mainData.regionSize,
-              forecastLength: settings.forecastLength,
-              weatherCondition
-            }
-          });
-        })
-        .catch((error) => {
-          console.error('Error setting initial weather condition:', error);
+      this.setInitialWeatherCondition();
+        // .then((weatherCondition) => {
+        //   this.sessionService.updateSessionData({
+        //     mainData: {
+        //       ...sessionData.mainData,
+        //       selectedRegionIndex: selectedRegionIndex,
+        //       regionResolution: selectedRegion ? selectedRegion.region.resolution : sessionData.mainData.regionResolution,
+        //       regionSize: selectedRegion ? selectedRegion.region.size : sessionData.mainData.regionSize,
+        //       forecastLength: settings.forecastLength,
+        //       weatherCondition
+        //     }
+        //   });
+        // })
+        // .catch((error) => {
+        //   console.error('Error setting initial weather condition:', error);
 
-          this.sessionService.updateSessionData({
-            mainData: {
-              ...sessionData.mainData,
-              selectedRegionIndex: selectedRegionIndex,
-              regionResolution: selectedRegion ? selectedRegion.region.resolution : sessionData.mainData.regionResolution,
-              regionSize: selectedRegion ? selectedRegion.region.size : sessionData.mainData.regionSize,
-              forecastLength: settings.forecastLength
-            }
-          });
-        });
+        //   this.sessionService.updateSessionData({
+        //     mainData: {
+        //       ...sessionData.mainData,
+        //       selectedRegionIndex: selectedRegionIndex,
+        //       regionResolution: selectedRegion ? selectedRegion.region.resolution : sessionData.mainData.regionResolution,
+        //       regionSize: selectedRegion ? selectedRegion.region.size : sessionData.mainData.regionSize,
+        //       forecastLength: settings.forecastLength
+        //     }
+        //   });
+        // });
     })
 
     this.updateSessionDebounce$
@@ -488,84 +510,49 @@ export class MainComponent {
   }
 
   private updateWeatherConditionsList(oldDataGathererName?: DataGathererName, oldWeatherCondition?: WeatherCondition): void {
-    window.weather.listWeatherConditions()
-      .then((conditions) => {
-        if(!conditions[this.lastReadMainSessionData.weatherDataSource]) {
-          console.error('No weather conditions found for the selected data source:', this.lastReadMainSessionData.weatherDataSource);
+    if(!this.allWeatherConditions[this.lastReadMainSessionData.weatherDataSource]) {
+      console.error('No weather conditions found for the selected data source:', this.lastReadMainSessionData.weatherDataSource);
+      return;
+    }
 
-          this.weatherConditions = [];
-          this.changeDetectorRef.detectChanges();
+    // try to select the same weather condition as before just for the new data source; only if the data source has changed
+    if(oldDataGathererName && oldDataGathererName !== this.lastReadMainSessionData.weatherDataSource && oldWeatherCondition) {
+      const newWeatherCondition = this.allWeatherConditions[this.lastReadMainSessionData.weatherDataSource].find((condition) => condition.id == oldWeatherCondition.id);
 
-          return;
-        }
-
-        this.weatherConditions = conditions[this.lastReadMainSessionData.weatherDataSource];
-
-        // try to select the same weather condition as before just for the new data source; only if the data source has changed
-        if(oldDataGathererName && oldDataGathererName !== this.lastReadMainSessionData.weatherDataSource && oldWeatherCondition) {
-          const newWeatherCondition = this.weatherConditions.find((condition) => condition.id == oldWeatherCondition.id);
-
-          if(newWeatherCondition) {
-            this.sessionService.updateSessionData({
-              mainData: {
-                ...this.mainSessionDataForUpdate,
-                weatherCondition: newWeatherCondition
-              }
-            });
-          } else {
-            this.sessionService.updateSessionData({
-              mainData: {
-                ...this.mainSessionDataForUpdate,
-                weatherCondition: this.weatherConditions[0]
-              }
-            });
+      if(newWeatherCondition) {
+        this.sessionService.updateSessionData({
+          mainData: {
+            ...this.mainSessionDataForUpdate,
+            weatherCondition: newWeatherCondition
           }
-        }
+        });
+      } else {
+        this.sessionService.updateSessionData({
+          mainData: {
+            ...this.mainSessionDataForUpdate,
+            weatherCondition: this.allWeatherConditions[this.lastReadMainSessionData.weatherDataSource][0]
+          }
+        });
+      }
+    }
 
-        this.changeDetectorRef.detectChanges();
-      })
-      .catch((error) => {
-        console.error('Error getting weather conditions:', error);
-        this.weatherConditions = [];
-        this.changeDetectorRef.detectChanges();
-      });
+    this.changeDetectorRef.detectChanges();
   }
 
-  private setInitialWeatherCondition(): Promise<WeatherCondition> {
-    return new Promise((resolve, reject) => {
-      window.weather.listWeatherConditions()
-        .then((conditions) => {
-          if(!conditions[this.lastReadMainSessionData.weatherDataSource]) {
-            console.error('No weather conditions found for the selected data source:', this.lastReadMainSessionData.weatherDataSource);
+  private setInitialWeatherCondition(): void{
+    if(!this.allWeatherConditions[this.lastReadMainSessionData.weatherDataSource]) {
+      console.error('No weather conditions found for the selected data source:', this.lastReadMainSessionData.weatherDataSource);
+      return;
+    }
 
-            this.weatherConditions = [];
-            this.changeDetectorRef.detectChanges();
-
-            reject('No weather conditions found for the selected data source');
-            return;
-          }
-
-          this.weatherConditions = conditions[this.lastReadMainSessionData.weatherDataSource];
-
-          if(!this.lastReadMainSessionData.weatherCondition) {
-            this.sessionService.updateSessionData({
-              mainData: {
-                ...this.mainSessionDataForUpdate,
-                weatherCondition: this.weatherConditions[0]
-              }
-            });
-          }
-
-          resolve(this.weatherConditions[0]);
-        })
-        .catch((error) => {
-          console.error('Error getting weather conditions:', error);
-          this.weatherConditions = [];
-          this.changeDetectorRef.detectChanges();
-
-          reject(error);
-        });
-    });
+    if(!this.lastReadMainSessionData.weatherCondition) {
+      this.sessionService.updateSessionData({
+        mainData: {
+          ...this.mainSessionDataForUpdate,
+          weatherCondition: this.allWeatherConditions[this.lastReadMainSessionData.weatherDataSource][0]
+        }
+      });
+    }
   }
 
   private convertTimelengthToHours(value: Settings['forecastLength']['value'], unit: Settings['forecastLength']['unitId']): number {
