@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SelectItemGroup } from 'primeng/api';
+import { MessageService, SelectItemGroup } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DividerModule } from 'primeng/divider';
@@ -16,7 +16,7 @@ import { MessagesModule } from 'primeng/messages';
 import { getTimeZones, TimeZone } from '@vvo/tzdb';
 import { Region, RegionAddingData } from '../../../types/location';
 import { WeatherCondition } from '../../../types/weather-data';
-import { Message } from 'primeng/message';
+import { Toast } from 'primeng/toast';
 
 @Component({
   selector: 'app-settings',
@@ -32,10 +32,12 @@ import { Message } from 'primeng/message';
     ListboxModule,
     InputTextModule,
     ProgressSpinnerModule,
-    MessagesModule
+    MessagesModule,
+    Toast
   ],
   templateUrl: './settings.component.html',
-  styleUrl: './settings.component.scss'
+  styleUrl: './settings.component.scss',
+  providers: [MessageService]
 })
 export class SettingsComponent {
   readonly localizedTexts = {
@@ -86,14 +88,14 @@ export class SettingsComponent {
   updateCheck: boolean = true;
   labeledImages: boolean = true;
   workingLocation?: Region;
-  locationLoadingMessages: Message[] = [];
   locationsAlreadyLoaded: boolean = false;
   locationsList: Region[] = [];
   darkMode: boolean = false;
 
   constructor(
     public settingsService: SettingsService,
-    public locationsService: LocationService
+    public locationsService: LocationService,
+    private messageService: MessageService
   ) {
     this.getWeatherDataSources();
 
@@ -108,12 +110,11 @@ export class SettingsComponent {
     });
 
     // display a message while loading the locations file
-    this.locationLoadingMessages = [
-      // {
-      //   severity: 'info',
-      //   text: $localize`Loading locations...` + $localize`Please wait a moment.`,
-      // }
-    ];
+    this.messageService.add({
+      severity: 'info',
+      summary: $localize`Loading locations...`,
+      detail: $localize`Please wait a moment.`
+    })
 
     // load the locations file
     locationsService.isServiceReady().subscribe((fileRead: boolean) => {
@@ -121,7 +122,7 @@ export class SettingsComponent {
 
       this.locationsList = this.locationsService.getLocations();
       this.setWorkingLocation(this.settingsService.getSettings().defaultLocationIndex);
-      this.locationLoadingMessages = [];
+      this.messageService.clear();
       this.locationsAlreadyLoaded = true;
     });
 
@@ -129,13 +130,12 @@ export class SettingsComponent {
     setTimeout(() => {
       if(this.locationsAlreadyLoaded) return;
 
-      this.locationLoadingMessages = [
-        // {
-        //   severity:'warn',
-        //   summary: $localize`Loading locations...`,
-        //   detail: $localize`This is taking longer than expected. Please wait a moment.`
-        // }
-      ]
+      this.messageService.clear();
+      this.messageService.add({
+        severity: 'warn',
+        summary: $localize`Loading locations...`,
+        detail: $localize`This is taking longer than expected. Please wait a moment.`
+      });
     }, 3000);
   }
 

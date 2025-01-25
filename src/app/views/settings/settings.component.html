@@ -1,3 +1,5 @@
+<p-toast />
+
 <p-tabView [scrollable]="true">
   <p-tabPanel [header]="localizedTexts.titleGeneralSettings">
     <p class="mt-0" i18n>Language:</p>
@@ -176,11 +178,6 @@
     @else {
       <div class="w-full h-full flex flex-column justify-content-center align-items-center">
         <p-progressSpinner />
-
-        <!-- <p-messages
-          [(value)]="locationLoadingMessages"
-          [enableService]="false"
-          [closable]="false" /> -->
       </div>
     }
   </p-tabPanel>
