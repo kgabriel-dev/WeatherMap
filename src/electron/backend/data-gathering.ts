@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
-import { SizeUnits, sendWeatherGenerationProgressUpdate } from './../utils.js';
-import { DataGatherer, WeatherCondition, WeatherData } from './../../types/weather-data';
-import { Region } from './../../types/location';
+import { SizeUnits, sendWeatherGenerationProgressUpdate } from '../utils.js';
+import { DataGatherer, WeatherCondition, WeatherData } from '../../types/weather-data.js';
+import { Region } from '../../types/location.js';
 
 let cancelRequested = false;
 

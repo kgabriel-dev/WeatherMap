@@ -2,18 +2,21 @@ import { app, BrowserWindow, ipcMain, Menu, shell, dialog, nativeTheme } from 'e
 import path from 'node:path';
 import url from 'node:url';
 import fs from 'node:fs';
-import { generateWeatherImageForLocation } from './backend/image-generation.js';
 import { OpenMeteoDataGatherer, BrightSkyDataGatherer } from './backend/data-gathering.js';
 import { fileURLToPath } from 'node:url';
+// import pkg from 'electron-updater';
+import { Worker, isMainThread } from 'worker_threads';
+// import { startWeatherImageGenerationWorker } from './backend/image-generation.js';
 
-import pkg from 'electron-updater';
-const { autoUpdater } = pkg;
+// const { autoUpdater } = pkg;
 
-autoUpdater.autoDownload = false;
-autoUpdater.autoInstallOnAppQuit = false;
+// autoUpdater.autoDownload = false;
+// autoUpdater.autoInstallOnAppQuit = false;
 
 let mainWindow, progressWindow, settingsWindow;
 let latestProgressMessages = [];
+
+let imageGenerationWorker;
 
 let locale = 'en-US';
 let translations = {};
@@ -33,7 +36,8 @@ const createWindow = () => {
     height: 720,
     show: false,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
+      // sandbox: false
     }
   })
 
@@ -84,9 +88,9 @@ app.whenReady().then(() => {
   })
 })
 
-autoUpdater.on('update-not-available', () => {
-  console.log('No updates available');
-});
+// autoUpdater.on('update-not-available', () => {
+//   console.log('No updates available');
+// });
 
 // function to open the settings modal; called from the menu bar
 function openSettingsModal() {
@@ -153,7 +157,66 @@ ipcMain.handle('write-app-file', (_event, filePath, data, encoding) => {
 });
 
 ipcMain.handle('generate-weather-images-for-region', (_event, region, dataGatherer, weatherCondition, forecastLength, valueLabels) => {
-  return generateWeatherImageForLocation(region, dataGatherer, weatherCondition, forecastLength, valueLabels, translations);
+  const workerScriptPath = path.join(__dirname, 'backend', 'worker-test.mjs');
+  const workerScriptURL = url.pathToFileURL(workerScriptPath);
+
+  new Worker(
+    workerScriptURL, {
+      type: "module",
+      workerData: {
+        region,
+        dataGatherer,
+        weatherCondition,
+        forecastLength,
+        valueLabels,
+        translations
+      }
+    }
+  ).on('message', (message) => {
+    console.log(message);
+  });
+
+  // if(!isMainThread) return;
+
+  // const workerScriptPath = path.join(__dirname, 'backend', 'image-generation.js');
+  // const workerScriptURL = url.pathToFileURL(workerScriptPath);
+
+  // imageGenerationWorker = new Worker(
+  //   workerScriptURL, {
+  //   type: "module",
+  //     workerData: {
+  //       region,
+  //       dataGatherer,
+  //       weatherCondition,
+  //       forecastLength,
+  //       valueLabels,
+  //       translations
+  //     }
+  //   }
+  // );
+
+  // return new Promise((resolve, reject) => {
+  //   imageGenerationWorker.on('message', (message) => {
+  //     if(message.images) resolve(message.images);
+  //     else console.log(message);
+  //   });
+
+  //   imageGenerationWorker.on('error', (error) => {
+  //     console.error('Error generating weather images:', error);
+  //     reject(error);
+  //   });
+
+  //   imageGenerationWorker.on('exit', (code) => {
+  //     if (code !== 0) {
+  //       reject(new Error(`Worker stopped with exit code ${code}`));
+  //     }
+  //   });
+  // });
+});
+
+ipcMain.on('cancel-weather-image-generation', () => {
+  imageGenerationWorker.terminate();
+  ipcMain.emit('canceled-weather-image-generation');
 });
 
 ipcMain.on('weather-generation-progress', (_event, inProgress, progressValue, progressMessage) => {
@@ -253,20 +316,20 @@ ipcMain.handle('trigger-update-check', (_event) => {
   autoUpdater.checkForUpdatesAndNotify();
 });
 
-autoUpdater.on('update-available', () => {
-  const dialogOpts = {
-    type: 'info',
-    buttons: [translations.updateAvailableDialogButtonYes, translations.updateAvailableDialogButtonNo],
-    title: translations.updateAvailableDialogTitle,
-    message: translations.updateAvailableDialogMessage
-  };
+// autoUpdater.on('update-available', () => {
+//   const dialogOpts = {
+//     type: 'info',
+//     buttons: [translations.updateAvailableDialogButtonYes, translations.updateAvailableDialogButtonNo],
+//     title: translations.updateAvailableDialogTitle,
+//     message: translations.updateAvailableDialogMessage
+//   };
 
-  dialog.showMessageBox(dialogOpts).then((returnValue) => {
-    if (returnValue.response === 0) {
-      shell.openExternal('https://github.com/kgabriel-dev/WeatherMap/releases/latest')
-    }
-  });
-});
+//   dialog.showMessageBox(dialogOpts).then((returnValue) => {
+//     if (returnValue.response === 0) {
+//       shell.openExternal('https://github.com/kgabriel-dev/WeatherMap/releases/latest')
+//     }
+//   });
+// });
 
 ipcMain.handle('close-settings', (_event) => {
   if(settingsWindow && !settingsWindow.isDestroyed())

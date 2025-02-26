@@ -2,21 +2,25 @@ import { createCanvas, GlobalFonts } from "@napi-rs/canvas";
 import { OpenMeteoDataGatherer, BrightSkyDataGatherer } from "./data-gathering.js";
 import { app, ipcMain } from 'electron';
 import { sendWeatherGenerationProgressUpdate } from "../utils.js";
-import { Region, SimpleLocation } from "../../types/location";
-import { DataGathererName, DataGatherer, WeatherCondition } from "../../types/weather-data";
+import { Region, SimpleLocation } from "../../types/location.js";
+import { DataGathererName, DataGatherer, WeatherCondition } from "../../types/weather-data.js";
 import * as fs from 'fs';
-import path from "path";
+import path from "node:path";
+import { parentPort, workerData, isMainThread, Worker } from "worker_threads";
 
 let cancelRequested = false;
 const imagePixelSize = 512;
 
 GlobalFonts.registerFromPath(path.join(app.getPath("userData"), "Poppins-Regular.ttf"), 'Poppins');
 
-ipcMain.on('cancel-weather-image-generation', (_event) => cancelRequested = true);
+// ipcMain.on('cancel-weather-image-generation', (_event) => cancelRequested = true);
 
 function generateWeatherImageForLocation(region: Region, dataGathererName: DataGathererName, weatherConditionId: string, forecast_length: number, valueLabels: boolean, translations: {[key: string]: string}): Promise<{ date: string, filename: string }[]> {
+  parentPort?.postMessage('test2')
+  
   const dataGatherer: DataGatherer = getDataGatherer(dataGathererName, translations);
-
+  parentPort?.postMessage('test');
+  
   return new Promise((resolve, reject) => {
     const weatherCondition = dataGatherer.listAvailableWeatherConditions(translations).find((condition: WeatherCondition) => condition.id === weatherConditionId);
 
@@ -24,6 +28,8 @@ function generateWeatherImageForLocation(region: Region, dataGathererName: DataG
       reject('Unknown weather condition id');
       return;
     }
+
+    parentPort?.postMessage('test');
 
     let progress = 0;
     sendWeatherGenerationProgressUpdate(true, progress, translations["imgGenerationDelOldImages"]);
@@ -225,5 +231,56 @@ function getDataGatherer(dataGathererName: DataGathererName, translations: {[key
       throw new Error('Unknown data gatherer id');
   }
 }
+
+// if(parentPort) {
+//   parentPort.postMessage('started')
+
+//   generateWeatherImageForLocation(workerData.region, workerData.dataGathererName, workerData.weatherConditionId, workerData.forecast_length, workerData.valueLabels, workerData.translations)
+//     .then((images) => {
+//       parentPort!.postMessage({ images: images });
+//     })
+//     .catch((error) => {
+//       parentPort!.postMessage({ error: error });
+//     });
+// }
+
+// function startWeatherImageGenerationWorker(region: Region, dataGathererName: DataGathererName, weatherConditionId: string, forecastLength: number, valueLabels: boolean, translations: {[key: string]: string}) {
+//   if(isMainThread) {
+//     const imageGenerationWorker = new Worker(
+//       import.meta.filename,
+//       {
+//         // eval: true,
+//         type: "module",
+//         workerData: {
+//           region,
+//           dataGathererName,
+//           weatherConditionId,
+//           forecastLength,
+//           valueLabels,
+//           translations
+//         }
+//     });
+
+//     imageGenerationWorker.on("message", msg => console.log(`Worker message received: ${msg}`));
+//     imageGenerationWorker.on("error", err => console.error(err));
+//     imageGenerationWorker.on("exit", code => console.log(`Worker exited with code ${code}.`));
+//   } else {
+//     if(!parentPort) {
+//       console.error("No parent port in worker!");
+//       return;
+//     }
+
+//     const data = workerData;
+
+//     generateWeatherImageForLocation(data.region, data.dataGathererName, data.weatherConditionId, data.forecastLength, data.valueLabels, data.translations)
+//       .then((images) => {
+//         parentPort?.postMessage({images});
+//       })
+//       .catch((error) => {
+//         throw error;
+//       });
+//   }
+// }
+
 
 export { generateWeatherImageForLocation };
