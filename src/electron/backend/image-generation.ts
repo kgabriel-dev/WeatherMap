@@ -1,21 +1,17 @@
-import { createCanvas, GlobalFonts } from "@napi-rs/canvas";
-import { OpenMeteoDataGatherer, BrightSkyDataGatherer } from "./data-gathering.js";
-import { app, ipcMain } from 'electron';
-import { sendWeatherGenerationProgressUpdate } from "../utils.js";
-import { Region, SimpleLocation } from "../../types/location.js";
-import { DataGathererName, DataGatherer, WeatherCondition } from "../../types/weather-data.js";
-import * as fs from 'fs';
-import path from "node:path";
-import { parentPort, workerData, isMainThread, Worker } from "worker_threads";
+import path from "path";
+
+const { createCanvas, GlobalFonts } = require("@napi-rs/canvas");
+const { OpenMeteoDataGatherer, BrightSkyDataGatherer } = require("./data-gathering.js");
+const { parentPort, workerData, isMainThread, Worker } = require("worker_threads");
+const fs = require("fs");
 
 let cancelRequested = false;
 const imagePixelSize = 512;
 
-GlobalFonts.registerFromPath(path.join(app.getPath("userData"), "Poppins-Regular.ttf"), 'Poppins');
-
+// TODO: Cancel weather image generation
 // ipcMain.on('cancel-weather-image-generation', (_event) => cancelRequested = true);
 
-function generateWeatherImageForLocation(region: Region, dataGathererName: DataGathererName, weatherConditionId: string, forecast_length: number, valueLabels: boolean, translations: {[key: string]: string}): Promise<{ date: string, filename: string }[]> {
+function generateWeatherImageForLocation(region: Region, dataGathererName: DataGathererName, weatherConditionId: string, forecast_length: number, valueLabels: boolean, translations: {[key: string]: string}, filePath: string): Promise<{ date: string, filename: string }[]> {
   parentPort?.postMessage('test2')
   
   const dataGatherer: DataGatherer = getDataGatherer(dataGathererName, translations);
@@ -33,13 +29,6 @@ function generateWeatherImageForLocation(region: Region, dataGathererName: DataG
 
     let progress = 0;
     sendWeatherGenerationProgressUpdate(true, progress, translations["imgGenerationDelOldImages"]);
-    // check if the WeatherMap dir in the temp dir exists, if not create it
-    // and if it exists, delete all files in it
-    const dir = `${app.getPath('temp')}/WeatherMap`;
-    if(!fs.existsSync(dir))
-      fs.mkdirSync(dir);
-    else
-      fs.readdirSync(dir).forEach((file) => fs.unlinkSync(`${dir}/${file}`));
 
     if(cancelRequested) {
       sendWeatherGenerationProgressUpdate(false, 100, translations["canceledByUser"]);
@@ -52,8 +41,10 @@ function generateWeatherImageForLocation(region: Region, dataGathererName: DataG
     const numberOfImages = forecast_length;
     const progressPerStep = 100 / (numberOfLocations + numberOfImages + 2); // how much progress is made per step (location or image); +2 for "finished data gathering"-message and for the final step
 
+    parentPort?.postMessage(progressPerStep + " " + numberOfImages + " " + numberOfLocations);
+
     // gather the data for the location
-    dataGatherer.gatherData(region, weatherCondition, forecast_length, progressPerStep, translations)
+    dataGatherer.gatherData(region, weatherCondition, forecast_length, progressPerStep, translations, sendWeatherGenerationProgressUpdate)
       .then((weatherData) => {
         if(cancelRequested) {
           sendWeatherGenerationProgressUpdate(false, 100, translations["canceledByUser"]);
@@ -73,7 +64,8 @@ function generateWeatherImageForLocation(region: Region, dataGathererName: DataG
             timeList.push(data.date);
         });
 
-        const imagesToReturn: { date: string, filename: string }[] = [];
+        // const imageBuffers: { date: string, buffer: any }[] = [];
+        const filesToReturn: { date: string, filename: string }[] = [];
 
         weatherData.forEach((data) => {
           const timeIndex = timeList.indexOf(data.date);
@@ -156,7 +148,8 @@ function generateWeatherImageForLocation(region: Region, dataGathererName: DataG
           }
 
           progress += progressPerStep;
-          sendWeatherGenerationProgressUpdate(true, progress, translations["imgGenerationStartingCreationImageIndex"].replace('$index$', (timeIndex + 1).toString()));
+          parentPort.postMessage("text: " + translations["imgGenerationStartingCreationImageIndex"]);
+          sendWeatherGenerationProgressUpdate(true, progress, (translations["imgGenerationStartingCreationImageIndex"]).replace('$index$', (timeIndex + 1).toString()));
 
             // create the image square by square starting from the most northern and western coordinate
             gridCoordinates.forEach((row, rowIndex) => {
@@ -192,19 +185,16 @@ function generateWeatherImageForLocation(region: Region, dataGathererName: DataG
 
             // save the image to a file in the temp directory
             const buffer = canvas.encodeSync('png');
-            const filename = `${app.getPath('temp')}/WeatherMap/weather_image_${timeIndex}.png`;
+            const filename = path.join(filePath, "weather_image_" + timeIndex + ".png");
+            fs.writeFileSync(filename, buffer);
 
-            try {
-              fs.writeFileSync(filename, buffer);
-              imagesToReturn.push({date: timeList[timeIndex], filename: filename});
-            } catch (error) {
-              console.error('Failed to write file', error);
+            filesToReturn.push({date: timeList[timeIndex], filename});
+
+            if(filesToReturn.length === timeList.length) {
+              sendWeatherGenerationProgressUpdate(false, 100, translations["imgGenerationFinished"]);
+              resolve(filesToReturn);
             }
         }
-
-        progress = 100;
-        sendWeatherGenerationProgressUpdate(false, progress, translations["imgGenerationFinished"]);
-        resolve(imagesToReturn);
       })
       .catch((error) => {
         reject(error);
@@ -232,55 +222,23 @@ function getDataGatherer(dataGathererName: DataGathererName, translations: {[key
   }
 }
 
-// if(parentPort) {
-//   parentPort.postMessage('started')
+if(parentPort) {
+  parentPort.postMessage('started')
 
-//   generateWeatherImageForLocation(workerData.region, workerData.dataGathererName, workerData.weatherConditionId, workerData.forecast_length, workerData.valueLabels, workerData.translations)
-//     .then((images) => {
-//       parentPort!.postMessage({ images: images });
-//     })
-//     .catch((error) => {
-//       parentPort!.postMessage({ error: error });
-//     });
-// }
+  parentPort.postMessage(workerData);
 
-// function startWeatherImageGenerationWorker(region: Region, dataGathererName: DataGathererName, weatherConditionId: string, forecastLength: number, valueLabels: boolean, translations: {[key: string]: string}) {
-//   if(isMainThread) {
-//     const imageGenerationWorker = new Worker(
-//       import.meta.filename,
-//       {
-//         // eval: true,
-//         type: "module",
-//         workerData: {
-//           region,
-//           dataGathererName,
-//           weatherConditionId,
-//           forecastLength,
-//           valueLabels,
-//           translations
-//         }
-//     });
+  generateWeatherImageForLocation(workerData.region, workerData.dataGatherer, workerData.weatherCondition, workerData.forecastLength, workerData.valueLabels, workerData.translations, workerData.filePath)
+    .then((images) => {
+      parentPort!.postMessage({ images: images });
+    })
+    .catch((error) => {
+      parentPort!.postMessage({ error: error });
+    });
+}
 
-//     imageGenerationWorker.on("message", msg => console.log(`Worker message received: ${msg}`));
-//     imageGenerationWorker.on("error", err => console.error(err));
-//     imageGenerationWorker.on("exit", code => console.log(`Worker exited with code ${code}.`));
-//   } else {
-//     if(!parentPort) {
-//       console.error("No parent port in worker!");
-//       return;
-//     }
-
-//     const data = workerData;
-
-//     generateWeatherImageForLocation(data.region, data.dataGathererName, data.weatherConditionId, data.forecastLength, data.valueLabels, data.translations)
-//       .then((images) => {
-//         parentPort?.postMessage({images});
-//       })
-//       .catch((error) => {
-//         throw error;
-//       });
-//   }
-// }
+function sendWeatherGenerationProgressUpdate(inProgress: boolean, progress: number, message: string) {
+  parentPort?.postMessage({ type: 'progressUpdate', inProgress, progress, message });
+}
 
 
 export { generateWeatherImageForLocation };

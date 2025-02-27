@@ -1,5 +1,3 @@
-import { SimpleLocation, Region } from "../../../types/location";
-import { DataGathererName, WeatherCondition } from "../../../types/weather-data";
 import { Settings } from "../settings/settings.service";
 
 export type SessionData = {

@@ -14,8 +14,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessagesModule } from 'primeng/messages';
 import { getTimeZones, TimeZone } from '@vvo/tzdb';
-import { Region, RegionAddingData } from '../../../types/location';
-import { WeatherCondition } from '../../../types/weather-data';
 import { Toast } from 'primeng/toast';
 
 @Component({

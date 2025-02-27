@@ -17,8 +17,7 @@
     "experimentalDecorators": true,
     "moduleResolution": "Node",
     "importHelpers": true,
-    "target": "ES6",
-    "module": "ESNext",
+    "module": "CommonJS",
     "lib": [
       "ES2022",
       "dom"
@@ -30,7 +29,8 @@
     ],
     "types": [
       "node",
-      "jest"
+      "jest",
+      "electron"
     ]
   },
   "angularCompilerOptions": {

@@ -1,7 +1,8 @@
 import { ipcMain } from "electron";
 
-function sendWeatherGenerationProgressUpdate(inProgress: boolean, progress: number, message: string) {
+function sendWeatherGenerationProgressUpdate(inProgress: boolean, progress: number, message: string, callback: any) {
   ipcMain.emit('weather-generation-progress', undefined, inProgress, progress, message);
+  callback();
 }
 
 enum SizeUnits {
@@ -9,4 +10,9 @@ enum SizeUnits {
   MILES
 }
 
-export { sendWeatherGenerationProgressUpdate, SizeUnits };
+// export { sendWeatherGenerationProgressUpdate, SizeUnits };
+
+module.exports = {
+  sendWeatherGenerationProgressUpdate,
+  SizeUnits
+};

@@ -1,12 +1,10 @@
-import { app, BrowserWindow, ipcMain, Menu, shell, dialog, nativeTheme } from 'electron';
-import path from 'node:path';
-import url from 'node:url';
-import fs from 'node:fs';
-import { OpenMeteoDataGatherer, BrightSkyDataGatherer } from './backend/data-gathering.js';
-import { fileURLToPath } from 'node:url';
-// import pkg from 'electron-updater';
-import { Worker, isMainThread } from 'worker_threads';
-// import { startWeatherImageGenerationWorker } from './backend/image-generation.js';
+const { app, BrowserWindow, ipcMain, Menu, shell, nativeTheme } = require('electron');
+const path = require('path');
+const url = require('url');
+const fs = require('fs');
+const { OpenMeteoDataGatherer, BrightSkyDataGatherer } = require('./backend/data-gathering.js');
+const { GlobalFonts } = require("@napi-rs/canvas");
+const { Worker } = require('worker_threads');
 
 // const { autoUpdater } = pkg;
 
@@ -21,8 +19,8 @@ let imageGenerationWorker;
 let locale = 'en-US';
 let translations = {};
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
 ipcMain.on('translations-changed', (_event, newTranslations) => {
   translations = newTranslations;
@@ -79,6 +77,10 @@ app.whenReady().then(() => {
       fs.copyFileSync(srcPath, destPath);
     }
   });
+
+  // register the fonts
+  GlobalFonts.registerFromPath(app.getPath("userData") + '/Poppins-Regular.ttf', 'Poppins');
+  
 
   // create the main window
   createWindow()
@@ -157,61 +159,56 @@ ipcMain.handle('write-app-file', (_event, filePath, data, encoding) => {
 });
 
 ipcMain.handle('generate-weather-images-for-region', (_event, region, dataGatherer, weatherCondition, forecastLength, valueLabels) => {
-  const workerScriptPath = path.join(__dirname, 'backend', 'worker-test.mjs');
+  // check if the WeatherMap dir in the temp dir exists, if not create it
+  // and if it exists, delete all files in it
+  const dir = `${app.getPath('temp')}/` + "WeatherMap";
+
+  if(!fs.existsSync(dir))
+    fs.mkdirSync(dir);
+  else
+    fs.readdirSync(dir).forEach((file) => fs.unlinkSync(`${dir}/${file}`));
+
+  // start the worker thread
+  const workerScriptPath = path.join(__dirname, 'backend', 'image-generation.js');
   const workerScriptURL = url.pathToFileURL(workerScriptPath);
 
-  new Worker(
+  imageGenerationWorker = new Worker(
     workerScriptURL, {
-      type: "module",
+    type: "module",
       workerData: {
         region,
         dataGatherer,
         weatherCondition,
         forecastLength,
         valueLabels,
-        translations
+        translations,
+        filePath: `${app.getPath('temp')}/WeatherMap`
       }
     }
-  ).on('message', (message) => {
-    console.log(message);
+  );
+
+  return new Promise((resolve, reject) => {
+    imageGenerationWorker.on('message', (message) => {
+      console.log('Message from worker:', message);
+
+      if(message.type == 'progressUpdate')
+        ipcMain.emit('weather-generation-progress', message.inProgress ?? true, message.progress ?? 0, message.message);
+      else if(message.images) {
+        resolve(message.images);
+      }
+    });
+
+    imageGenerationWorker.on('error', (error) => {
+      console.error('Error generating weather images:', error);
+      reject(error);
+    });
+
+    imageGenerationWorker.on('exit', (code) => {
+      if (code !== 0) {
+        reject(new Error(`Worker stopped with exit code ${code}`));
+      }
+    });
   });
-
-  // if(!isMainThread) return;
-
-  // const workerScriptPath = path.join(__dirname, 'backend', 'image-generation.js');
-  // const workerScriptURL = url.pathToFileURL(workerScriptPath);
-
-  // imageGenerationWorker = new Worker(
-  //   workerScriptURL, {
-  //   type: "module",
-  //     workerData: {
-  //       region,
-  //       dataGatherer,
-  //       weatherCondition,
-  //       forecastLength,
-  //       valueLabels,
-  //       translations
-  //     }
-  //   }
-  // );
-
-  // return new Promise((resolve, reject) => {
-  //   imageGenerationWorker.on('message', (message) => {
-  //     if(message.images) resolve(message.images);
-  //     else console.log(message);
-  //   });
-
-  //   imageGenerationWorker.on('error', (error) => {
-  //     console.error('Error generating weather images:', error);
-  //     reject(error);
-  //   });
-
-  //   imageGenerationWorker.on('exit', (code) => {
-  //     if (code !== 0) {
-  //       reject(new Error(`Worker stopped with exit code ${code}`));
-  //     }
-  //   });
-  // });
 });
 
 ipcMain.on('cancel-weather-image-generation', () => {
@@ -223,6 +220,7 @@ ipcMain.on('weather-generation-progress', (_event, inProgress, progressValue, pr
   if(progressValue === 0) {
     latestProgressMessages = [];
   }
+  
   latestProgressMessages.push({ inProgress, progress: progressValue, message: progressMessage });
 
   if(mainWindow && !mainWindow.isDestroyed())

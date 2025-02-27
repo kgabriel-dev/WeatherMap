@@ -1,11 +1,14 @@
-import { ipcMain } from 'electron';
-import { SizeUnits, sendWeatherGenerationProgressUpdate } from '../utils.js';
-import { DataGatherer, WeatherCondition, WeatherData } from '../../types/weather-data.js';
-import { Region } from '../../types/location.js';
+const { ipcMain } = require('electron');
+// const { sendWeatherGenerationProgressUpdate } = require('../utils.js');
+const { SizeUnits } = require('../utils.js');
 
 let cancelRequested = false;
 
-ipcMain.on('cancel-weather-image-generation', (_event) => cancelRequested = true);
+// ipcMain.on('cancel-weather-image-generation', (_event) => cancelRequested = true);
+
+function cancelWeatherImageGeneration() {
+    cancelRequested = true;
+}
 
 class OpenMeteoDataGatherer implements DataGatherer {
   readonly API_URL = "https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly={category}&forecast_hours={hours}&timezone={timezone}";
@@ -13,7 +16,7 @@ class OpenMeteoDataGatherer implements DataGatherer {
 
   translations: {[key: string]: string} = {};
 
-  gatherData(region: Region, condition: WeatherCondition, forecast_hours: number, progressPerStep: number, translations: {[key: string]: string}): Promise<WeatherData[]> {
+  gatherData(region: Region, condition: WeatherCondition, forecast_hours: number, progressPerStep: number, translations: {[key: string]: string}, progressUpdateCallback: CallableFunction): Promise<WeatherData[]> {
     if(!this.listAvailableWeatherConditions(this.translations).find((availableCondition) => availableCondition.id === condition.id))
       throw new Error('The selected Weather Condition not available');
 
@@ -28,7 +31,7 @@ class OpenMeteoDataGatherer implements DataGatherer {
       const requests: { lat: number, lon: number, api: string, hours: number, tz: string }[] = [];
 
       if(cancelRequested) {
-        sendWeatherGenerationProgressUpdate(false, 100, this.translations["canceledByUser"]);
+        progressUpdateCallback(false, 100, this.translations["canceledByUser"], cancelWeatherImageGeneration);
         reject('Cancelled by user.');
         cancelRequested = false;
       }
@@ -43,12 +46,12 @@ class OpenMeteoDataGatherer implements DataGatherer {
       }
 
       if(cancelRequested) {
-        sendWeatherGenerationProgressUpdate(false, 100, this.translations["canceledByUser"]);
+        progressUpdateCallback(false, 100, this.translations["canceledByUser"], cancelWeatherImageGeneration);
         reject('Cancelled by user.');
         cancelRequested = false;
       }
 
-      this.requestApiUrls(requests, progressPerStep)
+      this.requestApiUrls(requests, progressPerStep, progressUpdateCallback)
         .then((data) => {
           resolve(data);
           cancelRequested = false;
@@ -60,7 +63,7 @@ class OpenMeteoDataGatherer implements DataGatherer {
     });
   }
 
-  private async requestApiUrls(dataList: { lat: number, lon: number, api: string, hours: number, tz: string }[], progressPerStep: number): Promise<WeatherData[]> {
+  private async requestApiUrls(dataList: { lat: number, lon: number, api: string, hours: number, tz: string }[], progressPerStep: number, progressUpdateCallback: CallableFunction): Promise<WeatherData[]> {
     const weatherData: WeatherData[] = [];
 
     // get the current progress
@@ -96,7 +99,7 @@ class OpenMeteoDataGatherer implements DataGatherer {
           }
 
           progress += progressPerStep;
-          sendWeatherGenerationProgressUpdate(true, progress, this.translations["dataGatheringIndexFailed"].replace('$index$', (dataList.indexOf(data) + 1).toString()));
+          progressUpdateCallback(true, progress, this.translations["dataGatheringIndexFailed"].replace('$index$', (dataList.indexOf(data) + 1).toString()), cancelWeatherImageGeneration);
         }
 
         // if the request was successful add the data to the weatherData array
@@ -118,7 +121,7 @@ class OpenMeteoDataGatherer implements DataGatherer {
           }
 
           progress += progressPerStep;
-          sendWeatherGenerationProgressUpdate(true, progress, this.translations["dataGatheringIndexSuccess"].replace('$index$', (dataList.indexOf(data) + 1).toString()));
+          progressUpdateCallback(true, progress, this.translations["dataGatheringIndexSuccess"].replace('$index$', (dataList.indexOf(data) + 1).toString()), cancelWeatherImageGeneration);
         }
 
         if(cancelRequested)
@@ -163,7 +166,7 @@ class BrightSkyDataGatherer implements DataGatherer {
 
   translations: {[key: string]: string} = {};
 
-  gatherData(region: Region, condition: WeatherCondition, forecast_hours: number, progressPerStep: number, translations: {[key: string]: string}): Promise<WeatherData[]> {
+  gatherData(region: Region, condition: WeatherCondition, forecast_hours: number, progressPerStep: number, translations: {[key: string]: string}, progressUpdateCallback: CallableFunction): Promise<WeatherData[]> {
     if(!this.listAvailableWeatherConditions(translations).find((availableCondition) => availableCondition.id === condition.id))
       throw new Error('The selected Weather Condition not available');
 
@@ -183,7 +186,7 @@ class BrightSkyDataGatherer implements DataGatherer {
       const requests: { lat: number, lon: number, api: string, startDate: Date, endDate: Date, tz: string }[] = [];
 
       if(cancelRequested) {
-        sendWeatherGenerationProgressUpdate(false, 100, this.translations["canceledByUser"]);
+        progressUpdateCallback(false, 100, this.translations["canceledByUser"], cancelWeatherImageGeneration);
         reject('Cancelled by user.');
         cancelRequested = false;
       }
@@ -198,12 +201,12 @@ class BrightSkyDataGatherer implements DataGatherer {
       }
 
       if(cancelRequested) {
-        sendWeatherGenerationProgressUpdate(false, 100, this.translations["canceledByUser"]);
+        progressUpdateCallback(false, 100, this.translations["canceledByUser"], cancelWeatherImageGeneration);
         reject('Cancelled by user.');
         cancelRequested = false;
       }
 
-      this.requestApiUrls(requests, progressPerStep)
+      this.requestApiUrls(requests, progressPerStep, progressUpdateCallback)
         .then((data) => {
           resolve(data);
           cancelRequested = false;
@@ -215,7 +218,7 @@ class BrightSkyDataGatherer implements DataGatherer {
     });
   }
 
-  private async requestApiUrls(dataList: { lat: number, lon: number, api: string, startDate: Date, endDate: Date, tz: string }[], progressPerStep: number): Promise<WeatherData[]> {
+  private async requestApiUrls(dataList: { lat: number, lon: number, api: string, startDate: Date, endDate: Date, tz: string }[], progressPerStep: number, progressUpdateCallback: CallableFunction): Promise<WeatherData[]> {
     const weatherData: WeatherData[] = [];
 
     // get the current progress
@@ -251,7 +254,7 @@ class BrightSkyDataGatherer implements DataGatherer {
           }
 
           progress += progressPerStep;
-          sendWeatherGenerationProgressUpdate(true, progress, this.translations["dataGatheringIndexFailed"].replace('$index$', (dataList.indexOf(data) + 1).toString()));
+          progressUpdateCallback(true, progress, this.translations["dataGatheringIndexFailed"].replace('$index$', (dataList.indexOf(data) + 1).toString()), cancelWeatherImageGeneration);
         }
 
         // if the request was successful
@@ -272,7 +275,7 @@ class BrightSkyDataGatherer implements DataGatherer {
           }
 
           progress += progressPerStep;
-          sendWeatherGenerationProgressUpdate(true, progress, this.translations["dataGatheringIndexSuccess"].replace('$index$', (dataList.indexOf(data) + 1).toString()));
+          progressUpdateCallback(true, progress, this.translations["dataGatheringIndexSuccess"].replace('$index$', (dataList.indexOf(data) + 1).toString()), cancelWeatherImageGeneration);
         }
 
         if(cancelRequested)
@@ -309,7 +312,7 @@ class BrightSkyDataGatherer implements DataGatherer {
   }
 }
 
-function convertToKm(number: number, unit: SizeUnits): number {
+function convertToKm(number: number, unit: typeof SizeUnits): number {
   return unit === SizeUnits.KILOMETERS ? number : number * 1.60934;
 }
 

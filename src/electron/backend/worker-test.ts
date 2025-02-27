@@ -1,12 +1,15 @@
-import { createCanvas, GlobalFonts } from "@napi-rs/canvas";
-import { OpenMeteoDataGatherer, BrightSkyDataGatherer } from "./data-gathering.js";
-import { app, ipcMain } from 'electron';
-import { sendWeatherGenerationProgressUpdate } from "../utils.js";
-import { Region, SimpleLocation } from "../../types/location.js";
-import { DataGathererName, DataGatherer, WeatherCondition } from "../../types/weather-data.js";
-import * as fs from 'fs';
-import path from "node:path";
-import { parentPort, workerData, isMainThread, Worker } from "worker_threads";
+// import { createCanvas, GlobalFonts } from "@napi-rs/canvas";
+// import { OpenMeteoDataGatherer, BrightSkyDataGatherer } from "./data-gathering.js";
+// import { app, ipcMain } from 'electron';
+// import { sendWeatherGenerationProgressUpdate } from "../utils.js";
+// import { Region, SimpleLocation } from "../../types/location.js";
+// import { DataGathererName, DataGatherer, WeatherCondition } from "../../types/weather-data.js";
+// import * as fs from 'fs';
+// import path from "node:path";
+// import { parentPort, workerData, isMainThread, Worker } from "worker_threads";
+
+const { parentPort, workerData, isMainThread } = require('worker_threads');
+const { OpenMeteoDataGatherer } = require('./data-gathering.js');
 
 if (!isMainThread) {
     parentPort!.postMessage(workerData);
