@@ -5,11 +5,10 @@ const fs = require('fs');
 const { OpenMeteoDataGatherer, BrightSkyDataGatherer } = require('./backend/data-gathering.js');
 const { GlobalFonts } = require("@napi-rs/canvas");
 const { Worker } = require('worker_threads');
+const { autoUpdater } = require('electron-updater');
 
-// const { autoUpdater } = pkg;
-
-// autoUpdater.autoDownload = false;
-// autoUpdater.autoInstallOnAppQuit = false;
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = false;
 
 let mainWindow, progressWindow, settingsWindow;
 let latestProgressMessages = [];
@@ -18,9 +17,6 @@ let imageGenerationWorker;
 
 let locale = 'en-US';
 let translations = {};
-
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
 
 ipcMain.on('translations-changed', (_event, newTranslations) => {
   translations = newTranslations;
@@ -34,8 +30,7 @@ const createWindow = () => {
     height: 720,
     show: false,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      // sandbox: false
+      preload: path.join(__dirname, 'preload.js')
     }
   })
 
@@ -52,7 +47,7 @@ const createWindow = () => {
   mainWindow.once('ready-to-show', () => {
     // wait until the locale is set and the translations are loaded before showing the window
     let checkInterval = setInterval(() => {
-      if(Object.keys(translations).length > 0) {
+      if (Object.keys(translations).length > 0) {
         clearInterval(checkInterval);
 
         // maximize the window and show it
@@ -73,14 +68,14 @@ app.whenReady().then(() => {
     const srcPath = path.join(__dirname, "weather-map", "browser", locale, "assets", "fonts", fontFile);
     const destPath = path.join(app.getPath("userData"), fontFile);
 
-    if(!fs.existsSync(destPath)) {
+    if (!fs.existsSync(destPath)) {
       fs.copyFileSync(srcPath, destPath);
     }
   });
 
   // register the fonts
   GlobalFonts.registerFromPath(app.getPath("userData") + '/Poppins-Regular.ttf', 'Poppins');
-  
+
 
   // create the main window
   createWindow()
@@ -89,10 +84,6 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
-
-// autoUpdater.on('update-not-available', () => {
-//   console.log('No updates available');
-// });
 
 // function to open the settings modal; called from the menu bar
 function openSettingsModal() {
@@ -161,9 +152,11 @@ ipcMain.handle('write-app-file', (_event, filePath, data, encoding) => {
 ipcMain.handle('generate-weather-images-for-region', (_event, region, dataGatherer, weatherCondition, forecastLength, valueLabels) => {
   // check if the WeatherMap dir in the temp dir exists, if not create it
   // and if it exists, delete all files in it
+  ipcMain.emit('weather-generation-progress', undefined, true, 0, translations.imgGenerationDelOldImages);
+
   const dir = `${app.getPath('temp')}/` + "WeatherMap";
 
-  if(!fs.existsSync(dir))
+  if (!fs.existsSync(dir))
     fs.mkdirSync(dir);
   else
     fs.readdirSync(dir).forEach((file) => fs.unlinkSync(`${dir}/${file}`));
@@ -174,23 +167,25 @@ ipcMain.handle('generate-weather-images-for-region', (_event, region, dataGather
 
   imageGenerationWorker = new Worker(
     workerScriptURL, {
-      workerData: {
-        region,
-        dataGatherer,
-        weatherCondition,
-        forecastLength,
-        valueLabels,
-        translations,
-        filePath: `${app.getPath('temp')}/WeatherMap`
-      }
+    workerData: {
+      region,
+      dataGatherer,
+      weatherCondition,
+      forecastLength,
+      valueLabels,
+      translations,
+      filePath: `${app.getPath('temp')}/WeatherMap`
     }
+  }
   );
 
   return new Promise((resolve, reject) => {
     imageGenerationWorker.on('message', (message) => {
-      if(message.type == 'progressUpdate')
+      console.log('Message from worker:', message);
+
+      if (message.type == 'progressUpdate')
         ipcMain.emit('weather-generation-progress', undefined, message.inProgress ?? true, message.progress ?? 0, message.message);
-      else if(message.images) {
+      else if (message.images) {
         resolve(message.images);
       }
     });
@@ -214,16 +209,16 @@ ipcMain.on('cancel-weather-image-generation', () => {
 });
 
 ipcMain.on('weather-generation-progress', (_event, inProgress, progressValue, progressMessage) => {
-  if(progressValue === 0) {
+  if (progressValue === 0) {
     latestProgressMessages = [];
   }
-  
+
   latestProgressMessages.push({ inProgress, progress: progressValue, message: progressMessage });
 
-  if(mainWindow && !mainWindow.isDestroyed())
+  if (mainWindow && !mainWindow.isDestroyed())
     mainWindow.webContents.send('weather-generation-progress-update', inProgress, progressValue, progressMessage);
 
-  if(progressWindow && !progressWindow.isDestroyed())
+  if (progressWindow && !progressWindow.isDestroyed())
     progressWindow.webContents.send('weather-generation-progress-update', inProgress, progressValue, progressMessage);
 });
 
@@ -279,14 +274,14 @@ ipcMain.handle('list-weather-conditions', (_event) => {
 ipcMain.handle('set-locale', (_event, newLocale) => {
   locale = newLocale;
 
-  if(mainWindow && !mainWindow.isDestroyed())
+  if (mainWindow && !mainWindow.isDestroyed())
     mainWindow.loadURL(url.format({
       pathname: path.join(__dirname, 'weather-map', 'browser', locale, 'index.html'),
       protocol: 'file:',
       slashes: true
     }));
 
-  if(progressWindow && !progressWindow.isDestroyed())
+  if (progressWindow && !progressWindow.isDestroyed())
     progressWindow.loadURL(url.format({
       pathname: path.join(__dirname, 'weather-map', 'browser', locale, 'index.html'),
       protocol: 'file:',
@@ -294,7 +289,7 @@ ipcMain.handle('set-locale', (_event, newLocale) => {
       hash: '#/progress'
     }));
 
-  if(settingsWindow && !settingsWindow.isDestroyed())
+  if (settingsWindow && !settingsWindow.isDestroyed())
     settingsWindow.loadURL(url.format({
       pathname: path.join(__dirname, 'weather-map', 'browser', locale, 'index.html'),
       protocol: 'file:',
@@ -311,23 +306,27 @@ ipcMain.handle('trigger-update-check', (_event) => {
   autoUpdater.checkForUpdatesAndNotify();
 });
 
-// autoUpdater.on('update-available', () => {
-//   const dialogOpts = {
-//     type: 'info',
-//     buttons: [translations.updateAvailableDialogButtonYes, translations.updateAvailableDialogButtonNo],
-//     title: translations.updateAvailableDialogTitle,
-//     message: translations.updateAvailableDialogMessage
-//   };
+autoUpdater.on('update-available', () => {
+  const dialogOpts = {
+    type: 'info',
+    buttons: [translations.updateAvailableDialogButtonYes, translations.updateAvailableDialogButtonNo],
+    title: translations.updateAvailableDialogTitle,
+    message: translations.updateAvailableDialogMessage
+  };
 
-//   dialog.showMessageBox(dialogOpts).then((returnValue) => {
-//     if (returnValue.response === 0) {
-//       shell.openExternal('https://github.com/kgabriel-dev/WeatherMap/releases/latest')
-//     }
-//   });
-// });
+  dialog.showMessageBox(dialogOpts).then((returnValue) => {
+    if (returnValue.response === 0) {
+      shell.openExternal('https://github.com/kgabriel-dev/WeatherMap/releases/latest')
+    }
+  });
+});
+
+autoUpdater.on('update-not-available', () => {
+  console.log('No updates available');
+});
 
 ipcMain.handle('close-settings', (_event) => {
-  if(settingsWindow && !settingsWindow.isDestroyed())
+  if (settingsWindow && !settingsWindow.isDestroyed())
     settingsWindow.close();
 });
 
@@ -363,58 +362,58 @@ function createAndSetMenu() {
           { role: 'quit' }
         ]
       }]
-    : []),
-  // { role: 'settingsMenu' }
-  {
-    label: translations.menuSettingsTitle,
-    submenu: [
-      {
-        label: translations.menuOpenSettings,
-        accelerator: 'CmdOrCtrl+,',
-        click: () => openSettingsModal()
-      }
-    ]
-  },
-  // { role: 'windowMenu' }
-  {
-    label: translations.menuWindowTitle,
-    submenu: [
-      { role: 'minimize', label: translations.menuMinimizeWindow },
-      ...(isMac
-        ? [
+      : []),
+    // { role: 'settingsMenu' }
+    {
+      label: translations.menuSettingsTitle,
+      submenu: [
+        {
+          label: translations.menuOpenSettings,
+          accelerator: 'CmdOrCtrl+,',
+          click: () => openSettingsModal()
+        }
+      ]
+    },
+    // { role: 'windowMenu' }
+    {
+      label: translations.menuWindowTitle,
+      submenu: [
+        { role: 'minimize', label: translations.menuMinimizeWindow },
+        ...(isMac
+          ? [
             { type: 'separator' },
             { role: 'front' },
             { type: 'separator' },
             { role: 'window' }
           ]
-        : [
+          : [
             { role: 'close', label: translations.menuCloseWindow }
           ])
-    ]
-  },
-  {
-    role: 'help',
-    label: translations.menuHelpTitle,
-    submenu: [
-      {
-        label: translations.menuLearnMore,
-        click: async () => {
-          await shell.openExternal('https://github.com/kgabriel-dev/WeatherMap')
+      ]
+    },
+    {
+      role: 'help',
+      label: translations.menuHelpTitle,
+      submenu: [
+        {
+          label: translations.menuLearnMore,
+          click: async () => {
+            await shell.openExternal('https://github.com/kgabriel-dev/WeatherMap')
+          }
+        },
+        {
+          role: 'about',
+          label: translations.menuAbout
+        },
+        {
+          'label': translations.menuDevTools,
+          'accelerator': 'CmdOrCtrl+Shift+I',
+          'click': async () => {
+            mainWindow.webContents.toggleDevTools();
+          }
         }
-      },
-      {
-        role: 'about',
-        label: translations.menuAbout
-      },
-      {
-        'label': translations.menuDevTools,
-        'accelerator': 'CmdOrCtrl+Shift+I',
-        'click': async () => {
-          mainWindow.webContents.toggleDevTools();
-        }
-      }
-    ]
-  }];
+      ]
+    }];
   const menu = Menu.buildFromTemplate(menuTemplate);
   Menu.setApplicationMenu(menu);
 }

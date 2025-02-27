@@ -1,14 +1,4 @@
-const { ipcMain } = require('electron');
-// const { sendWeatherGenerationProgressUpdate } = require('../utils.js');
-const { SizeUnits } = require('../utils.js');
-
-let cancelRequested = false;
-
-// ipcMain.on('cancel-weather-image-generation', (_event) => cancelRequested = true);
-
-function cancelWeatherImageGeneration() {
-    cancelRequested = true;
-}
+const { SizeUnits } = require("./../utils");
 
 class OpenMeteoDataGatherer implements DataGatherer {
   readonly API_URL = "https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly={category}&forecast_hours={hours}&timezone={timezone}";
@@ -30,12 +20,6 @@ class OpenMeteoDataGatherer implements DataGatherer {
       const locationOffset = Math.floor(-region.region.resolution/2) + (region.region.resolution % 2 === 0 ? 0.5 : 1); // how many steps to the left and top from the center
       const requests: { lat: number, lon: number, api: string, hours: number, tz: string }[] = [];
 
-      if(cancelRequested) {
-        progressUpdateCallback(false, 100, this.translations["canceledByUser"], cancelWeatherImageGeneration);
-        reject('Cancelled by user.');
-        cancelRequested = false;
-      }
-
       for(let latIndex = 0; latIndex < region.region.resolution; latIndex++) {
         for(let lonIndex = 0; lonIndex < region.region.resolution; lonIndex++) {
           const lat = region.coordinates.latitude + (locationOffset + latIndex) * latStepSize;
@@ -45,20 +29,12 @@ class OpenMeteoDataGatherer implements DataGatherer {
         }
       }
 
-      if(cancelRequested) {
-        progressUpdateCallback(false, 100, this.translations["canceledByUser"], cancelWeatherImageGeneration);
-        reject('Cancelled by user.');
-        cancelRequested = false;
-      }
-
       this.requestApiUrls(requests, progressPerStep, progressUpdateCallback)
         .then((data) => {
           resolve(data);
-          cancelRequested = false;
         })
         .catch((error) => {
           reject(error);
-          cancelRequested = false;
         });
     });
   }
@@ -80,10 +56,6 @@ class OpenMeteoDataGatherer implements DataGatherer {
       try {
         const response = await fetch(url);
 
-        if(cancelRequested) {
-          throw new Error('Cancelled by user.');
-        }
-
         // create an error entry for each hour if the request failed
         if(!response.ok) {
           for(let i = 0; i < data.hours; i++) {
@@ -99,7 +71,7 @@ class OpenMeteoDataGatherer implements DataGatherer {
           }
 
           progress += progressPerStep;
-          progressUpdateCallback(true, progress, this.translations["dataGatheringIndexFailed"].replace('$index$', (dataList.indexOf(data) + 1).toString()), cancelWeatherImageGeneration);
+          progressUpdateCallback(true, progress, this.translations["dataGatheringIndexFailed"].replace('$index$', (dataList.indexOf(data) + 1).toString()));
         }
 
         // if the request was successful add the data to the weatherData array
@@ -121,11 +93,8 @@ class OpenMeteoDataGatherer implements DataGatherer {
           }
 
           progress += progressPerStep;
-          progressUpdateCallback(true, progress, this.translations["dataGatheringIndexSuccess"].replace('$index$', (dataList.indexOf(data) + 1).toString()), cancelWeatherImageGeneration);
+          progressUpdateCallback(true, progress, this.translations["dataGatheringIndexSuccess"].replace('$index$', (dataList.indexOf(data) + 1).toString()));
         }
-
-        if(cancelRequested)
-          throw new Error('Cancelled by user.');
 
         await delay(this.REQUEST_DELAY);
       }
@@ -185,12 +154,6 @@ class BrightSkyDataGatherer implements DataGatherer {
 
       const requests: { lat: number, lon: number, api: string, startDate: Date, endDate: Date, tz: string }[] = [];
 
-      if(cancelRequested) {
-        progressUpdateCallback(false, 100, this.translations["canceledByUser"], cancelWeatherImageGeneration);
-        reject('Cancelled by user.');
-        cancelRequested = false;
-      }
-
       for(let latIndex = 0; latIndex < region.region.resolution; latIndex++) {
         for(let lonIndex = 0; lonIndex < region.region.resolution; lonIndex++) {
           const lat = region.coordinates.latitude + locationOffset + latIndex * latStepSize;
@@ -200,20 +163,12 @@ class BrightSkyDataGatherer implements DataGatherer {
         }
       }
 
-      if(cancelRequested) {
-        progressUpdateCallback(false, 100, this.translations["canceledByUser"], cancelWeatherImageGeneration);
-        reject('Cancelled by user.');
-        cancelRequested = false;
-      }
-
       this.requestApiUrls(requests, progressPerStep, progressUpdateCallback)
         .then((data) => {
           resolve(data);
-          cancelRequested = false;
         })
         .catch((error) => {
           reject(error);
-          cancelRequested = false;
         });
     });
   }
@@ -236,10 +191,6 @@ class BrightSkyDataGatherer implements DataGatherer {
       try {
         const response = await fetch(url);
 
-        if(cancelRequested) {
-          throw new Error('Cancelled by user.');
-        }
-
         if(!response.ok) { // if the request failed
           for(let i = 0; i < (data.endDate.getTime() - data.startDate.getTime()); i += 3600000) {
             const date = new Date(data.startDate.getTime() + i);
@@ -254,7 +205,7 @@ class BrightSkyDataGatherer implements DataGatherer {
           }
 
           progress += progressPerStep;
-          progressUpdateCallback(true, progress, this.translations["dataGatheringIndexFailed"].replace('$index$', (dataList.indexOf(data) + 1).toString()), cancelWeatherImageGeneration);
+          progressUpdateCallback(true, progress, this.translations["dataGatheringIndexFailed"].replace('$index$', (dataList.indexOf(data) + 1).toString()));
         }
 
         // if the request was successful
@@ -275,11 +226,8 @@ class BrightSkyDataGatherer implements DataGatherer {
           }
 
           progress += progressPerStep;
-          progressUpdateCallback(true, progress, this.translations["dataGatheringIndexSuccess"].replace('$index$', (dataList.indexOf(data) + 1).toString()), cancelWeatherImageGeneration);
+          progressUpdateCallback(true, progress, this.translations["dataGatheringIndexSuccess"].replace('$index$', (dataList.indexOf(data) + 1).toString()));
         }
-
-        if(cancelRequested)
-          throw new Error('Cancelled by user.');
 
         await delay(this.REQUEST_DELAY);
       }
@@ -312,7 +260,7 @@ class BrightSkyDataGatherer implements DataGatherer {
   }
 }
 
-function convertToKm(number: number, unit: typeof SizeUnits): number {
+function convertToKm(number: number, unit: SizeUnits): number {
   return unit === SizeUnits.KILOMETERS ? number : number * 1.60934;
 }
 
