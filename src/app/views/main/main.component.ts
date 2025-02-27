@@ -272,35 +272,7 @@ export class MainComponent {
       let selectedRegion = this.locationsService.getLocations()[selectedRegionIndex];
 
       this.applyLocation(selectedRegion);
-
-      const sessionData = this.sessionService.getLatestSessionData();
-
       this.setInitialWeatherCondition();
-        // .then((weatherCondition) => {
-        //   this.sessionService.updateSessionData({
-        //     mainData: {
-        //       ...sessionData.mainData,
-        //       selectedRegionIndex: selectedRegionIndex,
-        //       regionResolution: selectedRegion ? selectedRegion.region.resolution : sessionData.mainData.regionResolution,
-        //       regionSize: selectedRegion ? selectedRegion.region.size : sessionData.mainData.regionSize,
-        //       forecastLength: settings.forecastLength,
-        //       weatherCondition
-        //     }
-        //   });
-        // })
-        // .catch((error) => {
-        //   console.error('Error setting initial weather condition:', error);
-
-        //   this.sessionService.updateSessionData({
-        //     mainData: {
-        //       ...sessionData.mainData,
-        //       selectedRegionIndex: selectedRegionIndex,
-        //       regionResolution: selectedRegion ? selectedRegion.region.resolution : sessionData.mainData.regionResolution,
-        //       regionSize: selectedRegion ? selectedRegion.region.size : sessionData.mainData.regionSize,
-        //       forecastLength: settings.forecastLength
-        //     }
-        //   });
-        // });
     })
 
     this.updateSessionDebounce$
@@ -449,6 +421,7 @@ export class MainComponent {
       })
       .catch((error) => {
         console.error('Error generating images:', error);
+        window.weather.sendWeatherGenerationProgress(false, 100, 'Error generating images');
       });
   }
 

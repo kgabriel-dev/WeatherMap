@@ -174,7 +174,6 @@ ipcMain.handle('generate-weather-images-for-region', (_event, region, dataGather
 
   imageGenerationWorker = new Worker(
     workerScriptURL, {
-    type: "module",
       workerData: {
         region,
         dataGatherer,
@@ -189,10 +188,8 @@ ipcMain.handle('generate-weather-images-for-region', (_event, region, dataGather
 
   return new Promise((resolve, reject) => {
     imageGenerationWorker.on('message', (message) => {
-      console.log('Message from worker:', message);
-
       if(message.type == 'progressUpdate')
-        ipcMain.emit('weather-generation-progress', message.inProgress ?? true, message.progress ?? 0, message.message);
+        ipcMain.emit('weather-generation-progress', undefined, message.inProgress ?? true, message.progress ?? 0, message.message);
       else if(message.images) {
         resolve(message.images);
       }
@@ -266,7 +263,7 @@ ipcMain.handle('cancel-weather-image-generation', (_event) => {
   ipcMain.emit('cancel-weather-image-generation');
 });
 ipcMain.on('canceled-weather-image-generation', (_event) => {
-  ipcMain.emit('weather-generation-progress', false, 100, translations.imageGenerationCanceledByUser);
+  ipcMain.emit('weather-generation-progress', undefined, false, 100, translations.imageGenerationCanceledByUser);
 });
 
 
