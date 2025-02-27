@@ -32,8 +32,3 @@ type RegionAddingData = {
   },
   timezoneCode: string;
 }
-
-enum SizeUnits {
-  KILOMETERS,
-  MILES
-}
