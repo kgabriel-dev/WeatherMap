@@ -2,6 +2,12 @@
 
 <hr>
 
+> [!IMPORTANT]
+> This is version 1 of the WeatherMap project. There is a version 2 available, which I recommend to use.
+> 
+> It is also harder to build v1 as the PySimpleGUI project has deleted the free access to their project. The WeatherMap project was using PySimpleGUI in v1. If you want to build v1 of the WeatherMap project, I recommend using the [PySimpleGUI 4 foss](https://github.com/andor-pierdelacabeza/PySimpleGUI-4-foss) code.
+> To use it, you can copy the `PySimpleGUI.py` file into the WeatherMap v1 code, install the new dependencies in your virtual environment and then start the project as usual.
+
 <div align="center">
 
 ## What is this project about?
