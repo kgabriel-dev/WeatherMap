@@ -1,6 +1,6 @@
 {
   "name": "weather-map",
-  "version": "1.9.0",
+  "version": "2.0.0",
   "type": "commonjs",
   "author": {
     "name": "kGabriel",
@@ -8,7 +8,7 @@
     "url": "https://www.kgabriel.dev"
   },
   "description": "WeatherMap",
-  "repository": "https://github.com/kgabriel-dev/WeatherMap-Testing",
+  "repository": "https://github.com/kgabriel-dev/WeatherMap",
   "main": "index.js",
   "scripts": {
     "ng": "ng",
