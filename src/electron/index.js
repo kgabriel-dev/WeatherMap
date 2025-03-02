@@ -9,6 +9,7 @@ const { autoUpdater } = require('electron-updater');
 
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = false;
+initialUpdateCheck = true; // flag to not notify for updates on startup
 
 let mainWindow, progressWindow, settingsWindow;
 let latestProgressMessages = [];
@@ -322,7 +323,17 @@ autoUpdater.on('update-available', () => {
 });
 
 autoUpdater.on('update-not-available', () => {
-  console.log('No updates available');
+  if(initialUpdateCheck) {
+    initialUpdateCheck = false;
+    return;
+  }
+  
+  dialog.showMessageBox({
+    type: 'info',
+    buttons: [translations.updateNotAvailableDialogButtonOk],
+    title: translations.updateNotAvailableDialogTitle,
+    message: translations.updateNotAvailableDialogMessage
+  })
 });
 
 ipcMain.handle('close-settings', (_event) => {

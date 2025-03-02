@@ -597,6 +597,9 @@ export class MainComponent {
       updateAvailableDialogButtonNo: $localize`No`,
       updateAvailableDialogMessage: $localize`An update is available. Do you want to download it now?`,
       updateAvailableDialogTitle: $localize`Update available`,
+      updateNotAvailableDialogButtonOk: $localize`Ok`,
+      updateNotAvailableDialogTitle: $localize`No update available`,
+      updateNotAvailableDialogMessage: $localize`You are already using the latest version.`,
     }
   }
 }
