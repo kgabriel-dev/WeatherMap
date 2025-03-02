@@ -1,3 +1,21 @@
 :host ::ng-deep .p-progressbar-value {
     transition-duration: 0.25s !important;
 }
+
+:host ::ng-deep p-inputNumber.rounded-left > input,
+p-dropdown.rounded-left
+{
+    border-radius: var(--inputtext-border-radius) 0 0 var(--inputtext-border-radius) !important;
+}
+
+:host ::ng-deep p-inputNumber.rounded-right > input,
+p-dropdown.rounded-right
+{
+    border-radius: 0 var(--inputtext-border-radius) var(--inputtext-border-radius) 0 !important;
+}
+
+:host ::ng-deep p-inputNumber.no-border-right > input,
+p-dropdown.no-border-right
+{
+    border-right: none;
+}

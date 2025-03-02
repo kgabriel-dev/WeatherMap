@@ -54,7 +54,7 @@
           />
         </div>
 
-      <div class="flex flex-col text-center">
+      <div class="flex flex-row text-center"> 
         <div>
           <label for="latitude" i18n>Latitude:</label>
           <p-inputNumber
@@ -64,8 +64,8 @@
             mode="decimal"
             [minFractionDigits]="0"
             [maxFractionDigits]="6"
-            [inputStyle]="{'width': '100%', 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)'}"
-            styleClass="w-full"
+            [inputStyle]="{'width': '100%'}"
+            class="rounded-left no-border-right"
           />
         </div>
         <div>
@@ -77,8 +77,8 @@
             mode="decimal"
             [minFractionDigits]="0"
             [maxFractionDigits]="6"
-            [inputStyle]="{'width': '100%', 'border-radius': '0 var(--border-radius) var(--border-radius) 0'}"
-            styleClass="w-full border-left-none"
+            [inputStyle]="{'width': '100%'}"
+            class="rounded-right"
           />
         </div>
       </div>
@@ -89,8 +89,8 @@
           [(ngModel)]="mainSessionDataForUpdate.regionSize.length"
           (onInput)="debouncedUpdateSessionData()"
           inputId="size"
-          [inputStyle]="{'text-align': 'right' , 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'width': '100%'}"
-          styleClass="w-full" class="w-full"
+          [inputStyle]="{'text-align': 'right' , 'width': '100%'}"
+          class="rounded-left no-border-right"
         />
         <p-dropdown
           [(ngModel)]="mainSessionDataForUpdate.regionSize.unitId"
@@ -98,7 +98,8 @@
           [options]="regionSizeOptions"
           optionLabel="display"
           optionValue="id"
-          [style]="{'width': '7rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0'}"
+          [style]="{'width': '7rem'}"
+          class="rounded-right"
         />
       </div>
 
@@ -106,6 +107,7 @@
       <p-inputNumber
         inputId="resolution"
         [(ngModel)]="mainSessionDataForUpdate.regionResolution"
+        [showButtons]="true"
         (onInput)="debouncedUpdateSessionData()"
         mode="decimal"
         [inputStyle]="{'width': '100%'}"
@@ -116,9 +118,8 @@
       <div class="flex flex-row">
         <p-inputNumber
           inputId="forecast"
-          [inputStyle]="{'text-align': 'right' , 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'width': '100%'}"
-          styleClass="w-full"
-          class="w-full"
+          [inputStyle]="{'text-align': 'right', 'width': '100%' }"
+          class="rounded-left no-border-right"
           [(ngModel)]="mainSessionDataForUpdate.forecastLength.value"
           (onInput)="debouncedUpdateSessionData()"
         />
@@ -128,7 +129,8 @@
           optionValue="id"
           (onChange)="debouncedUpdateSessionData()"
           [options]="forecastLengthOptions"
-          [style]="{'width': '9rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0'}" />
+          [style]="{'width': '9rem'}"
+          class="rounded-right" />
       </div>
 
       <div class="flex items-center gap-2">
