@@ -31,7 +31,7 @@ export class MainComponent {
     buttonCancelImgGeneration: $localize`Cancel`,
     buttonGenerationProgressInfo: $localize`Info`,
     locationDropdownPlaceholder: $localize`Select a location`,
-    customLocationName: $localize`Custom Location`,
+    customLocationName: $localize`Custom Location`
   };
 
   forecastLengthOptions = TimeUnitStrings;
@@ -556,6 +556,17 @@ export class MainComponent {
       value: group.label,
       items: group.timezones
     }));
+  }
+
+  getStepsString(): String {
+    let textSingleStep = $localize`(makes 1 step)`;
+    let textMoreSteps = $localize`(makes $number$ steps)`;
+    
+    if(this.mainSessionDataForUpdate.regionResolution == 1) {
+      return textSingleStep;
+    }
+
+    return textMoreSteps.replaceAll("$number$", Math.pow(this.mainSessionDataForUpdate.regionResolution, 2).toString());
   }
 
   // translate the texts from the electron main process here so the translation is done in the Angular locale files

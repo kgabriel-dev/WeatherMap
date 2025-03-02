@@ -104,16 +104,19 @@
       </div>
 
       <label for="resolution" i18n>Resolution (n &#x2715; n steps):</label>
-      <p-inputNumber
-        inputId="resolution"
-        [(ngModel)]="mainSessionDataForUpdate.regionResolution"
-        [showButtons]="true"
-        (onInput)="debouncedUpdateSessionData()"
-        mode="decimal"
-        [inputStyle]="{'width': '100%'}"
-        styleClass="w-full"
-      />
-
+      <div>
+        <p-inputNumber
+          inputId="resolution"
+          [(ngModel)]="mainSessionDataForUpdate.regionResolution"
+          [showButtons]="true"
+          (onInput)="debouncedUpdateSessionData()"
+          mode="decimal"
+          [inputStyle]="{'width': '100%'}"
+          styleClass="w-full"
+        />
+        <p [style]="{'font-size': 'small'}">{{getStepsString()}}</p>
+      </div>
+      
       <label for="forecast" i18n>Forecast length:</label>
       <div class="flex flex-row">
         <p-inputNumber
