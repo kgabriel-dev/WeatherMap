@@ -89,6 +89,7 @@
           [(ngModel)]="mainSessionDataForUpdate.regionSize.length"
           (onInput)="debouncedUpdateSessionData()"
           inputId="size"
+          [min]="1"
           [inputStyle]="{'text-align': 'right' , 'width': '100%'}"
           class="rounded-left no-border-right"
         />
@@ -111,6 +112,7 @@
           [showButtons]="true"
           (onInput)="debouncedUpdateSessionData()"
           mode="decimal"
+          [min]="1"
           [inputStyle]="{'width': '100%'}"
           styleClass="w-full"
         />
@@ -125,6 +127,7 @@
           class="rounded-left no-border-right"
           [(ngModel)]="mainSessionDataForUpdate.forecastLength.value"
           (onInput)="debouncedUpdateSessionData()"
+          [min]="1"
         />
         <p-dropdown
           [(ngModel)]="mainSessionDataForUpdate.forecastLength.unitId"
