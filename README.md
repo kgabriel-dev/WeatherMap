@@ -28,7 +28,6 @@ Install it using the installer <br />
 or <br />
 Build it yourself from the code in this repository <br />
 
-> [!TIP]
 > If you want to run the program under Linux and it doesn't start, try running it with the `no-sandbox` parameter. The full command would then `./path/to/WeatherMap.AppImage --no-sandbox` if you use the AppImage, or `weather-map --no-sandbox` if you installed the `.deb` file.
 
 <br>
