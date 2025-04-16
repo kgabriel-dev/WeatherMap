@@ -21,6 +21,7 @@ let translations = {};
 
 ipcMain.on('translations-changed', (_event, newTranslations) => {
   translations = newTranslations;
+  initialUpdateCheck = true;
   createAndSetMenu();
 });
 
