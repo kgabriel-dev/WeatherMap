@@ -405,13 +405,11 @@ function createAndSetMenu() {
     },
     {
       role: 'help',
-      label: translations.menuHelpTitle,
+      label: translations.menuAppTitle,
       submenu: [
         {
           label: translations.menuLearnMore,
-          click: async () => {
-            await shell.openExternal('https://github.com/kgabriel-dev/WeatherMap')
-          }
+          click: async () => await shell.openExternal('https://github.com/kgabriel-dev/WeatherMap')
         },
         {
           role: 'about',
@@ -423,6 +421,10 @@ function createAndSetMenu() {
           'click': async () => {
             mainWindow.webContents.toggleDevTools();
           }
+        },
+        {
+          label: translations.menuReportBug,
+          click: async () => await shell.openExternal('https://github.com/kgabriel-dev/WeatherMap/issues/new')
         }
       ]
     }];
