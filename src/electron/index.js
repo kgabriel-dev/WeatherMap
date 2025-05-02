@@ -151,7 +151,7 @@ ipcMain.handle('write-app-file', (_event, filePath, data, encoding) => {
   }
 });
 
-ipcMain.handle('generate-weather-images-for-region', (_event, region, dataGatherer, weatherCondition, forecastLength, valueLabels) => {
+ipcMain.handle('generate-weather-images-for-region', (_event, region, dataGatherer, weatherCondition, forecastLength, valueLabels, temperatureUnit) => {
   // check if the WeatherMap dir in the temp dir exists, if not create it
   // and if it exists, delete all files in it
   ipcMain.emit('weather-generation-progress', undefined, true, 0, translations.imgGenerationDelOldImages);
@@ -176,7 +176,8 @@ ipcMain.handle('generate-weather-images-for-region', (_event, region, dataGather
       forecastLength,
       valueLabels,
       translations,
-      filePath: `${app.getPath('temp')}/WeatherMap`
+      filePath: `${app.getPath('temp')}/WeatherMap`,
+      temperatureUnit
     }
   }
   );

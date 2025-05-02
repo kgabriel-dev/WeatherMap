@@ -29,7 +29,7 @@ interface Window {
     toggleDarkMode: (value: boolean) => void,
   },
   weather: {
-    generateWeatherImagesForRegion: (region: Region, dataGatherer: DataGathererName, weatherConditionId: string, forecast_length: number, valueLabels: boolean) => Promise<{ date: Date, filename: string }[]>,
+    generateWeatherImagesForRegion: (region: Region, dataGatherer: DataGathererName, weatherConditionId: string, forecast_length: number, valueLabels: boolean, temperatureUnit: TemperatureUnits) => Promise<{ date: Date, filename: string }[]>,
     onWeatherGenerationProgress: (callback: CallableFunction) => void,
     sendWeatherGenerationProgress: (inProgress: boolean, progressValue: number, progressMessage: string) => void,
     getLatestProgressMessages: () => Promise<WeatherDataResponse[]>,

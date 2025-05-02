@@ -3,6 +3,13 @@ enum SizeUnits {
   MILES
 }
 
+enum TemperatureUnits {
+  CELSIUS,
+  FAHRENHEIT,
+  KELVIN
+}
+
 module.exports = {
-  SizeUnits
+  SizeUnits,
+  TemperatureUnits
 };

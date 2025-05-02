@@ -19,7 +19,7 @@ contextBridge.exposeInMainWorld('app', {
 });
 
 contextBridge.exposeInMainWorld('weather', {
-  generateWeatherImagesForRegion: (region, dataGatherer, weatherCondition, forecastLength, valueLabels) => ipcRenderer.invoke('generate-weather-images-for-region', region, dataGatherer, weatherCondition, forecastLength, valueLabels),
+  generateWeatherImagesForRegion: (region, dataGatherer, weatherCondition, forecastLength, valueLabels, temperatureUnit) => ipcRenderer.invoke('generate-weather-images-for-region', region, dataGatherer, weatherCondition, forecastLength, valueLabels, temperatureUnit),
   onWeatherGenerationProgress: (callback) => ipcRenderer.on('weather-generation-progress-update', (_event, inProgress, progressValue, progressMessage) => callback(inProgress, progressValue, progressMessage)),
   sendWeatherGenerationProgress: (inProgress, progressValue, progressMessage) => ipcRenderer.send('weather-generation-progress', inProgress, progressValue, progressMessage),
   getLatestProgressMessages: () => ipcRenderer.invoke('get-latest-progress-messages'),

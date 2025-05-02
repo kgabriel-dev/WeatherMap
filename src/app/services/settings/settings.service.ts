@@ -16,7 +16,8 @@ export class SettingsService {
     updateCheck: true,
     defaultLocationIndex: 0,
     labeledImages: true,
-    darkMode: false
+    darkMode: false,
+    temperatureUnit: TemperatureUnits.CELSIUS
   }
   private settings: Settings = this.defaultSettings;
 
@@ -136,7 +137,8 @@ export type Settings = {
   updateCheck: boolean,
   defaultLocationIndex: number,
   labeledImages: boolean,
-  darkMode: boolean
+  darkMode: boolean,
+  temperatureUnit: TemperatureUnits
 }
 
 export enum TimeUnits {
@@ -149,7 +151,7 @@ export const TimeUnitStrings: {id: TimeUnits, display: string}[] = [
   {id: TimeUnits.DAYS, display: $localize`:@@days:days`}
 ];
 
-// TODO: Needs to be the same as in src/types/location.d.ts
+// TODO: Needs to be the same as in src/electron/utils.ts
 // fix this to be a shared type
 export enum SizeUnits {
   KILOMETERS,
@@ -159,4 +161,19 @@ export enum SizeUnits {
 export const SizeUnitStrings: {id: SizeUnits, display: string}[] = [
   {id: SizeUnits.KILOMETERS, display: $localize`:@@kilometers:km`},
   {id: SizeUnits.MILES, display: $localize`:@@miles:mi`}
+];
+
+
+// TODO: Needs to be the same as in src/electron/utils.ts
+// fix this to be a shared type
+export enum TemperatureUnits {
+  CELSIUS,
+  FAHRENHEIT,
+  KELVIN
+}
+
+export const TemperatureUnitStrings: {id: TemperatureUnits, display: string}[] = [
+  {id: TemperatureUnits.CELSIUS, display: $localize`:@@celsius:°C (Celsius)`},
+  {id: TemperatureUnits.FAHRENHEIT, display: $localize`:@@fahrenheit:°F (Fahrenheit)`},
+  {id: TemperatureUnits.KELVIN, display: $localize`:@@kelvin:K (Kelvin)`}
 ];

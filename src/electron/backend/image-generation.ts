@@ -3,10 +3,12 @@ const { OpenMeteoDataGatherer, BrightSkyDataGatherer } = require("./data-gatheri
 const { parentPort, workerData } = require("worker_threads");
 const fs = require("fs");
 const path = require("path");
+const { TemperatureUnits } = require("../utils")
+
 
 const imagePixelSize = 512;
 
-function generateWeatherImageForLocation(region: Region, dataGathererName: DataGathererName, weatherConditionId: string, forecast_length: number, valueLabels: boolean, translations: {[key: string]: string}, filePath: string): Promise<{ date: string, filename: string }[]> {
+function generateWeatherImageForLocation(region: Region, dataGathererName: DataGathererName, weatherConditionId: string, forecast_length: number, valueLabels: boolean, translations: {[key: string]: string}, filePath: string, temperatureUnit: TemperatureUnits): Promise<{ date: string, filename: string }[]> {
   const dataGatherer: DataGatherer = getDataGatherer(dataGathererName, translations);
   
   return new Promise((resolve, reject) => {
@@ -39,15 +41,41 @@ function generateWeatherImageForLocation(region: Region, dataGathererName: DataG
             timeList.push(data.date);
         });
 
-        // const imageBuffers: { date: string, buffer: any }[] = [];
         const filesToReturn: { date: string, filename: string }[] = [];
 
+        // check if the weather data needs to be converted (e.g. °C -> °F)
+        // --> check for source values in °C and if the target value is a different unit
+        if(['temperature_c', 'dew_point_c'].includes(weatherConditionId) && temperatureUnit != TemperatureUnits.CELSIUS) {
+          switch(temperatureUnit) {
+            // convert from Celsius to Fahrenheit
+            case TemperatureUnits.FAHRENHEIT:
+              weatherData = weatherData.map(data => ({
+                  ...data,
+                  weatherValue: Math.round((data.weatherValue * 1.8 + 32) * 10) / 10  // convert to Fahrenheit with 1 decimal number
+                })
+              );
+              break;
+            
+            // convert from Celsius to Kelvin
+            case TemperatureUnits.KELVIN:
+              weatherData = weatherData.map(data => ({
+                  ...data,
+                  weatherValue: Math.round((data.weatherValue + 273.15) * 10) / 10  // convert to Kelvin with 1 decimal number
+                })
+              );
+              break;
+          }
+        }
+
         weatherData.forEach((data) => {
+          // get the current time
           const timeIndex = timeList.indexOf(data.date);
 
+          // create an array to store the data for this time
           if(!weatherDataOverTime[timeIndex])
             weatherDataOverTime[timeIndex] = [];
 
+          // put all weather data in its time slot
           weatherDataOverTime[timeIndex].push({
             weatherCondition: data.weatherCondition,
             weatherValue: data.weatherValue,
@@ -172,7 +200,7 @@ function getDataGatherer(dataGathererName: DataGathererName, translations: {[key
 }
 
 if(parentPort) {
-  generateWeatherImageForLocation(workerData.region, workerData.dataGatherer, workerData.weatherCondition, workerData.forecastLength, workerData.valueLabels, workerData.translations, workerData.filePath)
+  generateWeatherImageForLocation(workerData.region, workerData.dataGatherer, workerData.weatherCondition, workerData.forecastLength, workerData.valueLabels, workerData.translations, workerData.filePath, workerData.temperatureUnit)
     .then((images) => {
       parentPort!.postMessage({ images: images });
     })

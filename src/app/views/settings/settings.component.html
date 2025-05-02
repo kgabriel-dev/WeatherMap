@@ -42,7 +42,7 @@
       optionValue="value"
       [group]="true"
       styleClass="w-full"
-      [style]="{'z-index': '1'}"
+      [style]="{'z-index': '2'}"
       [(ngModel)]="selectedDataSource" >
 
       <ng-template let-group pTemplate="group">
@@ -53,6 +53,18 @@
       </ng-template>
 
     </p-dropdown>
+
+    <p-divider />
+
+    <p i18n>Temperature Unit</p>
+    <div class="flex flex-row">
+      <p-dropdown
+        [(ngModel)]="temperatureUnit"
+        [options]="temperatureUnitOptions"
+        optionLabel="display"
+        optionValue="id"
+        [style]="{'z-index': '1'}" />
+    </div>
 
     <p-divider />
 

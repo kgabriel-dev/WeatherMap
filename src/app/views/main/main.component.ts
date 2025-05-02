@@ -369,6 +369,7 @@ export class MainComponent {
   startWeatherImageGeneration(): void {
     window.weather.sendWeatherGenerationProgress(true, 0, 'Starting weather image generation');
 
+    const settings = this.settingsService.getSettings();
     const sessionData = this.sessionService.getLatestSessionData();
 
     const region: Region = {
@@ -394,7 +395,7 @@ export class MainComponent {
 
     const forecast_length = this.convertTimelengthToHours(sessionData.mainData.forecastLength.value, sessionData.mainData.forecastLength.unitId);
 
-    window.weather.generateWeatherImagesForRegion(region, dataGathererName, weatherConditionId, forecast_length, this.settingsService.getSettings().labeledImages)
+    window.weather.generateWeatherImagesForRegion(region, dataGathererName, weatherConditionId, forecast_length, this.settingsService.getSettings().labeledImages, settings.temperatureUnit)
       .then((images) => {
         const sessionData = this.sessionService.getLatestSessionData();
 

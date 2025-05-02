@@ -7,7 +7,7 @@ import { DividerModule } from 'primeng/divider';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { TabViewModule } from 'primeng/tabview';
-import { Settings, SettingsService, SizeUnits, SizeUnitStrings, TimeUnits, TimeUnitStrings } from '../../services/settings/settings.service';
+import { Settings, SettingsService, SizeUnits, SizeUnitStrings, TemperatureUnits, TemperatureUnitStrings, TimeUnits, TimeUnitStrings } from '../../services/settings/settings.service';
 import { LocationService } from '../../services/location/location.service';
 import { ListboxModule } from 'primeng/listbox';
 import { InputTextModule } from 'primeng/inputtext';
@@ -51,6 +51,7 @@ export class SettingsComponent {
 
   forecastLengthOptions = TimeUnitStrings;
   regionSizeOptions = SizeUnitStrings;
+  temperatureUnitOptions = TemperatureUnitStrings;
 
   // variables for the selected timezone
   readonly timezoneList = this.buildTimezoneList();
@@ -89,6 +90,7 @@ export class SettingsComponent {
   locationsAlreadyLoaded: boolean = false;
   locationsList: Region[] = [];
   darkMode: boolean = false;
+  temperatureUnit: Settings['temperatureUnit']  = TemperatureUnits.CELSIUS;
 
   constructor(
     public settingsService: SettingsService,
@@ -105,6 +107,7 @@ export class SettingsComponent {
       this.updateCheck = settings.updateCheck;
       this.labeledImages = settings.labeledImages;
       this.darkMode = settings.darkMode;
+      this.temperatureUnit = settings.temperatureUnit
     });
 
     // display a message while loading the locations file
@@ -144,7 +147,8 @@ export class SettingsComponent {
       forecastLength: this.forecastLength,
       updateCheck: this.updateCheck,
       labeledImages: this.labeledImages,
-      darkMode: this.darkMode
+      darkMode: this.darkMode,
+      temperatureUnit: this.temperatureUnit
     });
 
     this.settingsService.saveSettings();
