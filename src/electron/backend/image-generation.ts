@@ -1,3 +1,5 @@
+import { TemperatureUnitStrings } from "../../app/services/settings/settings.service";
+
 const { createCanvas } = require("@napi-rs/canvas");
 const { OpenMeteoDataGatherer, BrightSkyDataGatherer } = require("./data-gathering.js");
 const { parentPort, workerData } = require("worker_threads");
@@ -148,7 +150,15 @@ function generateWeatherImageForLocation(region: Region, dataGathererName: DataG
                   if(!weatherData || weatherData.error) {
                     value = 'N/A'; // no data or error -> no visible square
                   } else {
-                    value = weatherData.weatherValue.toString() + (weatherCondition.unit == '%' ? '' : ' ') + weatherCondition.unit;
+                    let unit = weatherCondition.unit;
+
+                    if(['temperature_c', 'dew_point_c'].includes(weatherConditionId)) {
+                      if(temperatureUnit == TemperatureUnits.CELSIUS) unit = translations['temperatureUnitCelsiusShort'];
+                      else if(temperatureUnit == TemperatureUnits.FAHRENHEIT) unit = translations['temperatureUnitFahrenheitShort']
+                      else if(temperatureUnit == TemperatureUnits.KELVIN) unit = translations['temperatureUnitKelvinShort']
+                    }
+
+                    value = weatherData.weatherValue.toString() + (weatherCondition.unit == '%' ? '' : ' ') + unit;
                   }
 
                   context.fillStyle = 'rgba(0, 0, 0, 255)';

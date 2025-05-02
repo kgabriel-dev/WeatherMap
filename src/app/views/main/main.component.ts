@@ -593,13 +593,13 @@ export class MainComponent {
       imgGenerationUnknownDataGatherer: $localize`Unknown data gatherer: $dataGathererName$`,
       dataGatheringIndexSuccess: $localize`Request for location #$index$ succeeded.`,
       dataGatheringIndexFailed: $localize`Request for location #$index$ failed.`,
-      dataGathererCategoryTempC: $localize`Temperature (°C)`,
+      dataGathererCategoryTempC: $localize`Temperature`,
       dataGathererCategoryCloudCover: $localize`Cloud Coverage (%)`,
       dataGathererCategoryRelHumidity: $localize`Relative Humidity (%)`,
       dataGathererCategoryCloudsLow: $localize`Cloud Coverage Low (%)`,
       dataGathererCategoryCloudsMid: $localize`Cloud Coverage Mid (%)`,
       dataGathererCategoryCloudsHigh: $localize`Cloud Coverage High (%)`,
-      dataGathererCategoryDewPointC: $localize`Dew Point (°C)`,
+      dataGathererCategoryDewPointC: $localize`Dew Point`,
       dataGathererCategoryAirPressure: $localize`Air Pressure (hPa)`,
       dataGathererCategoryPrecipitation: $localize`Precipitation (mm)`,
       dataGathererCategoryPrecipitationProbability: $localize`Precipitation Probability (%)`,
@@ -613,6 +613,9 @@ export class MainComponent {
       updateNotAvailableDialogButtonOk: $localize`Ok`,
       updateNotAvailableDialogTitle: $localize`No update available`,
       updateNotAvailableDialogMessage: $localize`You are already using the latest version.`,
+      temperatureUnitCelsiusShort: $localize`°C`,
+      temperatureUnitFahrenheitShort: $localize`°F`,
+      temperatureUnitKelvinShort: $localize`K`
     }
   }
 }
