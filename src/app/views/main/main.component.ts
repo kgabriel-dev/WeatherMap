@@ -109,6 +109,25 @@ export class MainComponent {
       if(settings.updateCheck) {
         window.app.triggerUpdateCheck();
       }
+
+      const sessionData = sessionService.getLatestSessionData();
+
+      // get the weather condition
+      const weatherConditionSplit = settings.weatherCondition.split('.');
+      const weatherConditionSource = weatherConditionSplit[0] == 'openmeteo' ? 'OpenMeteo' : 'BrightSky';
+      const weatherConditionId = weatherConditionSplit[1];
+      const weatherCondition = this.allWeatherConditions[weatherConditionSource].find((condition) => condition.id == weatherConditionId);
+      
+      this.sessionService.updateSessionData({
+        ...sessionData,
+        mainData: {
+          ...sessionData.mainData,
+          forecastLength: settings.forecastLength,
+          selectedRegionIndex: settings.defaultLocationIndex,
+          weatherCondition: weatherCondition ? weatherCondition : sessionData.mainData.weatherCondition,
+          weatherDataSource: weatherConditionSource
+        }
+      })
     });
 
     const listWeatherConditions$ = from(window.weather.listWeatherConditions()
