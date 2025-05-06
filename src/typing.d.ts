@@ -27,6 +27,7 @@ interface Window {
     triggerUpdateCheck: () => void,
     closeSettings: () => void,
     toggleDarkMode: (value: boolean) => void,
+    openLocationsSettings: () => void,
   },
   weather: {
     generateWeatherImagesForRegion: (region: Region, dataGatherer: DataGathererName, weatherConditionId: string, forecast_length: number, valueLabels: boolean, temperatureUnit: TemperatureUnits) => Promise<{ date: Date, filename: string }[]>,

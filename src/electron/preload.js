@@ -16,6 +16,7 @@ contextBridge.exposeInMainWorld('app', {
   triggerUpdateCheck: () => ipcRenderer.invoke('trigger-update-check'),
   closeSettings: () => ipcRenderer.invoke('close-settings'),
   toggleDarkMode: (value) => ipcRenderer.invoke('toggle-dark-mode', value),
+  openLocationsSettings: () => ipcRenderer.invoke('open-locations-settings'),
 });
 
 contextBridge.exposeInMainWorld('weather', {

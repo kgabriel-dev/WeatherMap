@@ -35,13 +35,13 @@
           <div class="flex-grow-1">
             <p-dropdown
               #locationDropdown
-              [options]="locationsService.getLocations()"
+              [options]="getLocationDropdownOptions()"
               [(ngModel)]="regionInDropdown"
-              (onChange)="applyLocation(regionInDropdown)"
               optionLabel="name"
               [placeholder]="localizedTexts.locationDropdownPlaceholder"
               styleClass="w-full"
               [disabled]="disableLocationDropdown"
+              (onChange)="onLocationChange()"
             />
           </div>
 

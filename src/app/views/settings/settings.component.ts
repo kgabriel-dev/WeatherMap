@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MessageService, SelectItemGroup } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -6,7 +6,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { DividerModule } from 'primeng/divider';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { TabViewModule } from 'primeng/tabview';
+import { TabView, TabViewModule } from 'primeng/tabview';
 import { Settings, SettingsService, SizeUnits, SizeUnitStrings, TemperatureUnits, TemperatureUnitStrings, TimeUnits, TimeUnitStrings } from '../../services/settings/settings.service';
 import { LocationService } from '../../services/location/location.service';
 import { ListboxModule } from 'primeng/listbox';
@@ -15,6 +15,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessagesModule } from 'primeng/messages';
 import { getTimeZones, TimeZone } from '@vvo/tzdb';
 import { Toast } from 'primeng/toast';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-settings',
@@ -37,7 +38,7 @@ import { Toast } from 'primeng/toast';
   styleUrl: './settings.component.scss',
   providers: [MessageService]
 })
-export class SettingsComponent {
+export class SettingsComponent implements AfterViewInit {
   readonly localizedTexts = {
     titleGeneralSettings: $localize`General`,
     titleLocationSettings: $localize`Locations`,
@@ -48,6 +49,11 @@ export class SettingsComponent {
     buttonDiscardLocation: $localize`Discard`,
     buttonCheckForUpdates: $localize`Check for Updates`,
   }
+
+  @ViewChild('tabView') tabView?: TabView;
+
+  enforcedSection: string | undefined = undefined;
+  selectedTabIndex: number = 0;
 
   forecastLengthOptions = TimeUnitStrings;
   regionSizeOptions = SizeUnitStrings;
@@ -95,7 +101,8 @@ export class SettingsComponent {
   constructor(
     public settingsService: SettingsService,
     public locationsService: LocationService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private route: ActivatedRoute
   ) {
     this.getWeatherDataSources();
 
@@ -138,6 +145,43 @@ export class SettingsComponent {
         detail: $localize`This is taking longer than expected. Please wait a moment.`
       });
     }, 3000);
+
+    this.route.queryParams.subscribe((params) => {
+      if(params['section'])
+        this.enforcedSection = params['section'];
+    })
+  }
+
+  ngAfterViewInit(): void {
+    if(this.tabView) {
+      // check periodically if the enforced section is set
+      // if so, set the active tab to the corresponding index
+      window.setInterval(() => {
+        let index = 0;
+
+        switch(this.enforcedSection) {
+          case 'general':
+            index = 0;
+            break;
+          case 'locations':
+            index = 1;
+            break;
+          case 'update':
+            index = 2;
+            break;
+          default:
+            index = -1;
+        }
+
+  
+        if(this.tabView && index !== -1) {
+          this.tabView.activeIndex = index;
+          this.enforcedSection = undefined;
+
+          this.tabView.refreshButtonState();
+        }
+      }, 200);
+    }
   }
 
   saveSettings() {

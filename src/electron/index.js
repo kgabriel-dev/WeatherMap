@@ -88,12 +88,12 @@ app.whenReady().then(() => {
 })
 
 // function to open the settings modal; called from the menu bar
-function openSettingsModal() {
+function openSettingsModal(section = "") {
   settingsWindow = new BrowserWindow({
     parent: mainWindow,
     modal: true,
     width: 800,
-    height: 600,
+    height: 700,
     show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
@@ -104,7 +104,7 @@ function openSettingsModal() {
     pathname: path.join(__dirname, 'weather-map', 'browser', locale, 'index.html'),
     protocol: 'file:',
     slashes: true,
-    hash: '#/settings'
+    hash: '#/settings' + (section.length > 0 ? "?section=" + section : "")
   }))
 
   let menuTemplate = [];
@@ -345,6 +345,13 @@ ipcMain.handle('close-settings', (_event) => {
 
 ipcMain.handle('toggle-dark-mode', (_event, value) => {
   nativeTheme.themeSource = value ? 'dark' : 'light';
+});
+
+ipcMain.handle('open-locations-settings', (_event) => {
+  if(settingsWindow && !settingsWindow.isDestroyed())
+    return;
+
+  openSettingsModal("locations");
 });
 
 // Helper functions

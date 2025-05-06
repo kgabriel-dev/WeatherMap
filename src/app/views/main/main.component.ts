@@ -570,6 +570,31 @@ export class MainComponent {
     return textMoreSteps.replaceAll("$number$", Math.pow(this.mainSessionDataForUpdate.regionResolution, 2).toString());
   }
 
+  getLocationDropdownOptions(): Region[] {
+    return [
+      ...this.locationsService.getLocations(),
+      {
+        ...this.customLocation,
+        id: -2,
+        name: $localize`- New location -`
+      }
+    ]
+  }
+
+  onLocationChange(): void {
+    if(this.regionInDropdown.id !== -2)
+      this.applyLocation(this.regionInDropdown);
+
+    // selected location matches the entry "new location" --> user wants to add a new location
+    else {
+      // open the settings window for the locations
+      window.app.openLocationsSettings();
+
+      // new location will be set as the last added location automatically by the settings window
+      // so nothing to do here
+    }
+  }
+
   // translate the texts from the electron main process here so the translation is done in the Angular locale files
   // this is necessary because the translation files are not available in the main process
   getTranslations(): { [key: string]: string } {
