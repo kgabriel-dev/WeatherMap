@@ -176,6 +176,7 @@
 
             <div class="flex flex-row gap-2 w-full justify-content-center">
               <p-button [label]="localizedTexts.buttonDeleteLocation" icon="pi pi-trash" (onClick)="deleteWorkingLocation()" />
+              <p-button [label]="localizedTexts.buttonSetDefaultLocation" [icon]="'pi ' + (isWorkingLocationDefault ? 'pi-star-fill' : 'pi-star')" [disabled]="isWorkingLocationDefault" (onClick)="setDefaultLocation()" />
             </div>
           </div>
         </div>

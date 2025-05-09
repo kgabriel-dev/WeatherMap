@@ -198,9 +198,30 @@ export class MainComponent {
     window.app.onSettingsModalClosed(() => {
       this.disableLocationDropdown = true;
 
-      this.locationsService.rereadLocationsFile()
+      // combine the promises of rereading the locations file and the settings file
+      const locationsFileRead$ = this.locationsService.rereadLocationsFile();
+      const settingsFileRead$ = this.settingsService.rereadSettingsFile();
+
+      // wait for both promises to finish
+      Promise.all([locationsFileRead$, settingsFileRead$])
         .then(() => {
           const settings = this.settingsService.getSettings();
+
+          // update the locale if it has changed
+          window.app.getLocale()
+          .then((currentLocale) => {
+            const newLocale = this.settingsService.getSettings().languageCode;
+
+            if(currentLocale !== newLocale) {
+              window.app.setLocale(newLocale);
+            }
+          })
+          .catch((error) => {
+            console.error('Error getting locale:', error);
+          });
+
+          this.selectedRegionIndex = settings.defaultLocationIndex;
+
           let selectedLocation = this.locationsService.getLocations()[settings.defaultLocationIndex];
 
           if(!selectedLocation)
@@ -239,30 +260,6 @@ export class MainComponent {
             }
           });
         })
-        .catch((error) => {
-          throw Error('Error rereading locations file: ' + error);
-        });
-
-
-        // re-read the settings
-        this.settingsService.rereadSettingsFile()
-          .then(() => {
-            // update the locale if it has changed
-            window.app.getLocale()
-            .then((currentLocale) => {
-              const newLocale = this.settingsService.getSettings().languageCode;
-
-              if(currentLocale !== newLocale) {
-                window.app.setLocale(newLocale);
-              }
-            })
-            .catch((error) => {
-              console.error('Error getting locale:', error);
-            });
-          })
-          .catch((error) => {
-            console.error('Error re-reading settings file:', error);
-          });
     });
 
     window.weather.onWeatherGenerationProgress((inProgress: boolean, progressValue: number, progressMessage: string) => {

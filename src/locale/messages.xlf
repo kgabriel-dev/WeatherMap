@@ -221,315 +221,315 @@
         <source>(makes 1 step)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">563</context>
+          <context context-type="linenumber">653</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2406321093744000442" datatype="html">
         <source>(makes $number$ steps)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">564</context>
+          <context context-type="linenumber">654</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2878377754709408949" datatype="html">
         <source>- New location -</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">579</context>
+          <context context-type="linenumber">669</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5310131164547818745" datatype="html">
         <source>Image generation canceled by user</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">602</context>
+          <context context-type="linenumber">692</context>
         </context-group>
       </trans-unit>
       <trans-unit id="819996403327805209" datatype="html">
         <source>Learn more</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">603</context>
+          <context context-type="linenumber">693</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1726363342938046830" datatype="html">
         <source>About</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">604</context>
+          <context context-type="linenumber">694</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4320444664592658938" datatype="html">
         <source>Developer Tools</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">605</context>
+          <context context-type="linenumber">695</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1762579199463627317" datatype="html">
         <source>Open Settings</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">606</context>
+          <context context-type="linenumber">696</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4930506384627295710" datatype="html">
         <source>Settings</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">607</context>
+          <context context-type="linenumber">697</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6718069813936046169" datatype="html">
         <source>Window</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">608</context>
+          <context context-type="linenumber">698</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8739965563912784562" datatype="html">
         <source>Program</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">609</context>
+          <context context-type="linenumber">699</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9050763865008211915" datatype="html">
         <source>Minimize</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">610</context>
+          <context context-type="linenumber">700</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7819314041543176992" datatype="html">
         <source>Close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">611</context>
+          <context context-type="linenumber">701</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9110363267178274426" datatype="html">
         <source>Report a bug</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">612</context>
+          <context context-type="linenumber">702</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8043717025994295310" datatype="html">
         <source>Deleting the old weather images</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">613</context>
+          <context context-type="linenumber">703</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8477056474175343" datatype="html">
         <source>Canceled by the user</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">614</context>
+          <context context-type="linenumber">704</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7652993961962601314" datatype="html">
         <source>Data gathering finished. Converting the data now.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">615</context>
+          <context context-type="linenumber">705</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8037768404051225651" datatype="html">
         <source>Starting creation of image $index$.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">616</context>
+          <context context-type="linenumber">706</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2657148871386452832" datatype="html">
         <source>Finished creating the weather images.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">617</context>
+          <context context-type="linenumber">707</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9080614536932235873" datatype="html">
         <source>Unknown data gatherer: $dataGathererName$</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">618</context>
+          <context context-type="linenumber">708</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3791002472107815494" datatype="html">
         <source>Request for location #$index$ succeeded.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">619</context>
+          <context context-type="linenumber">709</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4038999339776479110" datatype="html">
         <source>Request for location #$index$ failed.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">620</context>
+          <context context-type="linenumber">710</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2592368582911584624" datatype="html">
         <source>Temperature</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">621</context>
+          <context context-type="linenumber">711</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2287124292755201210" datatype="html">
         <source>Cloud Coverage (%)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">622</context>
+          <context context-type="linenumber">712</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7302549771398919820" datatype="html">
         <source>Relative Humidity (%)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">623</context>
+          <context context-type="linenumber">713</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7070263524029596319" datatype="html">
         <source>Cloud Coverage Low (%)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">624</context>
+          <context context-type="linenumber">714</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6023819613234932797" datatype="html">
         <source>Cloud Coverage Mid (%)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">625</context>
+          <context context-type="linenumber">715</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2372908011403431975" datatype="html">
         <source>Cloud Coverage High (%)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">626</context>
+          <context context-type="linenumber">716</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6916463299626142414" datatype="html">
         <source>Dew Point</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">627</context>
+          <context context-type="linenumber">717</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7912701845646690019" datatype="html">
         <source>Air Pressure (hPa)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">628</context>
+          <context context-type="linenumber">718</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8006928638903346004" datatype="html">
         <source>Precipitation (mm)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">629</context>
+          <context context-type="linenumber">719</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7603377279515443315" datatype="html">
         <source>Precipitation Probability (%)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">630</context>
+          <context context-type="linenumber">720</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3374429388643143323" datatype="html">
         <source>Visibility (m)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">631</context>
+          <context context-type="linenumber">721</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1254434809546707710" datatype="html">
         <source>UV Index</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">632</context>
+          <context context-type="linenumber">722</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2644893580865797737" datatype="html">
         <source>Wind Speed (km/h)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">633</context>
+          <context context-type="linenumber">723</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2807800733729323332" datatype="html">
         <source>Yes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">634</context>
+          <context context-type="linenumber">724</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3542042671420335679" datatype="html">
         <source>No</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">635</context>
+          <context context-type="linenumber">725</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8505784703243293328" datatype="html">
         <source>An update is available. Do you want to download it now?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">636</context>
+          <context context-type="linenumber">726</context>
         </context-group>
       </trans-unit>
       <trans-unit id="509090351011426949" datatype="html">
         <source>Update available</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">637</context>
+          <context context-type="linenumber">727</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8720977247725652816" datatype="html">
         <source>Ok</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">638</context>
+          <context context-type="linenumber">728</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3777732842184182749" datatype="html">
         <source>No update available</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">639</context>
+          <context context-type="linenumber">729</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1000594442308732041" datatype="html">
         <source>You are already using the latest version.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">640</context>
+          <context context-type="linenumber">730</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2936057948596507296" datatype="html">
         <source>°C</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">641</context>
+          <context context-type="linenumber">731</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2474331731830341287" datatype="html">
         <source>°F</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">642</context>
+          <context context-type="linenumber">732</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2735420972741760581" datatype="html">
         <source>K</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/main/main.component.ts</context>
-          <context context-type="linenumber">643</context>
+          <context context-type="linenumber">733</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3419681791450150574" datatype="html">
@@ -627,35 +627,35 @@
         <source>No locations found. Add a location to get started.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">185,186</context>
+          <context context-type="linenumber">186,187</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4962621902898875665" datatype="html">
         <source>Update check &amp; notification</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">198,199</context>
+          <context context-type="linenumber">199,200</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6044862297969542880" datatype="html">
         <source>Check for updates at startup and notify me when an update is available.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">201,202</context>
+          <context context-type="linenumber">202,203</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2448998566468414760" datatype="html">
         <source>Save &amp; Close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">212</context>
+          <context context-type="linenumber">213</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6665722712497831206" datatype="html">
         <source>Discard &amp; Close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
-          <context context-type="linenumber">213</context>
+          <context context-type="linenumber">214</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6439365426343089851" datatype="html">
@@ -714,29 +714,36 @@
           <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="7024821440110652619" datatype="html">
+        <source>Set as default Location</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="719553356650717763" datatype="html">
         <source>Loading locations...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">122</context>
+          <context context-type="linenumber">128</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">143</context>
+          <context context-type="linenumber">149</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8312841402649007072" datatype="html">
         <source>Please wait a moment.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">123</context>
+          <context context-type="linenumber">129</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6078879738091446056" datatype="html">
         <source>This is taking longer than expected. Please wait a moment.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
-          <context context-type="linenumber">144</context>
+          <context context-type="linenumber">150</context>
         </context-group>
       </trans-unit>
     </body>

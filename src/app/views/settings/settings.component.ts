@@ -48,12 +48,16 @@ export class SettingsComponent implements AfterViewInit {
     buttonDeleteLocation: $localize`Delete`,
     buttonDiscardLocation: $localize`Discard`,
     buttonCheckForUpdates: $localize`Check for Updates`,
+    buttonSetDefaultLocation: $localize`Set as default Location`
   }
 
   @ViewChild('tabView') tabView?: TabView;
 
   enforcedSection: string | undefined = undefined;
   selectedTabIndex: number = 0;
+
+  isWorkingLocationDefault: boolean = false; // this is set to true if the working location is set as the default location
+  defaultLocationIndex: number = -1;
 
   forecastLengthOptions = TimeUnitStrings;
   regionSizeOptions = SizeUnitStrings;
@@ -115,6 +119,7 @@ export class SettingsComponent implements AfterViewInit {
       this.labeledImages = settings.labeledImages;
       this.darkMode = settings.darkMode;
       this.temperatureUnit = settings.temperatureUnit
+      this.defaultLocationIndex = settings.defaultLocationIndex;
     });
 
     // display a message while loading the locations file
@@ -185,6 +190,11 @@ export class SettingsComponent implements AfterViewInit {
   }
 
   saveSettings() {
+    const settings = this.settingsService.getSettings();
+    const locations = this.locationsService.getLocations();
+
+    const locationIndex = locations.findIndex(location => location.id === this.workingLocation?.id);
+
     this.settingsService.setSettings({
       weatherCondition: this.selectedDataSource,
       languageCode: this.selectedLanguageKey,
@@ -192,7 +202,8 @@ export class SettingsComponent implements AfterViewInit {
       updateCheck: this.updateCheck,
       labeledImages: this.labeledImages,
       darkMode: this.darkMode,
-      temperatureUnit: this.temperatureUnit
+      temperatureUnit: this.temperatureUnit,
+      defaultLocationIndex: this.defaultLocationIndex
     });
 
     this.settingsService.saveSettings();
@@ -263,6 +274,12 @@ export class SettingsComponent implements AfterViewInit {
         this.locationsList.find(location => location.id === locationId) || this.locationsList[0]
       )
     );
+
+    // flag if the working location is the primary location
+    if(this.workingLocation)
+      this.isWorkingLocationDefault = this.defaultLocationIndex === this.locationsList.findIndex((location) => location.id === locationId);
+    else
+      this.isWorkingLocationDefault = false;
   }
 
   saveWorkingLocation() {
@@ -343,6 +360,13 @@ export class SettingsComponent implements AfterViewInit {
 
   toggleDarkMode(value: boolean): void {
     window.app.toggleDarkMode(value);
+  }
+
+  setDefaultLocation(): void {
+    if (!this.workingLocation) return;
+
+    this.isWorkingLocationDefault = true;
+    this.defaultLocationIndex = this.locationsList.findIndex(location => location.id === this.workingLocation?.id);
   }
 }
 
