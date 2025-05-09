@@ -1,6 +1,6 @@
 <p-toast />
 
-<p-tabView [scrollable]="true" #tabView>
+<p-tabView [scrollable]="false" #tabView>
   <p-tabPanel [header]="localizedTexts.titleGeneralSettings">
     <p class="mt-0" i18n>Language:</p>
     <p-dropdown
@@ -70,13 +70,13 @@
 
     <p i18n>Default length of forecast:</p>
     <div class="flex flex-row">
-      <p-inputNumber [(ngModel)]="forecastLength.value" styleClass="w-full" [inputStyle]="{'width': '100%', 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'text-align': 'right'}" />
+      <p-inputNumber [(ngModel)]="forecastLength.value" styleClass="w-full" [inputStyle]="{'width': '100%', 'border-radius': 'var(--inputtext-border-radius) 0 0 var(--inputtext-border-radius)', 'text-align': 'right'}" />
       <p-dropdown
         [(ngModel)]="forecastLength.unitId"
         [options]="forecastLengthOptions"
         optionLabel="display"
         optionValue="id"
-        [style]="{'border-radius': '0 var(--border-radius) var(--border-radius) 0', 'width': '7rem'}" />
+        [style]="{'border-radius': '0 var(--select-border-radius) var(--select-border-radius) 0', 'width': '7rem'}" />
     </div>
 
     <p-divider />
@@ -136,11 +136,11 @@
             <div class="flex flex-row w-full gap-2">
               <div class="flex flex-column w-full">
                 <p i18n>Latitude:</p>
-                <p-inputNumber [(ngModel)]="workingLocation.coordinates.latitude" maxFractionDigits="5" styleClass="w-full" [inputStyle]="{'width': '100%', 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'text-align': 'right'}" />
+                <p-inputNumber [(ngModel)]="workingLocation.coordinates.latitude" maxFractionDigits="5" styleClass="w-full" [inputStyle]="{'width': '100%', 'text-align': 'right'}" />
               </div>
               <div class="flex flex-column w-full">
                 <p i18n>Longitude:</p>
-                <p-inputNumber [(ngModel)]="workingLocation.coordinates.longitude" maxFractionDigits="5" styleClass="w-full" [inputStyle]="{'width': '100%', 'border-radius': '0 var(--border-radius) var(--border-radius) 0', 'text-align': 'right'}" />
+                <p-inputNumber [(ngModel)]="workingLocation.coordinates.longitude" maxFractionDigits="5" styleClass="w-full" [inputStyle]="{'width': '100%', 'text-align': 'right'}" />
               </div>
             </div>
 
@@ -151,7 +151,7 @@
                   <p-inputNumber
                     [(ngModel)]="workingLocation.region.size.length"
                     inputId="size"
-                    [inputStyle]="{'text-align': 'right' , 'border-radius': 'var(--border-radius) 0 0 var(--border-radius)', 'width': '100%'}"
+                    [inputStyle]="{'text-align': 'right' , 'border-radius': 'var(--inputtext-border-radius) 0 0 var(--inputtext-border-radius)', 'width': '100%'}"
                     styleClass="w-full"
                     class="w-full" />
                   <p-dropdown
@@ -159,7 +159,7 @@
                     [options]="regionSizeOptions"
                     optionLabel="display"
                     optionValue="id"
-                    [style]="{'width': '7rem', 'border-radius': '0 var(--border-radius) var(--border-radius) 0', 'z-index': 2}" />
+                    [style]="{'width': '7rem', 'border-radius': '0 var(--select-border-radius) var(--select-border-radius) 0', 'z-index': 2}" />
                 </div>
               </div>
               <div class="flex flex-column w-full">

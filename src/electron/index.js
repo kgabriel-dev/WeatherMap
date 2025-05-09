@@ -61,6 +61,10 @@ const createWindow = () => {
     // get the translations from the renderer process
     mainWindow.webContents.send('request-translations');
   });
+
+  mainWindow.once('show', () => {
+    mainWindow.maximize();
+  })
 }
 
 app.whenReady().then(() => {
@@ -184,8 +188,6 @@ ipcMain.handle('generate-weather-images-for-region', (_event, region, dataGather
 
   return new Promise((resolve, reject) => {
     imageGenerationWorker.on('message', (message) => {
-      console.log('Message from worker:', message);
-
       if (message.type == 'progressUpdate')
         ipcMain.emit('weather-generation-progress', undefined, message.inProgress ?? true, message.progress ?? 0, message.message);
       else if (message.images) {
