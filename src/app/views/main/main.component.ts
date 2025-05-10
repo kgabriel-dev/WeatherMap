@@ -45,6 +45,9 @@ export class MainComponent {
     latitude: 0,
     longitude: 0
   }
+  useShorterUnits: boolean = false;
+
+  selectedForecastLengthOption: typeof TimeUnitStrings[number] = this.forecastLengthOptions[0];
 
   latestProgressValue = 0;
 
@@ -127,7 +130,9 @@ export class MainComponent {
           weatherCondition: weatherCondition ? weatherCondition : sessionData.mainData.weatherCondition,
           weatherDataSource: weatherConditionSource
         }
-      })
+      });
+
+      this.useShorterUnits = settings.shorterUnits;
     });
 
     const listWeatherConditions$ = from(window.weather.listWeatherConditions()
@@ -144,6 +149,8 @@ export class MainComponent {
       this.mainSessionDataForUpdate = JSON.parse(JSON.stringify(sessionData.mainData));
       this.selectedRegionIndex = this.mainSessionDataForUpdate.selectedRegionIndex;
       this.usedCoordinates = this.mainSessionDataForUpdate.usedLocation;
+
+      this.selectedForecastLengthOption = this.forecastLengthOptions.find((option) => option.id == this.mainSessionDataForUpdate.forecastLength.unitId) || this.forecastLengthOptions[0];
 
       if(this.selectedRegionIndex > -1) {
         const selectedRegion = this.locationsService.getLocations()[this.selectedRegionIndex];
@@ -259,6 +266,8 @@ export class MainComponent {
               forecastLength: settings.forecastLength
             }
           });
+
+          this.useShorterUnits = settings.shorterUnits;
         })
     });
 

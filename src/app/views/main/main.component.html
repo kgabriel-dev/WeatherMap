@@ -131,12 +131,22 @@
         />
         <p-dropdown
           [(ngModel)]="mainSessionDataForUpdate.forecastLength.unitId"
-          optionLabel="display"
+          [optionLabel]="useShorterUnits ? 'display_short' : 'display_long'"
           optionValue="id"
           (onChange)="debouncedUpdateSessionData()"
           [options]="forecastLengthOptions"
           [style]="{'width': '9rem'}"
-          class="rounded-right" />
+          class="rounded-right">
+          
+          <ng-template pTemplate="selectedItem">
+            @if (useShorterUnits) {
+              <span>{{ selectedForecastLengthOption.display_short }}</span>
+            }
+            @else {
+              <span>{{ selectedForecastLengthOption.display_long }}</span>
+            }
+          </ng-template>
+        </p-dropdown>
       </div>
 
       <div class="flex items-center gap-2">

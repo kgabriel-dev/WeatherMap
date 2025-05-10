@@ -89,7 +89,7 @@ export class SettingsComponent implements AfterViewInit {
   ]
   selectedLanguageKey: string = this.languages[0].key;
 
-  // other variables
+  // working copy of the settings entry
   forecastLength: Settings['forecastLength'] = {
     value: 12,
     unitId: TimeUnits.HOURS
@@ -101,6 +101,11 @@ export class SettingsComponent implements AfterViewInit {
   locationsList: Region[] = [];
   darkMode: boolean = false;
   temperatureUnit: Settings['temperatureUnit']  = TemperatureUnits.CELSIUS;
+  shorterUnits: boolean = false;
+
+  useShorterUnits: boolean = false; // this is based on the stored settings --> it can be different from the current selection in the settings window
+
+  selectedForecastLengthOption: typeof TimeUnitStrings[number] = this.forecastLengthOptions[0];
 
   constructor(
     public settingsService: SettingsService,
@@ -120,6 +125,10 @@ export class SettingsComponent implements AfterViewInit {
       this.darkMode = settings.darkMode;
       this.temperatureUnit = settings.temperatureUnit
       this.defaultLocationIndex = settings.defaultLocationIndex;
+      this.shorterUnits = settings.shorterUnits;
+
+      this.useShorterUnits = settings.shorterUnits;
+      this.selectedForecastLengthOption = this.forecastLengthOptions.find((unit) => unit.id === settings.forecastLength.unitId) || this.forecastLengthOptions[0];
     });
 
     // display a message while loading the locations file
@@ -203,7 +212,8 @@ export class SettingsComponent implements AfterViewInit {
       labeledImages: this.labeledImages,
       darkMode: this.darkMode,
       temperatureUnit: this.temperatureUnit,
-      defaultLocationIndex: this.defaultLocationIndex
+      defaultLocationIndex: this.defaultLocationIndex,
+      shorterUnits: this.shorterUnits
     });
 
     this.settingsService.saveSettings();
@@ -367,6 +377,10 @@ export class SettingsComponent implements AfterViewInit {
 
     this.isWorkingLocationDefault = true;
     this.defaultLocationIndex = this.locationsList.findIndex(location => location.id === this.workingLocation?.id);
+  }
+
+  updateForecastLengthOption(): void {
+    this.selectedForecastLengthOption = this.forecastLengthOptions.find((unit) => unit.id === this.forecastLength.unitId) || this.forecastLengthOptions[0];
   }
 }
 

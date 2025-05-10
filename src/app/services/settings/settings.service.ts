@@ -17,7 +17,8 @@ export class SettingsService {
     defaultLocationIndex: 0,
     labeledImages: true,
     darkMode: false,
-    temperatureUnit: TemperatureUnits.CELSIUS
+    temperatureUnit: TemperatureUnits.CELSIUS,
+    shorterUnits: false
   }
   private settings: Settings = this.defaultSettings;
 
@@ -138,7 +139,8 @@ export type Settings = {
   defaultLocationIndex: number,
   labeledImages: boolean,
   darkMode: boolean,
-  temperatureUnit: TemperatureUnits
+  temperatureUnit: TemperatureUnits,
+  shorterUnits: boolean
 }
 
 export enum TimeUnits {
@@ -146,9 +148,9 @@ export enum TimeUnits {
   DAYS
 }
 
-export const TimeUnitStrings: {id: TimeUnits, display: string}[] = [
-  {id: TimeUnits.HOURS, display: $localize`:@@hours:hours`},
-  {id: TimeUnits.DAYS, display: $localize`:@@days:days`}
+export const TimeUnitStrings: {id: TimeUnits, display_short: string, display_long: string}[] = [
+  {id: TimeUnits.HOURS, display_short: $localize`:@@hours_short:h`, display_long: $localize`:@@hours:hours`}, // TODO: überall display zu display_short/_long ändern
+  {id: TimeUnits.DAYS, display_short: $localize`:@@days_short:d`, display_long: $localize`:@@days:days`}
 ];
 
 // TODO: Needs to be the same as in src/electron/utils.ts

@@ -74,9 +74,20 @@
       <p-dropdown
         [(ngModel)]="forecastLength.unitId"
         [options]="forecastLengthOptions"
-        optionLabel="display"
+        [optionLabel]="useShorterUnits ? 'display_short' : 'display_long'"
         optionValue="id"
-        [style]="{'border-radius': '0 var(--select-border-radius) var(--select-border-radius) 0', 'width': '7rem'}" />
+        (onChange)="updateForecastLengthOption()"
+        [style]="{'border-radius': '0 var(--select-border-radius) var(--select-border-radius) 0', 'width': '7rem'}">
+
+        <ng-template pTemplate="selectedItem">
+          @if (useShorterUnits) {
+            <span>{{ selectedForecastLengthOption.display_short }}</span>
+          }
+          @else {
+            <span>{{ selectedForecastLengthOption.display_long }}</span>
+          }
+        </ng-template>
+      </p-dropdown>
     </div>
 
     <p-divider />
@@ -85,6 +96,15 @@
     <div class="flex flex-row gap-1">
       <p-checkbox [(ngModel)]="labeledImages" [binary]="true" inputId="labeled_images"></p-checkbox>
       <label for="labeled_images" i18n>Show labels on the weather images.</label>
+    </div>
+
+    <p-divider />
+
+    
+    <p i18n>Use shorter unit names (e.g. 'h' instead of 'hours'). Usefull on devices with a small display.</p>
+    <div class="flex items-center gap-2">
+      <p-checkbox [binary]="true" [(ngModel)]="shorterUnits" inputId="shorterUnitsToggle" />
+      <label for="shorterUnitsToggle" i18n>Use shorter units</label>
     </div>
   </p-tabPanel>
 
