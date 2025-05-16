@@ -121,9 +121,6 @@ function openSettingsModal(section = "") {
 
   settingsWindow.on('closed', () => {
     settingsWindow = null;
-
-    // send a message to the main window to update the settings
-    mainWindow.webContents.send('settings-modal-closed');
   });
 }
 
@@ -146,13 +143,16 @@ ipcMain.handle('check-app-file-exists', (_event, filePath) => {
 });
 
 ipcMain.handle('write-app-file', (_event, filePath, data, encoding) => {
-  try {
-    fs.writeFileSync(path.join(app.getPath("userData"), filePath), data, { encoding, flag: 'w' });
-    return true;
-  } catch (err) {
-    console.error('Error writing file:', err);
-    return false;
-  }
+  return new Promise((resolve, reject) => {
+    fs.writeFile(path.join(app.getPath("userData"), filePath), data, { encoding, flag: 'w' }, (err) => {
+      if (err) {
+        console.error('Error writing file:', err);
+        reject(err);
+      }
+      
+      resolve(true);
+    });
+  });
 });
 
 ipcMain.handle('generate-weather-images-for-region', (_event, region, dataGatherer, weatherCondition, forecastLength, valueLabels, temperatureUnit) => {
@@ -354,6 +354,15 @@ ipcMain.handle('open-locations-settings', (_event) => {
     return;
 
   openSettingsModal("locations");
+});
+
+ipcMain.handle('notify-settings-file-saved', (_event) => {
+  // send a notification to the main window that the settings file has been saved
+  if (mainWindow && !mainWindow.isDestroyed())
+    mainWindow.webContents.send('settings-file-saved');
+  // send a notification to the settings window that the settings file has been saved
+  if (settingsWindow && !settingsWindow.isDestroyed())
+    settingsWindow.webContents.send('settings-file-saved');
 });
 
 // Helper functions

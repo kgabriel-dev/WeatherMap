@@ -202,7 +202,7 @@ export class MainComponent {
 
     this.updateWeatherConditionsList();
 
-    window.app.onSettingsModalClosed(() => {
+    window.app.onSettingsFileSaved(() => {
       this.disableLocationDropdown = true;
 
       // combine the promises of rereading the locations file and the settings file
@@ -253,6 +253,9 @@ export class MainComponent {
             default:
               weatherDataSource = 'OpenMeteo';
           }
+          let weatherCondition = this.allWeatherConditions[weatherDataSource].find((condition) => condition.id == settings.weatherCondition.split('.')[1]);
+          if(!weatherCondition)
+            weatherCondition = this.allWeatherConditions[weatherDataSource][0];
 
           const sessionData = this.sessionService.getLatestSessionData();
           this.sessionService.updateSessionData({
@@ -262,7 +265,7 @@ export class MainComponent {
               regionResolution: selectedLocation.region.resolution,
               regionSize: selectedLocation.region.size,
               weatherDataSource,
-              weatherCondition: this.allWeatherConditions[weatherDataSource].find((condition) => condition.id == settings.weatherCondition.split('.')[1]),
+              weatherCondition,
               forecastLength: settings.forecastLength
             }
           });

@@ -164,6 +164,10 @@ export class SettingsComponent implements AfterViewInit {
       if(params['section'])
         this.enforcedSection = params['section'];
     })
+
+    window.app.onSettingsFileSaved(() => {
+      this.closeWindow();
+    });
   }
 
   ngAfterViewInit(): void {
@@ -199,11 +203,6 @@ export class SettingsComponent implements AfterViewInit {
   }
 
   saveSettings() {
-    const settings = this.settingsService.getSettings();
-    const locations = this.locationsService.getLocations();
-
-    const locationIndex = locations.findIndex(location => location.id === this.workingLocation?.id);
-
     this.settingsService.setSettings({
       weatherCondition: this.selectedDataSource,
       languageCode: this.selectedLanguageKey,
@@ -216,15 +215,16 @@ export class SettingsComponent implements AfterViewInit {
       shorterUnits: this.shorterUnits
     });
 
-    this.settingsService.saveSettings();
-
     if(this.workingLocation)
       this.locationsService.updateLocation(this.workingLocation);
+
+    this.settingsService.saveSettings();
   }
 
   saveAndClose(): void {
     this.saveSettings();
-    this.closeWindow();
+
+    // settings window will be closed once the file is saved; there is a subscription for that in the constructor
   }
 
   discardAndClose(): void {

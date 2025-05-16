@@ -87,8 +87,12 @@ export class SettingsService {
 
   public saveSettings(): void {
     window.files.writeAppFile('settings.json', JSON.stringify(this.settings, undefined, 2), 'utf8')
-      .then(() => console.info('settings.json saved!'))
-      .catch((error) => console.error('Error saving settings.json!', error));
+      .then(() => {
+        window.app.notifySettingsFileSaved();
+      })
+      .catch((error) => {
+        console.error('Error saving settings.json!', error)
+      });
   }
 
   public getSettingsChangedObservable() {

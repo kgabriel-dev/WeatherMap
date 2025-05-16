@@ -18,8 +18,8 @@ interface Window {
     writeAppFile: (filePath: string, data: string, encoding: string) => Promise<boolean>
   },
   app: {
-    onSettingsModalClosed: (callback) => void,
-    onSettingsModalClosing: (callback) => void,
+    notifySettingsFileSaved: () => void,
+    onSettingsFileSaved: (callback: CallableFunction) => void,
     openProgressInfoWindow: () => void,
     setLocale: (locale: string) => void,
     getLocale: () => Promise<string>,
