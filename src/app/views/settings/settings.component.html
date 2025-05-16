@@ -70,14 +70,14 @@
 
     <p i18n>Default length of forecast:</p>
     <div class="flex flex-row">
-      <p-inputNumber [(ngModel)]="forecastLength.value" styleClass="w-full" [inputStyle]="{'width': '100%', 'border-radius': 'var(--inputtext-border-radius) 0 0 var(--inputtext-border-radius)', 'text-align': 'right'}" />
+      <p-inputNumber [(ngModel)]="forecastLength.value" styleClass="w-full" [inputStyle]="{'width': '5rem', 'border-radius': 'var(--inputtext-border-radius) 0 0 var(--inputtext-border-radius)', 'text-align': 'right'}" />
       <p-dropdown
         [(ngModel)]="forecastLength.unitId"
         [options]="forecastLengthOptions"
         [optionLabel]="useShorterUnits ? 'display_short' : 'display_long'"
         optionValue="id"
         (onChange)="updateForecastLengthOption()"
-        [style]="{'border-radius': '0 var(--select-border-radius) var(--select-border-radius) 0', 'width': '7rem'}">
+        [style]="{'border-radius': '0 var(--select-border-radius) var(--select-border-radius) 0', 'width': '100%'}">
 
         <ng-template pTemplate="selectedItem">
           @if (useShorterUnits) {

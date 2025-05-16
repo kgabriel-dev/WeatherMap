@@ -123,7 +123,7 @@
       <div class="flex flex-row">
         <p-inputNumber
           inputId="forecast"
-          [inputStyle]="{'text-align': 'right', 'width': '100%' }"
+          [inputStyle]="{'text-align': 'right', 'width': '5rem' }"
           class="rounded-left no-border-right"
           [(ngModel)]="mainSessionDataForUpdate.forecastLength.value"
           (onInput)="debouncedUpdateSessionData()"
@@ -135,7 +135,7 @@
           optionValue="id"
           (onChange)="debouncedUpdateSessionData()"
           [options]="forecastLengthOptions"
-          [style]="{'width': '9rem'}"
+          [style]="{'width': '100%'}"
           class="rounded-right">
           
           <ng-template pTemplate="selectedItem">
