@@ -39,6 +39,16 @@ const createWindow = () => {
   // Create the application menu
   createAndSetMenu();
 
+  // for requests to OSM's tile server, set a custom user agent to avoid getting blocked
+  mainWindow.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
+    if (details.url.includes('tile.openstreetmap.org')) {
+      details.requestHeaders['User-Agent'] = 'WeatherMap';
+      details.requestHeaders['Referer'] = 'https://github.com/kgabriel-dev/WeatherMap';
+    }
+
+    callback({ requestHeaders: details.requestHeaders });
+  });
+
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, 'weather-map', 'browser', locale, 'index.html'),
@@ -81,7 +91,6 @@ app.whenReady().then(() => {
 
   // register the fonts
   GlobalFonts.registerFromPath(app.getPath("userData") + '/Poppins-Regular.ttf', 'Poppins');
-
 
   // create the main window
   createWindow()
