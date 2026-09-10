@@ -163,6 +163,7 @@ export class MainComponent {
       // also only do this if this was not the initial setup
       if(this.initialDataReceived && this.selectedRegionIndex === -1 && !this.mainSessionDataForUpdate.useOverriddenTimezone) {
         this.mainSessionDataForUpdate.useOverriddenTimezone = true;
+        this.mainSessionDataForUpdate.overriddenTimezoneCode = getTimeZones().find((tz) => tz.name.includes('Berlin'))?.name || getTimeZones()[0].name;
         this.updateSessionData();
       }
 
