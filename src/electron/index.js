@@ -72,6 +72,14 @@ const createWindow = () => {
     mainWindow.webContents.send('request-translations');
   });
 
+  // Open external links in the default browser instead of the app
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('http:') || url.startsWith('https:')) {
+      shell.openExternal(url);
+      return { action: 'deny' };   
+    } 
+  });
+
   mainWindow.once('show', () => {
     mainWindow.maximize();
   })

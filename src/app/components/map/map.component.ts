@@ -127,14 +127,19 @@ export class MapComponent implements AfterViewInit {
     // create the map
     this.map = L.map('map', {
       center: [ 54.10352, 12.1048 ],
-      zoom: 10
+      zoom: 10,
+      attributionControl: false
     });
+
+    L.control.attribution({
+      prefix: '<a href="https://leafletjs.com" target="_blank"">Leaflet</a>'
+    }).addTo(this.map);
 
     // add tiles to the map
     const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 18,
       minZoom: 3,
-      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>',
     });
 
     tiles.addTo(this.map);
