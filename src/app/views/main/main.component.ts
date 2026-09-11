@@ -352,13 +352,15 @@ export class MainComponent {
   }
 
   toggleWeatherImageAnimation(): void {
-    if(this.imageAnimationInterval) {
+    if(this.imageAnimationInterval) { // animation is running, stop it
       clearInterval(this.imageAnimationInterval);
       this.imageAnimationInterval = undefined;
-    } else {
+    } else { // animation is not running, start it
+      let animationSpeed = this.settingsService.getSettings().imageAnimationSpeed;
+
       this.imageAnimationInterval = window.setInterval(() => {
         this.changeWeatherImageIndex(1);
-      }, 2000);
+      }, animationSpeed * 1000);
       this.changeWeatherImageIndex(1);
     }
 

@@ -18,7 +18,8 @@ export class SettingsService {
     labeledImages: true,
     darkMode: false,
     temperatureUnit: TemperatureUnits.CELSIUS,
-    shorterUnits: false
+    shorterUnits: false,
+    imageAnimationSpeed: 1
   }
   private settings: Settings = this.defaultSettings;
 
@@ -144,7 +145,8 @@ export type Settings = {
   labeledImages: boolean,
   darkMode: boolean,
   temperatureUnit: TemperatureUnits,
-  shorterUnits: boolean
+  shorterUnits: boolean,
+  imageAnimationSpeed: number
 }
 
 export enum TimeUnits {

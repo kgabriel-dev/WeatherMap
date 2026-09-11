@@ -48,7 +48,8 @@ export class SettingsComponent implements AfterViewInit {
     buttonDeleteLocation: $localize`Delete`,
     buttonDiscardLocation: $localize`Discard`,
     buttonCheckForUpdates: $localize`Check for Updates`,
-    buttonSetDefaultLocation: $localize`Set as default Location`
+    buttonSetDefaultLocation: $localize`Set as default Location`,
+    timeUnitSeconds: $localize`Seconds`
   }
 
   @ViewChild('tabView') tabView?: TabView;
@@ -107,6 +108,9 @@ export class SettingsComponent implements AfterViewInit {
 
   selectedForecastLengthOption: typeof TimeUnitStrings[number] = this.forecastLengthOptions[0];
 
+  readonly stdImageAnimationSpeed: number = 2; // this is the default value for the image animation speed in seconds
+  imageAnimationSpeed: number = this.stdImageAnimationSpeed; // this is the current value for the image animation speed in seconds
+
   constructor(
     public settingsService: SettingsService,
     public locationsService: LocationService,
@@ -126,9 +130,9 @@ export class SettingsComponent implements AfterViewInit {
       this.temperatureUnit = settings.temperatureUnit
       this.defaultLocationIndex = settings.defaultLocationIndex;
       this.shorterUnits = settings.shorterUnits;
-
       this.useShorterUnits = settings.shorterUnits;
       this.selectedForecastLengthOption = this.forecastLengthOptions.find((unit) => unit.id === settings.forecastLength.unitId) || this.forecastLengthOptions[0];
+      this.imageAnimationSpeed = settings.imageAnimationSpeed;
     });
 
     // display a message while loading the locations file
@@ -212,7 +216,8 @@ export class SettingsComponent implements AfterViewInit {
       darkMode: this.darkMode,
       temperatureUnit: this.temperatureUnit,
       defaultLocationIndex: this.defaultLocationIndex,
-      shorterUnits: this.shorterUnits
+      shorterUnits: this.shorterUnits,
+      imageAnimationSpeed: this.imageAnimationSpeed
     });
 
     if(this.workingLocation)
@@ -381,6 +386,10 @@ export class SettingsComponent implements AfterViewInit {
 
   updateForecastLengthOption(): void {
     this.selectedForecastLengthOption = this.forecastLengthOptions.find((unit) => unit.id === this.forecastLength.unitId) || this.forecastLengthOptions[0];
+  }
+
+  resetImageAnimationSpeed(): void {
+    this.imageAnimationSpeed = this.stdImageAnimationSpeed;
   }
 }
 

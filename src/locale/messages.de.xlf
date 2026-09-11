@@ -882,6 +882,22 @@
           <context context-type="linenumber">152</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="8874012390997067175" datatype="html">
+        <source>Seconds</source>
+        <target>Sekunden</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.ts</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6261175445000215219" datatype="html">
+        <source>Time a weather image is displayed in the animation (in seconds):</source>
+        <target>Zeit, wie lange ein Wetterbild in der Animation angezeigt wird (in Sekunden):</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/views/settings/settings.component.html</context>
+          <context context-type="linenumber">112,113</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>

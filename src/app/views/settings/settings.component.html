@@ -106,6 +106,21 @@
       <p-checkbox [binary]="true" [(ngModel)]="shorterUnits" inputId="shorterUnitsToggle" />
       <label for="shorterUnitsToggle" i18n>Use shorter units</label>
     </div>
+
+    <p-divider />
+
+    <p i18n>Time a weather image is displayed in the animation (in seconds):</p>
+    <div class="flex flex-row gap-2 justify-content-between w-full">
+      <div class="flex-grow-1">
+        <p-inputNumber [(ngModel)]="imageAnimationSpeed" styleClass="w-full" [inputStyle]="{'width': '5rem', 'border-radius': 'var(--inputtext-border-radius) 0 0 var(--inputtext-border-radius)', 'text-align': 'right'}" />
+        <p-dropdown
+          [options]="[{display: localizedTexts.timeUnitSeconds, id: 'seconds'}]"
+          [optionLabel]="'display'"
+          optionValue="id"
+          [style]="{'border-radius': '0 var(--select-border-radius) var(--select-border-radius) 0', 'width': '50%'}" />
+      </div>
+      <p-button icon="pi pi-replay" (onClick)="resetImageAnimationSpeed()" />
+    </div>
   </p-tabPanel>
 
   <p-tabPanel [header]="localizedTexts.titleLocationSettings">
